@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react"
+import React, { useCallback, useEffect, useState, useContext } from "react"
 import styled from "styled-components"
 import { Input } from "@/styles/templates/input"
 import { Button } from "@/styles/templates/button"
@@ -9,124 +9,171 @@ import MapContext from "../map/mapContext"
 import {fromLonLat} from 'ol/proj';
 import { transform } from "ol/proj"
 import { Point } from "ol/geom"
+import debounce from 'lodash/debounce'
+import { filter } from "lodash"
+import {transformExtent} from 'ol/proj';
 
 const AutoCompleteContainer = styled.div`
   width: 100%;
 `
 
+const AutoCompleteInput = styled.input`  
+  min-width: 250px;
+  border: 0 !important;  
+  outline: none !important;  
+  padding: 3px 5px;
+  font-size: 100%;
+`
+
+const SuggestionsContainer = styled.div`
+  position: absolute;  
+  min-width: 250px;
+`
+
+const ListContainer = styled.ol`
+  list-style: none;
+  padding-inline-start: 0;
+  background-color: var(--body-bg);
+`
+
+const ListItem = styled.li`
+  display: flex;
+  align-items: baseline;
+  border-bottom: 1px solid var(--border-color);
+  padding: 3px 5px;
+  cursor: pointer;
+  :hover {
+    background-color: var(--border-color);
+  }
+
+`
+
+const Place = styled.p`
+`
+
+const Country = styled.span`
+  font-size: .9rem;
+  margin-left: 4px;
+`
+
 function AutoComplete() {
-  const [isMenuOpened, setIsMenuOpened] = useState(false)
-  const [searchString, setSearchString] = useState("")
-  const [previewResults, setPreviewResults] = useState([])
-  const [searchResults, setSearchResults] = useState([])
+  const [suggestions, setSuggestions] = useState([])
+  const [result, setResult] = useState([]);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [input, setInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [osm_id, setOsm_id] = useState();
   const [userLang, setUserLang] = useState("en")
-  //const [userIp, setUserIp] = useState();http://www.geoplugin.net/json.gp?ip=93.227.112.181
-  //const [userLonLat, setserLonLat] = useState([0,0]);
-  const [searchTimer, setSearchTimer] = useState(0)
 
   const { map } = useContext(MapContext)
+    
+  /*let mapViewCenter
+  let lon
+  let lat
+  if (map) {
+    mapViewCenter = map ? map.getView().getCenter() : null
+    console.log(mapViewCenter[0])
+  }*/
 
-  const inputStyle = {
-    borderRadius: "3px",
-    boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",
-    background: "none",
-    padding: "2px 0",
-    fontSize: "90%",
-    position: "fixed",
-    overflow: "auto",
-    width: "100%",
-    maxHeight: "50%", // TODO: don't cheat, let it flow to the bottom
+
+  const handleChange = (e) => {
+    setInput(e.target.value);
+    getGeocodingResultsDelayed(input, 5)
+    setActiveSuggestionIndex(0);
+    setShowSuggestions(true);
+  };
+
+  const handleClick = (e) => {
+    setInput(searchTerm.toString());
+    setActiveSuggestionIndex(0);
+    setShowSuggestions(false);
+    //getGeocodingResultsDelayed(input, 1)
+    getNominatimInfo()
+    //map.getView().setCenter(transform(suggestions[0].geometry.coordinates, 'EPSG:4326', 'EPSG:3857'));
+    console.log(result)
+    if (result.bbox) {
+      //console.log(result.bbox)
+      const transformedBbox = transformExtent(result.bbox, 'EPSG:4326', 'EPSG:3857')
+      //console.log(transformedBbox)
+      map.getView().fit(transformedBbox)
+    }
+  };
+
+  const SuggestionsListComponent = () => {
+    if (!suggestions) {
+      return 
+    } else {
+      return suggestions.length ? (
+        <SuggestionsContainer>
+        <ListContainer class="suggestions">
+          {suggestions.map((suggestion, index, i) => {
+            setSearchTerm(`${suggestion.properties.name}, ${suggestion.properties.country}`)
+            let className;
+            // Flag the active suggestion with a class
+            if (index === activeSuggestionIndex) {
+              className = "suggestion-active";
+            }
+            return (
+              <ListItem key={i} className={className} onClick={handleClick}>
+                <Place>{suggestion.properties.name}</Place>
+                <Country>{suggestion.properties.country}</Country>
+              </ListItem>
+            );
+          })}
+        </ListContainer>
+        </SuggestionsContainer>
+      ) : null
+    };
   }
 
-  function handleClick() {
-    setIsMenuOpened({ isMenuOpened: !isMenuOpened });
-  }
 
-  function handleChange(event) {
-    setSearchString(event.target.value)
-    console.log("changed to:" + searchString)
-    getPreviewResults(searchString)
-  }
+  // Geocoding  &lat=${lat}&lon=${lon}
 
-  function handleSelect(value) {
-    setSearchString(value)
-    getFinalResults(searchString)
-    console.log(previewResults[0])
-    let point = new Point([previewResults[0].geometry.coordinates[1],previewResults[0].geometry.coordinates[0]]);
-    console.log(point)
-    map.getView().fit(point, { 
-      padding: [100, 100, 100, 100], 
-  });
-  }
-
-  const requestOptions = {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  }
-
-  async function getPreviewResults(searchString) {
-    const response = await fetch(`https://photon.komoot.io/api/?q=${searchString}&limit=5&lang=${userLang}`, requestOptions)
+  async function getGeocodingResults(searchString, limit) {
+    if (!searchString || searchString.length < 1) return
+    const response = await fetch(`https://photon.komoot.io/api/?q=${searchString}&limit=${limit}&lang=${userLang}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
     const data = await response.json();
-    setPreviewResults(data.features)
+    //console.log(data.features)
+    setSuggestions(data.features)
+    setOsm_id(data.features[0].properties.osm_id)
+  }
+  
+  const getGeocodingResultsDelayed = useCallback(
+    debounce((searchString, limit, callback) => {
+      getGeocodingResults(searchString, limit).then(callback);
+    }, 200),
+    []
+  );
+
+  async function getNominatimInfo() {
+   const encode = encodeURI(input)
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encode}&format=geojson&limit=1`,
+    {
+      method: "GET",
+    })
+    const data = await response.json();
+    //console.log(data)
+    setResult(data.features[0])
   }
 
-  async function getFinalResults(searchString) {
-    const response = await fetch(
-      `https://photon.komoot.io/api/?q=${searchString}&limit=1&lang=${userLang}`,
-      requestOptions
-    )
-    const data = await response.json()
-    await setSearchResults(data.features[0])
-    //[searchResults.geometry.coordinates[1],searchResults.geometry.coordinates[0]]
-    map.getView().setCenter([[47,17]])
-  }
-
-  /*useEffect(() => {
+  useEffect(() => {
     setUserLang(navigator.language || navigator.userLanguage)
-  }, [userLang])*/
+  }, [userLang])
 
-  /*useEffect(() => {
-    //console.log(previewResults.length)
-  }, [previewResults])*/
-
-  function renderItem(item, isHighlighted) {
-    return (
-      <li
-        key={item.properties.name}
-        style={{
-          background: isHighlighted ? "lightgray" : "white",
-          listStyle: "none",
-        }}
-      >
-        {item.properties.name}
-      </li>
-    )
-  }
-
-  function getItemValue(item) {
-    return `${item.properties.name}`
-  }
-
-  function renderInput(props) {
-    return <Input {...props} />
-  }
-
-  function renderMenu(items, value, style) {
-    return <div children={items} />
-  }
 
   return (
     <>
       <AutoCompleteContainer>
-        <Autocomplete
-          getItemValue={getItemValue}
-          items={previewResults}
-          renderItem={renderItem}
-          value={searchString}
+        <AutoCompleteInput
+          type="text"
           onChange={handleChange}
-          onSelect={handleSelect}
-          renderInput={renderInput}
-      />
+          value={input}
+        />
+        {showSuggestions && input && <SuggestionsListComponent />}
       </AutoCompleteContainer>
     </>
   )

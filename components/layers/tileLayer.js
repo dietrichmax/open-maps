@@ -3,7 +3,7 @@ import MapContext from "../map/mapContext"
 import OLTileLayer from "ol/layer/Tile"
 const TileLayer = ({ source, zIndex = 0 }) => {
   const { map } = useContext(MapContext)
-  console.log(map)
+
   useEffect(() => {
     if (!map) return
 

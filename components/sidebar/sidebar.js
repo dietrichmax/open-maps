@@ -13,7 +13,8 @@ const Container = styled.div`
   z-index: 1;
   margin: var(--space-sm);
   padding: var(--space-sm);
-  border-radius: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
   background-color: var(--body-bg);
   width: 400px;
   display: flex;
@@ -31,12 +32,12 @@ const SidebarContainer = styled.div`
 `
 
 const PageWrap = styled.div`
-position: absolute;
-z-index: 1;
-height: 100%;
-width: 100%;  
-opacity: .3;
-background: black;
+  position: absolute;
+  z-index: 1;
+  height: 100%;
+  width: 100%;  
+  opacity: .3;
+  background: black;
 `
 
 const CloseButton = styled.button`
@@ -138,7 +139,7 @@ function Sidebar() {
         <ButtonWrapper onClick={handleClick}>
           <BurgerIcon />
         </ButtonWrapper>
-      <Search />
+        <Search />
     </Container>
     </>
   )
