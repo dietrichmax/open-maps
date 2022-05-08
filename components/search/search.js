@@ -6,7 +6,7 @@ import { FaSearch } from "react-icons/fa"
 import { FiMenu } from "react-icons/fi"
 import MapContext from "../map/mapContext"
 import Sidebar from "@/components//sidebar"
-import {fromLonLat} from 'ol/proj';
+import { fromLonLat } from "ol/proj"
 import { transform } from "ol/proj"
 import AutoComplete from "@/components/search/autocomplete"
 
@@ -18,11 +18,10 @@ const SearchContainer = styled.div`
 function Search() {
   const [visible, setVisible] = useState(false)
 
-  const handleClose = () => setShow(false);
-  const handleClick = () => setShow(true);
+  const handleClose = () => setShow(false)
+  const handleClick = () => setShow(true)
 
   const { map } = useContext(MapContext)
-
 
   return (
     <>

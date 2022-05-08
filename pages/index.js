@@ -5,7 +5,6 @@ import { fromLonLat } from "ol/proj"
 import { Layers, TileLayer } from "components/layers"
 import OSM from "ol/source/OSM"
 
-
 function Index() {
   const [center, setCenter] = useState([0, 0])
   const [zoom, setZoom] = useState(3)

@@ -6,10 +6,10 @@ import { FaSearch } from "react-icons/fa"
 import { FiMenu } from "react-icons/fi"
 import Autocomplete from "react-autocomplete"
 import MapContext from "../map/mapContext"
-import {fromLonLat} from 'ol/proj';
+import { fromLonLat } from "ol/proj"
 import { transform } from "ol/proj"
 import { Point } from "ol/geom"
-import debounce from 'lodash/debounce'
+import debounce from "lodash/debounce"
 
 const AutoCompleteContainer = styled.div`
   width: 100%;
@@ -30,7 +30,7 @@ function AutoComplete() {
     setGeocodingResults()
   }
   function handleClick() {
-    setIsMenuOpened({ isMenuOpened: !isMenuOpened });
+    setIsMenuOpened({ isMenuOpened: !isMenuOpened })
   }
 
   function handleChange(event) {
@@ -54,21 +54,24 @@ function AutoComplete() {
   }, [])
 
   async function getGeocodingResults(searchString, limit) {
-    const response = await fetch(`https://photon.komoot.io/api/?q=${searchString}&limit=${limit}&lang=${userLang}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-    const data = await response.json();
+    const response = await fetch(
+      `https://photon.komoot.io/api/?q=${searchString}&limit=${limit}&lang=${userLang}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+    const data = await response.json()
     setGeocodingResults(data.features)
     //console.log(geocodingResults.length)
   }
-  
+
   const getGeocodingResultsDelayed = useCallback(
     debounce((searchString, limit, callback) => {
-      getGeocodingResults(searchString, limit).then(callback);
+      getGeocodingResults(searchString, limit).then(callback)
     }, 2000),
     []
-  );
+  )
 
   useEffect(() => {
     setUserLang(navigator.language || navigator.userLanguage)
@@ -109,9 +112,7 @@ function AutoComplete() {
   return (
     <>
       <AutoCompleteContainer>
-        <input
-          type="text"
-        />
+        <input type="text" />
       </AutoCompleteContainer>
     </>
   )
