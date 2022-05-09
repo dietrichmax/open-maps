@@ -59,6 +59,7 @@ function AutoComplete() {
   const [zoom, setZoom] = useState(8)
   const [lat, setLat] = useState(0)
   const [lon, setLon] = useState(0)
+  const [extent, setExtent] = useState(0)
   const [suggestions, setSuggestions] = useState([])
   const [result, setResult] = useState([])
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0)
@@ -79,7 +80,6 @@ function AutoComplete() {
     getGeocodingResultsDelayed(input, 20)
     setActiveSuggestionIndex(0)
     setShowSuggestions(true)
-    console.log(zoom)
   }, [input])
 
   useEffect(() => {
@@ -92,22 +92,27 @@ function AutoComplete() {
   const getOptions = () => {
     if (map) {
       const center = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326')
+      setExtent(transformExtent(map.getView().calculateExtent(map.getSize()),"EPSG:3857","EPSG:4326"))
       setLon(center[0])
       setLat(center[1])
       setZoom(map.getView().getZoom() + 2 )
     }
   }
+
   const filterData = (data) => {
     const set = new Set()
-    return data.features.filter(hit => { 
-      //console.log(hit.properties.name)
-      if (hit.properties.osm_value === "country" || hit.properties.osm_value === "continent" || hit.properties.osm_value === "state" || hit.properties.osm_value === "municipality") {
-        return false
-      } else if (hit.properties.type === "county" || hit.properties.type === "district") {
-        return false
-      }
-      return true
-    }).slice(0,5)
+    //console.log(data)
+    if (data.features) {
+      return data.features.filter(hit => {           
+        console.log(hit)
+        if (hit.properties.osm_value === "country" || hit.properties.osm_value === "continent" || hit.properties.osm_value === "state" || hit.properties.osm_value === "municipality") {
+          return false
+        } else if (hit.properties.type === "county") {
+          return false
+        }
+        return true
+      }).slice(0,5)
+    } 
   }
 
   const handleChange = (e) => {
@@ -146,7 +151,7 @@ function AutoComplete() {
         <SuggestionsContainer>
           <ListContainer Name="suggestions">
             {suggestions.map((suggestion, index, ) => {
-              const searchTerm = `${suggestion.properties.name}, ${suggestion.properties.country}`
+              const searchTerm = `${suggestion.properties.name}, ${suggestion.properties.city ?  suggestion.properties.city : ""}`
               //console.log(suggestion)
               let className
               // Flag the active suggestion with a class
@@ -156,7 +161,7 @@ function AutoComplete() {
               return (
                 <ListItem key={suggestion.properties.osm_id} className={className} onClick={() => handleClick(searchTerm)}>
                     <Place>{suggestion.properties.name}</Place>
-                    <Country>{suggestion.properties.country}</Country>
+                    <Country>{suggestion.properties.city}</Country>
                 </ListItem>
               )
             })}
@@ -172,11 +177,7 @@ function AutoComplete() {
     if (!input || input.length < 1) return
 
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}&bbox=${transformExtent(
-        map.getView().calculateExtent(map.getSize()),
-        "EPSG:3857",
-        "EPSG:4326"
-      )}&osm_tag=place`,
+      `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}${extent ? "&bbox=" + extent : null}&osm_tag=place`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
