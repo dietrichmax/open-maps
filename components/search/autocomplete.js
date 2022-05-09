@@ -177,7 +177,7 @@ function AutoComplete() {
     if (!input || input.length < 1) return
 
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}${extent ? "&bbox=" + extent : null}&osm_tag=place`,
+      `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}${extent ? "&bbox=" + extent : ""}&osm_tag=place`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
