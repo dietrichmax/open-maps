@@ -107,8 +107,8 @@ function AutoComplete() {
     } else {
       return suggestions.length ? (
         <SuggestionsContainer>
-          <ListContainer class="suggestions">
-            {suggestions.map((suggestion, index, i) => {
+          <ListContainer Name="suggestions">
+            {suggestions.map((suggestion, index, ) => {
               setSearchTerm(
                 `${suggestion.properties.name}, ${suggestion.properties.country}`
               )
@@ -118,7 +118,7 @@ function AutoComplete() {
                 className = "suggestion-active"
               }
               return (
-                <ListItem key={i} className={className} onClick={handleClick}>
+                <ListItem key={suggestion.properties.osm_id} className={className} onClick={handleClick}>
                   <Place>{suggestion.properties.name}</Place>
                   <Country>{suggestion.properties.country}</Country>
                 </ListItem>
