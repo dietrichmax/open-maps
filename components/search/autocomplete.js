@@ -11,6 +11,17 @@ import { transformExtent } from "ol/proj"
 import { Feature } from "ol"
 import VectorSource from "ol/source/Vector"
 import VectorLayer from "ol/layer/Vector"
+import { FaSearch } from "react-icons/fa"
+
+const SearchContainer = styled.div`
+  width: 100%;
+  display: flex;
+`
+
+const SearchButton = styled(Button)`
+  display: flex;
+  padding: 0.5rem .75rem;
+`
 
 const AutoCompleteContainer = styled.div`
   width: 100%;
@@ -21,6 +32,9 @@ const AutoCompleteContainer = styled.div`
 
 const AutoCompleteInput = styled(Input)`
   max-width: 250px;
+  ::placeholder {
+    color:var(--gray);
+  }
 `
 
 const SuggestionsContainer = styled.div`
@@ -193,8 +207,7 @@ function AutoComplete() {
               return (
                 <ListItem key={index} onClick={() => handleClick(searchTerm)}>
                   <Place>
-                    <b>{capitalizeFirstLetter(firstPart)}</b>
-                    {secondPart}
+                    {suggestion.properties.name}
                   </Place>
                   <Country>{suggestion.properties.city}</Country>
                 </ListItem>
@@ -214,7 +227,7 @@ function AutoComplete() {
     const response = await fetch(
       `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}${
         extent ? "&bbox=" + extent : ""
-      }&osm_tag=place`,
+      }`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -251,13 +264,23 @@ function AutoComplete() {
     setGeocodingResult(data.features[0])
   }
 
+  
+
   return (
-    <>
+    <SearchContainer>
       <AutoCompleteContainer>
-        <AutoCompleteInput type="text" onChange={handleChange} value={input} />
+        <AutoCompleteInput 
+          type="text" 
+          onChange={handleChange} 
+          value={input} 
+          placeholder="Search in mxd.codes Maps"
+        />
         {showSuggestions ? <SuggestionsListComponent /> : null}
       </AutoCompleteContainer>
-    </>
+        <SearchButton>
+          <FaSearch />
+        </SearchButton>
+    </SearchContainer>
   )
 }
 

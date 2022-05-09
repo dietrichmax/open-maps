@@ -4,7 +4,7 @@ const BurgerWrapper = styled.button`
 width: 25px;
 height: 25px;
 display: flex;
-
+margin-right: var(--space-sm);
 `
 
 function Burger() {

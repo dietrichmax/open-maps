@@ -2,10 +2,10 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import Logo from "@/components/logo/logo"
 //import { OutsideAlerter } from "@/components/hooks/clickOutsideAlerter"
-import Search from "@/components/search/search"
 import BurgerIcon from "./burgerIcon"
 import { DrawShapes } from "@/components/draw"
 import media from "styled-media-query"
+import AutoComplete from "@/components/search/autocomplete"
 
 const Container = styled.div`
   position: absolute;
@@ -19,8 +19,10 @@ const Container = styled.div`
   background-color: var(--body-bg);
   display: flex;
   align-items: center;
-  ${media.lessThan("300px")`
+  width: 400px;
+  ${media.lessThan("416px")`
     margin: 0;
+    width: 100%;
   `}
 `
 
@@ -28,7 +30,7 @@ const SidebarContainer = styled.div`
   position: absolute;
   z-index: 2;
   background-color: var(--body-bg);
-  width: 300px;
+  width: 350px;
   height: 100vh;
 `
 
@@ -146,7 +148,7 @@ function Sidebar() {
         <ButtonWrapper onClick={handleClick}>
           <BurgerIcon />
         </ButtonWrapper>
-        <Search />
+        <AutoComplete />
       </Container>
     </>
   )
