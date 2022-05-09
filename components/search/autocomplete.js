@@ -77,34 +77,30 @@ function AutoComplete() {
 
   useEffect(() => {
     getOptions()
-    getGeocodingResultsDelayed(input, 20)
-    setActiveSuggestionIndex(0)
-    setShowSuggestions(true)
   }, [input])
 
-  useEffect(() => {
-    /*getOptions()
-    getGeocodingResultsDelayed(input, 5)
-    setActiveSuggestionIndex(0)
-    setShowSuggestions(true)*/
-  }, [searchTerm])
-
   const getOptions = () => {
-    if (map) {
-      const center = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326')
-      setExtent(transformExtent(map.getView().calculateExtent(map.getSize()),"EPSG:3857","EPSG:4326"))
-      setLon(center[0])
-      setLat(center[1])
-      setZoom(map.getView().getZoom() + 2 )
-    }
-  }
+    const center = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326')
+    setExtent(transformExtent(map.getView().calculateExtent(map.getSize()),"EPSG:3857","EPSG:4326"))
+    setLon(center[0])
+    setLat(center[1])
+    setZoom(map.getView().getZoom() + 2 )
+}
+
+  useEffect(() => {
+    getGeocodingResultsDelayed(extent, input, 20)
+    setActiveSuggestionIndex(0)
+    setShowSuggestions(true)
+  }, [extent])
+
+
 
   const filterData = (data) => {
     const set = new Set()
     //console.log(data)
     if (data.features) {
       return data.features.filter(hit => {           
-        console.log(hit)
+        //console.log(hit)
         if (hit.properties.osm_value === "country" || hit.properties.osm_value === "continent" || hit.properties.osm_value === "state" || hit.properties.osm_value === "municipality") {
           return false
         } else if (hit.properties.type === "county") {
@@ -119,7 +115,7 @@ function AutoComplete() {
     setInput(e.target.value)
   }
 
-  const showResults = () => {
+  const getGeocoding = () => {
     getGeocodingResults()
     //console.log(showSuggestions)
     //console.log(searchTerm)
@@ -129,7 +125,7 @@ function AutoComplete() {
     setInput(searchTerm)
     setActiveSuggestionIndex(0)
   
-    showResults()
+    getGeocoding()
 
     if (result.bbox) {
       const transformedBbox = transformExtent(
@@ -173,7 +169,7 @@ function AutoComplete() {
 
   // Geocoding  &lat=${lat}&lon=${lon}
 
-  async function getSuggestionResults(input, limit) {
+  async function getSuggestionResults(extent, input, limit) {
     if (!input || input.length < 1) return
 
     const response = await fetch(
@@ -212,7 +208,7 @@ function AutoComplete() {
       }
     )
     const data = await response.json()
-    console.log(data)
+    //console.log(data)
     setResult(data.features[0])
   }
 
