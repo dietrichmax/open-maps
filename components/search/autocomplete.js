@@ -103,15 +103,15 @@ function AutoComplete() {
 
   const SuggestionsListComponent = () => {
     if (!suggestions) {
-      return
+      return nmu
     } else {
       return suggestions.length ? (
         <SuggestionsContainer>
           <ListContainer Name="suggestions">
             {suggestions.map((suggestion, index, ) => {
-              setSearchTerm(
+              /*setSearchTerm(
                 `${suggestion.properties.name}, ${suggestion.properties.country}`
-              )
+              )*/
               let className
               // Flag the active suggestion with a class
               if (index === activeSuggestionIndex) {
@@ -175,7 +175,7 @@ function AutoComplete() {
     <>
       <AutoCompleteContainer>
         <AutoCompleteInput type="text" onChange={handleChange} value={input} />
-        {showSuggestions && input && <SuggestionsListComponent />}
+         {showSuggestions ? <SuggestionsListComponent /> : null }
       </AutoCompleteContainer>
     </>
   )
