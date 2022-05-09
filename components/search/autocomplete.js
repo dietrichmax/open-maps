@@ -23,6 +23,7 @@ const AutoCompleteInput = styled.input`
   outline: none !important;
   padding: 3px 5px;
   font-size: 100%;
+  font-family: var(--primary-font);
 `
 
 const SuggestionsContainer = styled.div`
@@ -55,6 +56,9 @@ const Country = styled.span`
 `
 
 function AutoComplete() {
+  const [zoom, setZoom] = useState(8)
+  const [lat, setLat] = useState(0)
+  const [lon, setLon] = useState(0)
   const [suggestions, setSuggestions] = useState([])
   const [result, setResult] = useState([])
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0)
@@ -62,35 +66,71 @@ function AutoComplete() {
   const [input, setInput] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [osm_id, setOsm_id] = useState()
-  const [userLang, setUserLang] = useState("en")
+  const [userLang, setUserLang] = useState("de")
 
   const { map } = useContext(MapContext)
 
-  /*let mapViewCenter
-  let lon
-  let lat
-  if (map) {
-    mapViewCenter = map ? map.getView().getCenter() : null
-    console.log(mapViewCenter[0])
-  }*/
+  /*useEffect(() => {
+    setUserLang(navigator.language || navigator.userLanguage)
+  }, [userLang])*/
+
+  useEffect(() => {
+    getOptions()
+    getGeocodingResultsDelayed(input, 20)
+    setActiveSuggestionIndex(0)
+    setShowSuggestions(true)
+    console.log(zoom)
+  }, [input])
+
+  useEffect(() => {
+    /*getOptions()
+    getGeocodingResultsDelayed(input, 5)
+    setActiveSuggestionIndex(0)
+    setShowSuggestions(true)*/
+  }, [searchTerm])
+
+  const getOptions = () => {
+    //console.log("test1")
+    if (map) {
+      const center = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326')
+      //console.log("test2")
+      setLon(center[0])
+      setLat(center[1])
+      setZoom(map.getView().getZoom() + 8 )
+      console.log(zoom)
+    }
+  }
+  console.log(zoom)
+  const filterData = (data) => {
+    const set = new Set()
+    return data.features.filter(hit => { 
+      //console.log(hit.properties.name)
+      if (hit.properties.osm_value === "country" || hit.properties.osm_value === "continent" || hit.properties.osm_value === "state" || hit.properties.osm_value === "municipality") {
+        return false
+      } else if (hit.properties.type === "county" || hit.properties.type === "district") {
+        return false
+      }
+      return true
+    }).slice(0,5)
+  }
 
   const handleChange = (e) => {
     setInput(e.target.value)
-    getGeocodingResultsDelayed(input, 5)
-    setActiveSuggestionIndex(0)
-    setShowSuggestions(true)
   }
 
-  const handleClick = (e) => {
-    setInput(searchTerm.toString())
+  const showResults = () => {
+    getGeocodingResults()
+    console.log(showSuggestions)
+    console.log(searchTerm)
+
+  }
+  const handleClick = (searchTerm) => {
+    setInput(searchTerm)
     setActiveSuggestionIndex(0)
-    setShowSuggestions(false)
-    //getGeocodingResultsDelayed(input, 1)
-    getNominatimInfo()
-    //map.getView().setCenter(transform(suggestions[0].geometry.coordinates, 'EPSG:4326', 'EPSG:3857'));
-    console.log(result)
+  
+    showResults()
+
     if (result.bbox) {
-      //console.log(result.bbox)
       const transformedBbox = transformExtent(
         result.bbox,
         "EPSG:4326",
@@ -99,28 +139,28 @@ function AutoComplete() {
       //console.log(transformedBbox)
       map.getView().fit(transformedBbox)
     }
+    setShowSuggestions(false)
   }
 
   const SuggestionsListComponent = () => {
-    if (!suggestions) {
-      return nmu
+    if (!suggestions || input.length === 0) {
+      return
     } else {
       return suggestions.length ? (
         <SuggestionsContainer>
           <ListContainer Name="suggestions">
             {suggestions.map((suggestion, index, ) => {
-              /*setSearchTerm(
-                `${suggestion.properties.name}, ${suggestion.properties.country}`
-              )*/
+              const searchTerm = `${suggestion.properties.name}, ${suggestion.properties.country}`
+              //console.log(suggestion)
               let className
               // Flag the active suggestion with a class
               if (index === activeSuggestionIndex) {
                 className = "suggestion-active"
               }
               return (
-                <ListItem key={suggestion.properties.osm_id} className={className} onClick={handleClick}>
-                  <Place>{suggestion.properties.name}</Place>
-                  <Country>{suggestion.properties.country}</Country>
+                <ListItem key={suggestion.properties.osm_id} className={className} onClick={() => handleClick(searchTerm)}>
+                    <Place>{suggestion.properties.name}</Place>
+                    <Country>{suggestion.properties.country}</Country>
                 </ListItem>
               )
             })}
@@ -132,29 +172,41 @@ function AutoComplete() {
 
   // Geocoding  &lat=${lat}&lon=${lon}
 
-  async function getGeocodingResults(searchString, limit) {
-    if (!searchString || searchString.length < 1) return
+  async function getSuggestionResults(input, limit) {
+    if (!input || input.length < 1) return
+
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${searchString}&limit=${limit}&lang=${userLang}`,
+      `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}&bbox=${transformExtent(
+        map.getView().calculateExtent(map.getSize()),
+        "EPSG:3857",
+        "EPSG:4326"
+      )}&osm_tag=place`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }
     )
     const data = await response.json()
-    //console.log(data.features)
-    setSuggestions(data.features)
-    setOsm_id(data.features[0].properties.osm_id)
-  }
+    const filteredData = filterData(data)
+    setSuggestions(filteredData)
+    }
+    /*/ if no results `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}&bbox=${transformExtent(
+        map.getView().calculateExtent(map.getSize()),
+        "EPSG:3857",
+        "EPSG:4326"
+      )}&osm_tag=place`,*/
+
+      //https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=${zoom}&location_bias_scale=0.8&osm_tag=place
+  
 
   const getGeocodingResultsDelayed = useCallback(
-    debounce((searchString, limit, callback) => {
-      getGeocodingResults(searchString, limit).then(callback)
+    debounce((input, limit, callback) => {
+      getSuggestionResults(input, limit).then(callback)
     }, 200),
     []
   )
 
-  async function getNominatimInfo() {
+  async function getGeocodingResults() {
     const encode = encodeURI(input)
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encode}&format=geojson&limit=1`,
@@ -163,13 +215,11 @@ function AutoComplete() {
       }
     )
     const data = await response.json()
-    //console.log(data)
+    console.log(data)
     setResult(data.features[0])
   }
 
-  useEffect(() => {
-    setUserLang(navigator.language || navigator.userLanguage)
-  }, [userLang])
+
 
   return (
     <>

@@ -6,8 +6,8 @@ import { Layers, TileLayer } from "components/layers"
 import OSM from "ol/source/OSM"
 
 function Index() {
-  const [center, setCenter] = useState([0, 0])
-  const [zoom, setZoom] = useState(3)
+  const [center, setCenter] = useState([12, 48])
+  const [zoom, setZoom] = useState(8)
 
   return (
     <Map center={fromLonLat(center)} zoom={zoom}>
