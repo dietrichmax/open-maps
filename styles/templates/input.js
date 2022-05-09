@@ -2,7 +2,9 @@ import styled from "styled-components"
 
 const Input = styled.input`
   border: none;
+  padding: 3px 5px;
   background-color: var(--body-bg);
+  font-size: 100%;
   color: var(--text-color);
   width: 100%;
   :active {

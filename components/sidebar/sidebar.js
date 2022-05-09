@@ -5,6 +5,7 @@ import Logo from "@/components/logo/logo"
 import Search from "@/components/search/search"
 import BurgerIcon from "./burgerIcon"
 import { DrawShapes } from "@/components/draw"
+import media from "styled-media-query"
 
 const Container = styled.div`
   position: absolute;
@@ -16,16 +17,16 @@ const Container = styled.div`
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   background-color: var(--body-bg);
-  width: 400px;
   display: flex;
   align-items: center;
+  ${media.lessThan("300px")`
+    margin: 0;
+  `}
 `
 
 const SidebarContainer = styled.div`
   position: absolute;
   z-index: 2;
-  top: 0;
-  left: 0;
   background-color: var(--body-bg);
   width: 300px;
   height: 100vh;
