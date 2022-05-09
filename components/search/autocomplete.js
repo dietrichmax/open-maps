@@ -80,11 +80,13 @@ function AutoComplete() {
   }, [input])
 
   const getOptions = () => {
+    if (map) {
     const center = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326')
     setExtent(transformExtent(map.getView().calculateExtent(map.getSize()),"EPSG:3857","EPSG:4326"))
     setLon(center[0])
     setLat(center[1])
     setZoom(map.getView().getZoom() + 2 )
+  }
 }
 
   useEffect(() => {
