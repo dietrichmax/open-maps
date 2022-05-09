@@ -15,15 +15,17 @@ import VectorLayer from "ol/layer/Vector"
 const AutoCompleteContainer = styled.div`
   width: 100%;
   font-size: 15px;
+  margin-top: auto;
+  margin-bottom: auto;
 `
 
 const AutoCompleteInput = styled(Input)`
-  max-width: 220px;
+  max-width: 250px;
 `
 
 const SuggestionsContainer = styled.div`
   position: absolute;
-  min-width: 220px;
+  min-width: 250px;
 `
 
 const ListContainer = styled.ol`

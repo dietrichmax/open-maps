@@ -15,6 +15,10 @@ const SearchContainer = styled.div`
   display: flex;
 `
 
+const SearchButton = styled(Button)`
+  display: flex;
+  padding: 0.5rem .75rem;
+`
 function Search() {
   const [visible, setVisible] = useState(false)
 
@@ -27,9 +31,9 @@ function Search() {
     <>
       <SearchContainer>
         <AutoComplete />
-        <Button>
+        <SearchButton>
           <FaSearch />
-        </Button>
+        </SearchButton>
       </SearchContainer>
     </>
   )
