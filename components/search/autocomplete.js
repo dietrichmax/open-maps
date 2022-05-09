@@ -90,17 +90,13 @@ function AutoComplete() {
   }, [searchTerm])
 
   const getOptions = () => {
-    //console.log("test1")
     if (map) {
       const center = transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326')
-      //console.log("test2")
       setLon(center[0])
       setLat(center[1])
-      setZoom(map.getView().getZoom() + 8 )
-      console.log(zoom)
+      setZoom(map.getView().getZoom() + 2 )
     }
   }
-  console.log(zoom)
   const filterData = (data) => {
     const set = new Set()
     return data.features.filter(hit => { 
@@ -120,8 +116,8 @@ function AutoComplete() {
 
   const showResults = () => {
     getGeocodingResults()
-    console.log(showSuggestions)
-    console.log(searchTerm)
+    //console.log(showSuggestions)
+    //console.log(searchTerm)
 
   }
   const handleClick = (searchTerm) => {
