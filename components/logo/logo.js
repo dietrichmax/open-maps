@@ -14,7 +14,7 @@ const Subtitle = styled.span`
 
 const Logo = () => {
   return (
-    <LogoWrapper class="u-url" rel="me" title="Max Dietrich" href="/">
+    <LogoWrapper className="u-url" rel="me" title="Max Dietrich" href="/">
       <span>mxd.codes</span>
       <Subtitle> | Maps</Subtitle>
     </LogoWrapper>
