@@ -224,14 +224,14 @@ function Details({ result }) {
             </a>
         ) : null}
         <ActionWrapper
-        title="Share this place"
-        >
-            <FaShare />
-          </ActionWrapper>
-        <ActionWrapper
         title="Save this place"
         >
             <FaBookmark />
+          </ActionWrapper>
+        <ActionWrapper
+        title="Share this place"
+        >
+            <FaShare />
           </ActionWrapper>
         </Actions>
         {/*{wikipediaData ? 
