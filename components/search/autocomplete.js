@@ -18,6 +18,7 @@ import VectorLayer from "ol/layer/Vector"
 import { FaSearch } from "react-icons/fa"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import Details from "@/components/search/details/details"
+import { set } from "lodash"
 
 const Container = styled.div`
   position: absolute;
@@ -202,6 +203,7 @@ function Autocomplete() {
   const [input, setInput] = useState("")
   const [markerLayer, setMarkerLayer] = useState()
   const [userLang, setUserLang] = useState("en")
+  const [gotData, setGotData] = useState(false)
 
   const { map } = useContext(MapContext)
 
@@ -242,12 +244,13 @@ function Autocomplete() {
   }
 
   const handleChange = (e) => {
+    setGotData(false)
     setInput(e.target.value)
   }
 
 
   useEffect(() => {
-    getFirstSuggestionResultsDelayed(extent, input, suggestionLimit)
+    !gotData ? getFirstSuggestionResultsDelayed(extent, input, suggestionLimit) : null
   }, [extent])
 
   useEffect(() => {
@@ -255,7 +258,7 @@ function Autocomplete() {
       if (difference != 0) {
       getSecondSuggestionResults(lat, lon, zoom, input, difference)
     }
-  }, [suggestions.length !=5 ])
+  }, [suggestions])
 
   const filterData = (data) => {
     let set = []
@@ -294,25 +297,26 @@ function Autocomplete() {
   // Marker
   useEffect(() => {
     setShowSuggestions(false)
-    if (geocodingResult.bbox) {
-      const transformedBbox = transformExtent(
-        geocodingResult.bbox,
-        "EPSG:4326",
-        "EPSG:3857"
-      )
-      map.getView().fit(transformedBbox,  { duration: 1000 });
-      addMarker(geocodingResult.geometry.coordinates)
+    if (geocodingResult.geometry) {
+      const coordinates = transform([geocodingResult.geometry.coordinates[0],geocodingResult.geometry.coordinates[1]], "EPSG:4326", "EPSG:3857")
+      const marker = new Feature({
+        geometry: new Point (coordinates),
+        name: 'Marker'
+      });
+      map.getView().fit(marker.getGeometry(),  { 
+        padding: [10000, 10000, 10000, 10000], 
+        maxZoom: 12, 
+        duration: 1000 
+      });
+      addMarker(marker)
     }
     setShowSuggestions(false)
   }, [geocodingResult])
 
-  const addMarker = (coordinates) => {
-    const iconFeature = new Feature({
-      geometry: new Point(fromLonLat(coordinates)),
-    })
+  const addMarker = (marker) => {
 
     const vectorSource = new VectorSource({
-      features: [iconFeature],
+      features: [marker],
     })
 
     const vectorLayer = new VectorLayer({
@@ -342,6 +346,7 @@ function Autocomplete() {
     const filteredData = filterData(data)
     setSuggestions(filteredData)
     setShowSuggestions(true)
+    setGotData(true)
   }
 
   async function getSecondSuggestionResults(lat, lon, zoom, input, limit) {
@@ -357,6 +362,7 @@ function Autocomplete() {
     const filteredData = filterData(data)
     setSuggestions((suggestions) => [...filteredData, ...suggestions].slice(0,5))
     setShowSuggestions(true)
+    setGotData(true)
   }
 
   

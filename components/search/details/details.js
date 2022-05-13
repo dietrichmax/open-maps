@@ -36,7 +36,7 @@ const Title = styled.h1 `
     line-height: 1.75rem;
 `
 
-const County = styled.h2`
+const Adress = styled.h2`
 margin-top: 1rem;
     font-weight: 400;
 `
@@ -71,7 +71,7 @@ function Details({result}) {
     const [wikipediaData, setWikipediaData] = useState()
     const [gotWikipediaData, setGotWikipediaData] = useState(false)
 
-    console.log(result.properties)
+    //console.log(result.properties)
     
     if (!result.properties) {
         return null
@@ -115,8 +115,14 @@ function Details({result}) {
       </ImageWrapper>
       <Header>
         {result.properties.name ? <Title>{result.properties.name}</Title> : null }
-        {result.properties.county ? <County>{result.properties.county}</County> : null}
-        {result.properties.country ? <Country>{result.properties.country}</Country> : null}
+        <Adress>            
+            {result.properties.district ? `${result.properties.district},` : null}
+            {result.properties.street ? ` ${result.properties.street} ` : null}
+            {result.properties.housenumber ? ` ${result.properties.housenumber},` : null}
+            {result.properties.postcode ? ` ${result.properties.postcode}` : null}
+            {result.properties.city ? ` ${result.properties.city},` : null}
+            {result.properties.country ? ` ${result.properties.country}` : null}
+        </Adress>
       </Header>
       <Actions> 
         <ActionWrapper> 
