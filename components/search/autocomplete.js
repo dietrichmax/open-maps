@@ -364,7 +364,7 @@ function Autocomplete() {
   async function getSecondSuggestionResults(lat, lon, zoom, input, limit) {
     const encodedInput = encodeURI(input)
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=4&location_bias_scale=0.1`,
+      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=1&location_bias_scale=0.1`,
       {
         method: "GET",
         headers: {
@@ -442,8 +442,11 @@ function Autocomplete() {
                     {getSymbol(suggestion.properties.osm_value)}
                   </ButtonWrapper>
                   <Place>{suggestion.properties.name}</Place>
-                  {suggestion.properties.county ? (
-                    <County>{suggestion.properties.county}</County>
+                  {suggestion.properties.city ? (
+                    <Country>{suggestion.properties.city}</Country>
+                  ) : null}
+                  {suggestion.properties.street ? (
+                    <County>{suggestion.properties.street}</County>
                   ) : null}
                   {suggestion.properties.country ? (
                     <Country>{suggestion.properties.country}</Country>
