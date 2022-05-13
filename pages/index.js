@@ -4,6 +4,7 @@ import Autocomplete from "@/components/search/autocomplete"
 import { fromLonLat } from "ol/proj"
 import { Layers, TileLayer } from "components/layers"
 import OSM from "ol/source/OSM"
+import XYZ from 'ol/source/XYZ';
 
 function Index() {
   const [center, setCenter] = useState([12, 48])
@@ -13,7 +14,7 @@ function Index() {
     <Map center={fromLonLat(center)} zoom={zoom}>
       <Autocomplete />
       <Layers>
-        <TileLayer source={new OSM()} zIndex={0} />
+        <TileLayer source={new OSM} zIndex={0} />
       </Layers>
     </Map>
   )

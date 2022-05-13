@@ -203,6 +203,7 @@ function Autocomplete() {
   const [userLang, setUserLang] = useState("en")
   const [gotFirstData, setGotFirstData] = useState(false)
   const [gotSecondData, setGotSecondData] = useState(false)
+  const [searchQuery, setSearchQuery] = useState(false)
 
   const { map } = useContext(MapContext)
 
@@ -214,7 +215,7 @@ function Autocomplete() {
 
   useEffect(() => {
     getOptions()
-  }, [input])
+  }, [searchQuery])
 
   const getOptions = () => {
     if (map) {
@@ -244,11 +245,12 @@ function Autocomplete() {
     setGotFirstData(false)
     setGotSecondData(false)
     setInput(e.target.value)
+    setSearchQuery(e.target.value.replaceAll(",","+").replaceAll(" ","+").replaceAll("++","+"))
   }
 
   useEffect(() => {
     !gotFirstData
-      ? getFirstSuggestionResultsDelayed(extent, input, suggestionLimit)
+      ? getFirstSuggestionResultsDelayed(extent, searchQuery, suggestionLimit)
       : null
   }, [extent])
 
@@ -379,6 +381,7 @@ function Autocomplete() {
     setSuggestions((suggestions) =>
       [...filteredData, ...suggestions].slice(0, 5)
     )
+  
     setShowSuggestions(true)
   }
 

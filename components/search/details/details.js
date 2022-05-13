@@ -34,9 +34,10 @@ const Header = styled.div`
 
 const Title = styled.h1`
   font-size: 1.375rem;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 0;
   line-height: 1.75rem;
+  word
 `
 
 const Address = styled.h2`
@@ -81,6 +82,8 @@ function Details({ result }) {
       src={wikimediaImageUrl ? wikimediaImageUrl : `https://source.unsplash.com/random/300×450/?${result.display_name}`}
       height="300"
       width="450"
+      alt={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimeda` : "Random image from Unsplash"}
+      title={wikimediaImageUrl ? `Image of '${result.display_name}' from Wikimedia` : "Random image from Unsplash"}
       />
       </>
     )
@@ -173,7 +176,6 @@ function Details({ result }) {
       )
     }
   }
-  console.log(result.address)
   if (result.length === 0) {
     return null
   } else {
@@ -184,7 +186,7 @@ function Details({ result }) {
             </ImageWrapper>
         <Header>
           {result.display_name ? <Title>{result.display_name}</Title> : null}
-          {renderAdress(result.address)}
+          {/*renderAdress(result.address)*/}
         </Header>
         <Actions>
           <ActionWrapper>
