@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import Map from "@/components/map"
-import Sidebar from "@/components/sidebar/sidebar"
+import Autocomplete from "@/components/search/autocomplete"
 import { fromLonLat } from "ol/proj"
 import { Layers, TileLayer } from "components/layers"
 import OSM from "ol/source/OSM"
@@ -11,7 +11,7 @@ function Index() {
 
   return (
     <Map center={fromLonLat(center)} zoom={zoom}>
-      <Sidebar />
+      <Autocomplete />
       <Layers>
         <TileLayer source={new OSM()} zIndex={0} />
       </Layers>

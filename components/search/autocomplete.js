@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useState, useContext } from "react"
 import styled from "styled-components"
+import Logo from "@/components/logo/logo"
+import BurgerIcon from "@/components/sidebar/burgerIcon"
+import { DrawShapes } from "@/components/draw"
+import media from "styled-media-query"
 import { Input } from "@/styles/templates/input"
 import { Button } from "@/styles/templates/button"
 import MapContext from "../map/mapContext"
@@ -12,7 +16,98 @@ import { Feature } from "ol"
 import VectorSource from "ol/source/Vector"
 import VectorLayer from "ol/layer/Vector"
 import { FaSearch } from "react-icons/fa"
-import { slice } from "lodash"
+import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
+import Details from "@/components/search/details/details"
+
+const Container = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  margin: var(--space-sm);
+  padding: var(--space-sm);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: var(--body-bg);
+  display: flex;
+  align-items: center;
+  width: 400px;
+  ${media.lessThan("416px")`
+    margin: 0;
+    width: 100%;
+  `}
+`
+
+const SidebarContainer = styled.div`
+  position: absolute;
+  z-index: 3;
+  background-color: var(--body-bg);
+  width: var(--sidebar-width);
+  height: 100vh;
+`
+
+const PageWrap = styled.div`
+  position: absolute;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  opacity: 0.3;
+  background: black;
+`
+
+const CloseButton = styled.button`
+  ::after { content: "\2714"; }
+`
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding: 1rem 0 1rem 0;
+`
+const SectionHeader = styled.p`
+  margin-bottom: 0.5rem;
+  text-decoration: underline;
+`
+
+const SectionItem = styled.li`
+  padding: 4px 0;
+  list-style: none;
+  cursor: pointer;
+  :hover {
+    text-decoration: underline;
+  }
+`
+
+const Section = styled.div`
+  border-top: 1px solid #d9d9d9;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding: 1rem 0;
+`
+
+
+const InfoSection = styled.div`
+  border-top: 1px solid #d9d9d9;
+  margin-top: auto;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding: 1rem 0;
+`
+
+const InfoLinks = styled.a`
+  color: var(--text-color);
+  border-bottom: 1px solid var(--secondary-color);
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin-right: 1rem;
+  :hover {
+    border-bottom: none;
+  }
+`
+
+// autocomplete
 
 const SearchContainer = styled.div`
   width: 100%;
@@ -53,30 +148,49 @@ const ListContainer = styled.ol`
   list-style: none;
   padding-inline-start: 0;
   background-color: var(--body-bg);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
 `
 
 const ListItem = styled.li`
-  display: flex;
   align-items: baseline;
   padding-top: 6px;
   padding-bottom: 7px;
-  margin-left: 57px;
+  padding-right: 1rem;
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
   :hover {
     background-color: var(--border-color);
   }
 `
 
 const Place = styled.p`
+  display: inline-block;
   font-size: .9rem;
 `
 
-const Country = styled.span`
+const County = styled.span`
+  display: inline-block;
   font-size: 0.70rem;
   margin-left: 4px;
 `
 
-function AutoComplete() {
+const Country = styled.p`
+display: inline-block;
+  font-size: 0.70rem;
+  margin-left: 4px;
+`
+
+
+const ButtonWrapper = styled.div`
+  display: inline-block;
+  width: 57px;
+  text-align: center;
+`
+
+function Autocomplete() {
+  const [visible, setVisible] = useState(false)
   const [zoom, setZoom] = useState(8)
   const [lat, setLat] = useState(0)
   const [lon, setLon] = useState(0)
@@ -86,13 +200,12 @@ function AutoComplete() {
   const [geocodingResult, setGeocodingResult] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [input, setInput] = useState("")
-  const [resultDifference, setResultDifference] = useState(0)
   const [markerLayer, setMarkerLayer] = useState()
   const [userLang, setUserLang] = useState("en")
 
   const { map } = useContext(MapContext)
 
-  const suggestionSearchLimit = 5
+  const suggestionLimit = 5
 
   useEffect(() => {
     setUserLang((navigator.language || navigator.userLanguage).slice(0,2))
@@ -123,30 +236,26 @@ function AutoComplete() {
     }
   }
 
+    
+  const handleVisability = () => {
+    visible ? setVisible(false) : setVisible(true)
+  }
+
   const handleChange = (e) => {
     setInput(e.target.value)
   }
 
 
   useEffect(() => {
-    //console.log(resultDifference)
-    if (resultDifference > 0) {
-      getSecondSuggestionResults(lat, lon, zoom, input, 200)
-    } 
-  }, [resultDifference])
-
-
-  useEffect(() => {
-    if (suggestions) {
-      //filterDuplicates(suggestions)//setSuggestions(filterDuplicates(suggestions))
-    }
-  }, [suggestions])
-
-  
-  useEffect(() => {
-    getFirstSuggestionResultsDelayed(extent, input, suggestionSearchLimit)
-
+    getFirstSuggestionResultsDelayed(extent, input, suggestionLimit)
   }, [extent])
+
+  useEffect(() => {
+      const difference = suggestionLimit - suggestions.length
+      if (difference != 0) {
+      getSecondSuggestionResults(lat, lon, zoom, input, difference)
+    }
+  }, [suggestions.length !=5 ])
 
   const filterData = (data) => {
     let set = []
@@ -171,6 +280,18 @@ function AutoComplete() {
     }
   }
 
+  const handleClick = (searchTerm) => {
+    removeMarker()
+    setInput(searchTerm)
+    getGeocodingResults(searchTerm)
+    setShowSuggestions(false)
+  }
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
+  // Marker
   useEffect(() => {
     setShowSuggestions(false)
     if (geocodingResult.bbox) {
@@ -184,17 +305,6 @@ function AutoComplete() {
     }
     setShowSuggestions(false)
   }, [geocodingResult])
-
-  const handleClick = (searchTerm) => {
-    removeMarker()
-    setInput(searchTerm)
-    getGeocodingResults(searchTerm)
-    setShowSuggestions(false)
-  }
-
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1)
-  }
 
   const addMarker = (coordinates) => {
     const iconFeature = new Feature({
@@ -217,13 +327,8 @@ function AutoComplete() {
     map.removeLayer(markerLayer)
   }
 
-  // Geocoding  &lat=${lat}&lon=${lon}
-
-
-
   async function getFirstSuggestionResults(extent, input, limit) {
     if (!input || input.length < 1) return
-    setGotSecondSuggestions(false)
     const response = await fetch(
       `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}${
         extent ? "&bbox=" + extent : ""
@@ -235,17 +340,9 @@ function AutoComplete() {
     )
     const data = await response.json()
     const filteredData = filterData(data)
-    setResultDifference(suggestionSearchLimit - filteredData.length)
     setSuggestions(filteredData)
     setShowSuggestions(true)
   }
-
-  const getFirstSuggestionResultsDelayed = useCallback(
-    debounce((extent, input, limit, callback) => {
-      getFirstSuggestionResults(extent, input, limit).then(callback)
-    }, 200),
-    []
-  )
 
   async function getSecondSuggestionResults(lat, lon, zoom, input, limit) {
 
@@ -262,19 +359,36 @@ function AutoComplete() {
     setShowSuggestions(true)
   }
 
+  
+  const getFirstSuggestionResultsDelayed = useCallback(
+    debounce((extent, input, limit, callback) => {
+      getFirstSuggestionResults(extent, input, limit).then(callback)
+    }, 200),
+    []
+  )
+
   async function getGeocodingResults(searchTerm) {
     const encode = encodeURI(searchTerm)
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encode}&format=geojson&limit=1`,
+      `https://photon.komoot.io/api/?q=${encode}&limit=1&lang=${userLang}`,
       {
         method: "GET",
       }
     )
     const data = await response.json()
     setGeocodingResult(data.features[0])
-    console.log("test1")
     setShowSuggestions(false)
   }
+
+  const getSymbol = (value) => {
+    if (value === "train_station") {
+      return <FaTrain/>
+    } else {
+      return <FaMapMarkerAlt/>
+    }
+  }
+
+
 
   const SuggestionsListComponent = () => {
     if (!suggestions || input.length === 0) {
@@ -289,15 +403,19 @@ function AutoComplete() {
                   ? ", " + suggestion.properties.city
                   : ""
               }`
-              const secondPart = suggestion.properties.name.replace(
+              /*onst secondPart = suggestion.properties.name.replace(
                 capitalizeFirstLetter(input),
                 ""
               )
-              const firstPart = input
+              const firstPart = input*/
               return (
                 <ListItem key={index} onClick={() => handleClick(searchTerm)}>
+                  <ButtonWrapper>
+                    {getSymbol(suggestion.properties.osm_value)}
+                  </ButtonWrapper>
                   <Place>{suggestion.properties.name}</Place>
-                  <Country>{suggestion.properties.county}</Country>
+                  {suggestion.properties.county ? <County>{suggestion.properties.county}</County> : null}
+                  {suggestion.properties.country ? <Country>{suggestion.properties.country}</Country> : null }
                 </ListItem>
               )
             })}
@@ -307,22 +425,72 @@ function AutoComplete() {
     }
   }
 
+
   return (
-    <SearchContainer>
-      <AutoCompleteContainer>
-        <AutoCompleteInput
-          type="text"
-          onChange={handleChange}
-          value={input}
-          placeholder="Search in mxd.codes Maps"
-        />
-        {showSuggestions ? <SuggestionsListComponent /> : null}
-      </AutoCompleteContainer>
-      <SearchButton>
-        <FaSearch />
-      </SearchButton>
-    </SearchContainer>
+    <>
+      {visible ? (
+        <>
+          <SidebarContainer>
+            <Header>
+              <Logo />
+              <CloseButton onClick={handleVisability}>Close</CloseButton>
+            </Header>
+            <Section>
+              <SectionHeader>Draw Options</SectionHeader>
+              <SectionItem onClick={DrawShapes("Square")}>
+                Rectangles{" "}
+              </SectionItem>
+              <SectionItem>Point</SectionItem>
+              <SectionItem onClick={DrawShapes("Box")}>Polygon</SectionItem>
+            </Section>
+            <Section>
+              <SectionItem>Share Map</SectionItem>
+              <SectionItem>Embed Map</SectionItem>
+              <SectionItem>Print Map</SectionItem>
+            </Section>
+            <Section>
+              <SectionHeader>Improve this map</SectionHeader>
+              <SectionItem>OpenStreetMap</SectionItem>
+            </Section>
+            <InfoSection>
+              <InfoLinks title="Privacy" href="https://mxd.codes/privacy">
+                Privacy
+              </InfoLinks>
+              <InfoLinks
+                title="Site Notice"
+                href="https://mxd.codes/site-notice"
+              >
+                Site-Notice
+              </InfoLinks>
+            </InfoSection>
+          </SidebarContainer>
+          <PageWrap onClick={handleVisability} />
+        </>
+      ) : null}
+      <>
+      <Container>
+        <ButtonWrapper onClick={handleVisability}>
+          <BurgerIcon />
+        </ButtonWrapper>
+        <SearchContainer>
+          <AutoCompleteContainer>
+            <AutoCompleteInput
+              type="text"
+              onChange={handleChange}
+              value={input}
+              placeholder="Search in mxd.codes Maps"
+            />
+            {showSuggestions ? <SuggestionsListComponent /> : null}
+          </AutoCompleteContainer>
+          <SearchButton>
+            <FaSearch />
+          </SearchButton>
+        </SearchContainer>
+      </Container>
+      <Details result={geocodingResult} />
+      </>
+    </>
   )
 }
 
-export default AutoComplete
+export default Autocomplete

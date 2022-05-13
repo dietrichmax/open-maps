@@ -4,11 +4,12 @@ import "@/public/fonts/Quicksand/style.css"
 import { config } from "config"
 import Head from "next/head"
 import { init } from "@socialgouv/matomo-next"
+import App from "next/app"
 
 
-function MyApp({ Component, pageProps }) {
+class MyApp extends App {
 
-  useEffect(() => {
+  componentDidMount() {
     if (window.location.href.includes(config.domain)) {
       init({
         url: process.env.NEXT_PUBLIC_MATOMO_URL,
@@ -16,13 +17,16 @@ function MyApp({ Component, pageProps }) {
       }),
         window._paq.push(["enableHeartBeatTimer"])
     }
-  }, [])
+  }
   
-  return (
+  render() {
+    const { Component, pageProps } = this.props
+    return (
     <>
       <Component {...pageProps} />
       </>
   )
+}
 }
 
 export default MyApp
