@@ -6,9 +6,7 @@ import Head from "next/head"
 import { init } from "@socialgouv/matomo-next"
 import App from "next/app"
 
-
 class MyApp extends App {
-
   componentDidMount() {
     if (window.location.href.includes(config.domain)) {
       init({
@@ -18,15 +16,15 @@ class MyApp extends App {
         window._paq.push(["enableHeartBeatTimer"])
     }
   }
-  
+
   render() {
     const { Component, pageProps } = this.props
     return (
-    <>
-      <Component {...pageProps} />
+      <>
+        <Component {...pageProps} />
       </>
-  )
-}
+    )
+  }
 }
 
 export default MyApp

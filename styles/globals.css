@@ -145,7 +145,7 @@ body {
   --gray: #c9d1d9;
   --gap: 1rem;
   --border: var(--thirdy-color);
-  --border-radius: 4px;
+  --border-radius: .5rem;
   --primary-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";

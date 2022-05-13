@@ -18,7 +18,7 @@ import VectorLayer from "ol/layer/Vector"
 import { FaSearch } from "react-icons/fa"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import Details from "@/components/search/details/details"
-import { set } from "lodash"
+import { config } from "config"
 
 const Container = styled.div`
   position: absolute;
@@ -27,8 +27,7 @@ const Container = styled.div`
   z-index: 2;
   margin: var(--space-sm);
   padding: var(--space-sm);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  border-radius: var(--border-radius);
   background-color: var(--body-bg);
   display: flex;
   align-items: center;
@@ -88,7 +87,6 @@ const Section = styled.div`
   padding: 1rem 0;
 `
 
-
 const InfoSection = styled.div`
   border-top: 1px solid #d9d9d9;
   margin-top: auto;
@@ -117,6 +115,7 @@ const SearchContainer = styled.div`
 
 const SearchButton = styled(Button)`
   display: flex;
+  font-size: 100%;
   padding: 0.5rem 0.75rem;
 `
 
@@ -142,7 +141,7 @@ const SuggestionsContainer = styled.div`
   position: absolute;
   width: 100%;
   left: 0;
-  top: 61px
+  top: 61px;
 `
 
 const ListContainer = styled.ol`
@@ -168,21 +167,20 @@ const ListItem = styled.li`
 
 const Place = styled.p`
   display: inline-block;
-  font-size: .9rem;
+  font-size: 0.9rem;
 `
 
 const County = styled.span`
   display: inline-block;
-  font-size: 0.70rem;
+  font-size: 0.7rem;
   margin-left: 4px;
 `
 
 const Country = styled.p`
-display: inline-block;
-  font-size: 0.70rem;
+  display: inline-block;
+  font-size: 0.7rem;
   margin-left: 4px;
 `
-
 
 const ButtonWrapper = styled.div`
   display: inline-block;
@@ -203,16 +201,16 @@ function Autocomplete() {
   const [input, setInput] = useState("")
   const [markerLayer, setMarkerLayer] = useState()
   const [userLang, setUserLang] = useState("en")
-  const [gotData, setGotData] = useState(false)
+  const [gotFirstData, setGotFirstData] = useState(false)
+  const [gotSecondData, setGotSecondData] = useState(false)
 
   const { map } = useContext(MapContext)
 
   const suggestionLimit = 5
 
   useEffect(() => {
-    setUserLang((navigator.language || navigator.userLanguage).slice(0,2))
+    setUserLang((navigator.language || navigator.userLanguage).slice(0, 2))
   }, [userLang])
-
 
   useEffect(() => {
     getOptions()
@@ -238,55 +236,58 @@ function Autocomplete() {
     }
   }
 
-    
   const handleVisability = () => {
     visible ? setVisible(false) : setVisible(true)
   }
 
   const handleChange = (e) => {
-    setGotData(false)
+    setGotFirstData(false)
+    setGotSecondData(false)
     setInput(e.target.value)
   }
 
-
   useEffect(() => {
-    !gotData ? getFirstSuggestionResultsDelayed(extent, input, suggestionLimit) : null
+    !gotFirstData
+      ? getFirstSuggestionResultsDelayed(extent, input, suggestionLimit)
+      : null
   }, [extent])
 
   useEffect(() => {
-      const difference = suggestionLimit - suggestions.length
-      if (difference != 0) {
-      getSecondSuggestionResults(lat, lon, zoom, input, difference)
+    const difference = suggestionLimit - suggestions.length
+    if (difference != 0) {
+      gotFirstData && !gotSecondData
+        ? getSecondSuggestionResults(lat, lon, zoom, input, difference)
+        : null
     }
   }, [suggestions])
 
   const filterData = (data) => {
     let set = []
     if (data.features) {
-      set = data.features
-        .filter((hit) => {
-          if (
-            hit.properties.osm_value === "country" ||
-            hit.properties.osm_value === "continent" ||
-            hit.properties.osm_value === "state" ||
-            hit.properties.osm_value === "municipality" 
-          ) {
-            return false
-          } else if (hit.properties.type === "county") {
-            return false
-          } else if (hit.properties.osm_key === "boundary") {
-            return false
-          }
-          return true
-        })
-        return set.slice(0,5)
+      set = data.features.filter((hit) => {
+        if (
+          hit.properties.osm_value === "country" ||
+          hit.properties.osm_value === "continent" ||
+          hit.properties.osm_value === "state" ||
+          hit.properties.osm_value === "municipality"
+        ) {
+          return false
+        } else if (hit.properties.type === "county") {
+          return false
+        } else if (hit.properties.osm_key === "boundary") {
+          return false
+        }
+        return true
+      })
+      return set.slice(0, 5)
     }
   }
 
-  const handleClick = (searchTerm) => {
+  const selectResult = (searchTerm, osmId, osmType) => {
+    //console.log("test")
     removeMarker()
     setInput(searchTerm)
-    getGeocodingResults(searchTerm)
+    getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
   }
 
@@ -297,24 +298,32 @@ function Autocomplete() {
   // Marker
   useEffect(() => {
     setShowSuggestions(false)
-    if (geocodingResult.geometry) {
-      const coordinates = transform([geocodingResult.geometry.coordinates[0],geocodingResult.geometry.coordinates[1]], "EPSG:4326", "EPSG:3857")
-      const marker = new Feature({
-        geometry: new Point (coordinates),
-        name: 'Marker'
-      });
-      map.getView().fit(marker.getGeometry(),  { 
-        padding: [10000, 10000, 10000, 10000], 
-        maxZoom: 12, 
-        duration: 1000 
-      });
-      addMarker(marker)
+    if (geocodingResult.boundingbox) {
+      const transformedBbox = transformExtent(
+        [
+          geocodingResult.boundingbox[2],
+          geocodingResult.boundingbox[0],
+          geocodingResult.boundingbox[3],
+          geocodingResult.boundingbox[1],
+        ],
+        "EPSG:4326",
+        "EPSG:3857"
+      )
+      map.getView().fit(transformedBbox, {
+        duration: 1000,
+      })
+      addMarker(geocodingResult)
     }
     setShowSuggestions(false)
   }, [geocodingResult])
 
-  const addMarker = (marker) => {
-
+  const addMarker = (geocodingResult) => {
+    const marker = new Feature({
+      geometry: new Point(
+        fromLonLat([geocodingResult.lon, geocodingResult.lat])
+      ),
+      name: "Marker",
+    })
     const vectorSource = new VectorSource({
       features: [marker],
     })
@@ -339,33 +348,40 @@ function Autocomplete() {
       }`,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": config.email,
+        },
       }
     )
     const data = await response.json()
+    setGotFirstData(true)
     const filteredData = filterData(data)
     setSuggestions(filteredData)
     setShowSuggestions(true)
-    setGotData(true)
   }
 
   async function getSecondSuggestionResults(lat, lon, zoom, input, limit) {
-
+    const encodedInput = encodeURI(input)
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=${zoom + 10}&location_bias_scale=0.2`,
+      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=4&location_bias_scale=0.1`,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": config.email,
+        },
       }
     )
     const data = await response.json()
+    setGotSecondData(true)
     const filteredData = filterData(data)
-    setSuggestions((suggestions) => [...filteredData, ...suggestions].slice(0,5))
+    setSuggestions((suggestions) =>
+      [...filteredData, ...suggestions].slice(0, 5)
+    )
     setShowSuggestions(true)
-    setGotData(true)
   }
 
-  
   const getFirstSuggestionResultsDelayed = useCallback(
     debounce((extent, input, limit, callback) => {
       getFirstSuggestionResults(extent, input, limit).then(callback)
@@ -373,28 +389,29 @@ function Autocomplete() {
     []
   )
 
-  async function getGeocodingResults(searchTerm) {
-    const encode = encodeURI(searchTerm)
+  async function getGeocodingResults(osmId, osmType) {
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encode}&limit=1&lang=${userLang}`,
+      `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=${userLang}&polygon_geojson=1`,
       {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": config.email,
+        },
       }
     )
     const data = await response.json()
-    setGeocodingResult(data.features[0])
+    setGeocodingResult(data[0])
     setShowSuggestions(false)
   }
 
   const getSymbol = (value) => {
     if (value === "train_station") {
-      return <FaTrain/>
+      return <FaTrain />
     } else {
-      return <FaMapMarkerAlt/>
+      return <FaMapMarkerAlt />
     }
   }
-
-
 
   const SuggestionsListComponent = () => {
     if (!suggestions || input.length === 0) {
@@ -409,19 +426,28 @@ function Autocomplete() {
                   ? ", " + suggestion.properties.city
                   : ""
               }`
+              const osmId = suggestion.properties.osm_id
+              const osmType = suggestion.properties.osm_type
               /*onst secondPart = suggestion.properties.name.replace(
                 capitalizeFirstLetter(input),
                 ""
               )
               const firstPart = input*/
               return (
-                <ListItem key={index} onClick={() => handleClick(searchTerm)}>
+                <ListItem
+                  key={index}
+                  onClick={() => selectResult(searchTerm, osmId, osmType)}
+                >
                   <ButtonWrapper>
                     {getSymbol(suggestion.properties.osm_value)}
                   </ButtonWrapper>
                   <Place>{suggestion.properties.name}</Place>
-                  {suggestion.properties.county ? <County>{suggestion.properties.county}</County> : null}
-                  {suggestion.properties.country ? <Country>{suggestion.properties.country}</Country> : null }
+                  {suggestion.properties.county ? (
+                    <County>{suggestion.properties.county}</County>
+                  ) : null}
+                  {suggestion.properties.country ? (
+                    <Country>{suggestion.properties.country}</Country>
+                  ) : null}
                 </ListItem>
               )
             })}
@@ -430,7 +456,6 @@ function Autocomplete() {
       ) : null
     }
   }
-
 
   return (
     <>
@@ -474,26 +499,26 @@ function Autocomplete() {
         </>
       ) : null}
       <>
-      <Container>
-        <ButtonWrapper onClick={handleVisability}>
-          <BurgerIcon />
-        </ButtonWrapper>
-        <SearchContainer>
-          <AutoCompleteContainer>
-            <AutoCompleteInput
-              type="text"
-              onChange={handleChange}
-              value={input}
-              placeholder="Search in mxd.codes Maps"
-            />
-            {showSuggestions ? <SuggestionsListComponent /> : null}
-          </AutoCompleteContainer>
-          <SearchButton>
-            <FaSearch />
-          </SearchButton>
-        </SearchContainer>
-      </Container>
-      <Details result={geocodingResult} />
+        <Container>
+          <ButtonWrapper onClick={handleVisability}>
+            <BurgerIcon />
+          </ButtonWrapper>
+          <SearchContainer>
+            <AutoCompleteContainer>
+              <AutoCompleteInput
+                type="text"
+                onChange={handleChange}
+                value={input}
+                placeholder="Search in mxd.codes Maps"
+              />
+              {showSuggestions ? <SuggestionsListComponent /> : null}
+            </AutoCompleteContainer>
+            <SearchButton>
+              <FaSearch />
+            </SearchButton>
+          </SearchContainer>
+        </Container>
+        {geocodingResult ? <Details result={geocodingResult} /> : null }
       </>
     </>
   )

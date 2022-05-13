@@ -20,4 +20,10 @@ module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+      domains: [
+        "upload.wikimedia.org",
+        "source.unsplash.com"
+      ],
+    },
 }
