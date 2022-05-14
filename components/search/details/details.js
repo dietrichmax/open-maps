@@ -10,8 +10,10 @@ import {
   FaShare,
   FaBookmark,
 } from "react-icons/fa"
+import { ImCross } from "react-icons/im"
 const md5 = require("md5")
 import Image from "next/image"
+import media from "styled-media-query"
 
 const DetailsWrapper = styled.div`
   position: absolute;
@@ -23,7 +25,12 @@ const DetailsWrapper = styled.div`
   width: var(--sidebar-width);
   border: 0;
   box-shadow: var(--box-shadow);
-  opacounty: 1;
+  ${media.lessThan("416px")`
+    margin: 0;
+    width: 100%;
+    height: auto;
+    padding-bottom: 2.5rem;
+  `}
 `
 
 const ImageWrapper = styled.div`
@@ -31,12 +38,19 @@ const ImageWrapper = styled.div`
   width: 100%;
   height: 300px;
   margin-bottom: 1rem;
+  ${media.lessThan("416px")`
+  margin: 0;
+  height: 230px;
+`}
 `
 
 const Header = styled.div`
   padding: 1rem 2rem 2rem 2rem;
   display: block;
   border-bottom: 1px solid var(--border-color);
+  ${media.lessThan("416px")`
+  padding: 1rem 2rem 1rem 2rem;
+  `}
 `
 
 const Title = styled.h1`
@@ -72,6 +86,11 @@ const ActionWrapper = styled.div`
   :hover {
     border: 1px solid var(--secondary-color);
   }
+
+  ${media.lessThan("416px")`
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  `}
 `
 
 const WikipediaData = styled.div`
@@ -91,6 +110,32 @@ const WikipediaLink = styled.a`
   :hover {
     border-bottom: none;
   }
+`
+
+const CloseDetailsContainer = styled.div`
+  display: none;
+
+  ${media.lessThan("416px")`
+  position: absolute;
+  bottom: -1.75rem;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  justify-content: center;
+  :hover {
+    border: 1px solid var(--secondary-color);
+  }
+`}
 `
 
 function Details({ result, lang }) {
@@ -137,7 +182,7 @@ function Details({ result, lang }) {
       <WikipediaData>
         <WikipediaTitle>Short Summary</WikipediaTitle>
         <WikipediaDataContainer>
-          {wikipediaData.substr(0, wikipediaData.indexOf('. '))}.
+          {wikipediaData.substr(0, wikipediaData.indexOf(". "))}.
         </WikipediaDataContainer>
 
         <WikipediaCredit>
@@ -164,28 +209,29 @@ function Details({ result, lang }) {
     if (!result || !result.extratags) {
       setwikimediaImageUrl()
       return null
-    } 
-      const res = await fetch(
-        `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "User-Agent": config.email,
-          },
-        }
-      )
-      const data = await res.json()
-      let imageUrl
-      if (data.claims && data.claims.P18) {
-        const imageName =
-          data.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
-        const hash = md5(imageName)
-        imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+    }
+    const res = await fetch(
+      `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": config.email,
+        },
       }
+    )
+    const data = await res.json()
+    let imageUrl
+    if (data.claims && data.claims.P18) {
+      const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(
+        " ",
+        "_"
+      )
+      const hash = md5(imageName)
+      imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+    }
 
-      setwikimediaImageUrl(imageUrl)
-    
+    setwikimediaImageUrl(imageUrl)
   }
 
   async function getWikipediaData(result) {
@@ -193,8 +239,8 @@ function Details({ result, lang }) {
     if (!result || !result.extratags || !result.extratags.wikipedia) {
       setWikipediaData()
       return null
-    } 
-    
+    }
+
     wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
     const encode = encodeURI(wikipedia)
     const res = await fetch(
@@ -215,6 +261,8 @@ function Details({ result, lang }) {
       setWikipediaData(data.query.pages[0].extract.toString())
     }
   }
+
+  const deleteSearch = () => {}
 
   const renderAdress = (address) => {
     if (!address) {
@@ -285,6 +333,9 @@ function Details({ result, lang }) {
           </ActionWrapper>
         </Actions>
         {renderWikidata()}
+        <CloseDetailsContainer onClick={deleteSearch}>
+          <ImCross />
+        </CloseDetailsContainer>
       </DetailsWrapper>
     )
   }

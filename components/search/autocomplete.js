@@ -59,7 +59,7 @@ const PageWrap = styled.div`
 `
 
 const CloseButton = styled(ImCross)`
-cursor: pointer;
+  cursor: pointer;
 `
 
 const Header = styled.div`
@@ -192,16 +192,15 @@ const Country = styled.p`
 `
 
 const SearchButtonWrapper = styled.div`
-display: flex;
-cursor: pointer;
-font-size: 100%;
-align-items: center;
-padding: 0;
-border: none;
-background: var(--body-bg);
-margin-right: .5rem;
+  display: flex;
+  cursor: pointer;
+  font-size: 100%;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: var(--body-bg);
+  margin-right: 0.5rem;
 `
-
 
 const ButtonWrapper = styled.div`
   display: inline-block;
@@ -210,12 +209,10 @@ const ButtonWrapper = styled.div`
 `
 
 const DeleteSearchButtonWrapper = styled.div`
-
-display: flex;
-padding-right: .75rem;
-border-right: 1px solid var(--gray);
+  display: flex;
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--gray);
 `
-
 
 function Autocomplete() {
   const [visible, setVisible] = useState(false)
@@ -347,7 +344,11 @@ function Autocomplete() {
     if (!showResult) return
     return (
       <DeleteSearchButtonWrapper>
-      <CloseButton style={{color:'var(--gray)'}} title="Delete search" onClick={deleteSearch}/>
+        <CloseButton
+          style={{ color: "var(--gray)" }}
+          title="Delete search"
+          onClick={deleteSearch}
+        />
       </DeleteSearchButtonWrapper>
     )
   }
@@ -394,11 +395,11 @@ function Autocomplete() {
       zIndex: 2,
       style: new Style({
         image: new Icon({
-          crossOrigin: 'anonymous',
+          crossOrigin: "anonymous",
           // src: "marker.png",
-          src: 'https://icons.iconarchive.com/icons/paomedia/small-n-flat/24/map-marker-icon.png'
-        })
-      })
+          src: "https://icons.iconarchive.com/icons/paomedia/small-n-flat/24/map-marker-icon.png",
+        }),
+      }),
     })
     map.addLayer(vectorLayer)
   }
@@ -482,7 +483,6 @@ function Autocomplete() {
     }
   }
 
-
   const SuggestionsListComponent = () => {
     if (!suggestions || input.length === 0) {
       return
@@ -537,7 +537,9 @@ function Autocomplete() {
           <SidebarContainer>
             <Header>
               <Logo />
-              <CloseButton onClick={handleVisability} title="Close menu">Close</CloseButton>
+              <CloseButton onClick={handleVisability} title="Close menu">
+                Close
+              </CloseButton>
             </Header>
             <Section>
               <SectionHeader>Draw Options</SectionHeader>
@@ -578,14 +580,14 @@ function Autocomplete() {
           </SearchButtonWrapper>
           <SearchContainer>
             <AutoCompleteContainer>
-            <AutoCompleteInputContainer>
-              <AutoCompleteInput
-                type="text"
-                onChange={handleChange}
-                value={input}
-                placeholder="Search in mxd.codes Maps"
-              />
-              {setShowResult ? <DeleteSearch/> : null}
+              <AutoCompleteInputContainer>
+                <AutoCompleteInput
+                  type="text"
+                  onChange={handleChange}
+                  value={input}
+                  placeholder="Search in mxd.codes Maps"
+                />
+                {setShowResult ? <DeleteSearch /> : null}
               </AutoCompleteInputContainer>
               {showSuggestions ? <SuggestionsListComponent /> : null}
             </AutoCompleteContainer>

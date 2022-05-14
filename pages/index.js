@@ -19,7 +19,6 @@ const Attribution = styled.div`
   padding-left: 5px;
 `
 
-
 function Index() {
   const [center, setCenter] = useState([14, 46])
   const [zoom, setZoom] = useState(5)
@@ -68,9 +67,18 @@ function Index() {
         <TileLayer source={new OSM()} zIndex={0} />
       </Layers>
       <Attribution>
-        <div id="copyright"><a target="_blank" href="https://www.openstreetmap.org/">Map built with OpenStreetMap data</a> 
-        <span> | </span>
-        <a rel="license" target="_blank" href="https://opendatacommons.org/licenses/odbl/">Open Database License (ODbL)</a>
+        <div id="copyright">
+          <a target="_blank" href="https://www.openstreetmap.org/">
+            Map built with OpenStreetMap data
+          </a>
+          <span> | </span>
+          <a
+            rel="license"
+            target="_blank"
+            href="https://opendatacommons.org/licenses/odbl/"
+          >
+            Open Database License (ODbL)
+          </a>
         </div>
       </Attribution>
     </Map>
