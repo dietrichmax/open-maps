@@ -26,14 +26,12 @@ const MapWrapper = ({ children, zoom, center }) => {
   // zoom change handler
   useEffect(() => {
     if (!map) return
-
     map.getView().setZoom(zoom)
   }, [zoom])
 
   // center change handler
   useEffect(() => {
     if (!map) return
-
     map.getView().setCenter(center)
   }, [center])
 

@@ -1,7 +1,15 @@
 import styled from "styled-components"
 import { useState, useEffect } from "react"
 import { config } from "config"
-import { FaRoute, FaDirections, FaHome, FaPhone, FaEnvelope, FaShare,FaBookmark } from "react-icons/fa"
+import {
+  FaRoute,
+  FaDirections,
+  FaHome,
+  FaPhone,
+  FaEnvelope,
+  FaShare,
+  FaBookmark,
+} from "react-icons/fa"
 const md5 = require("md5")
 import Image from "next/image"
 
@@ -26,7 +34,7 @@ const ImageWrapper = styled.div`
 `
 
 const Header = styled.div`
-    padding: 0 2rem 0 2rem;
+  padding: 0 2rem 0 2rem;
   display: block;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
@@ -53,8 +61,9 @@ const Actions = styled.div`
 
 const ActionWrapper = styled.div`
   display: flex;
-  margin-top: 1rem;
+  margin-top: 2rem;
   margin-right: 1rem;
+  margin-bottom: 2rem;
   justify-content: space-between;
   cursor: pointer;
   border-radius: 40px;
@@ -67,98 +76,146 @@ const ActionWrapper = styled.div`
   }
 `
 
-function Details({ result }) {
+const WikipediaData = styled.div`
+  padding: 0 2rem 0 2rem;
+`
+
+const WikipediaDataContainer = styled.div``
+const WikipediaTitle = styled.h3`
+  margin-bottom: 1rem;
+`
+
+const WikipediaCredit = styled.div`
+  margin-top: 1rem;
+`
+const WikipediaLink = styled.a`
+  border-bottom: 1px solid var(--secondary-color);
+  :hover {
+    border-bottom: none;
+  }
+`
+
+function Details({ result, lang }) {
   const [visible, setVisible] = useState(false)
   const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
-  const [gotWikipediaData, setGotWikipediaData] = useState(false)
+  const [wikipediaData, setWikipediaData] = useState(false)
 
-  
+  //console.log(result)
 
-  
   const renderImage = () => {
+    if (!wikimediaImageUrl) {
+      return null
+    }
     return (
-        <>
-      <Image
-      src={wikimediaImageUrl ? wikimediaImageUrl : `https://source.unsplash.com/random/300×450/?${result.display_name}`}
-      height="300"
-      width="450"
-      alt={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimeda` : "Random image from Unsplash"}
-      title={wikimediaImageUrl ? `Image of '${result.display_name}' from Wikimedia` : "Random image from Unsplash"}
-      />
+      <>
+        <Image
+          src={
+            wikimediaImageUrl
+              ? wikimediaImageUrl
+              : `https://source.unsplash.com/random/300×450/?${result.display_name}`
+          }
+          height="300"
+          width="450"
+          alt={
+            wikimediaImageUrl
+              ? `Image of ${result.display_name} from Wikimeda`
+              : "Random image from Unsplash"
+          }
+          title={
+            wikimediaImageUrl
+              ? `Image of '${result.display_name}' from Wikimedia`
+              : "Random image from Unsplash"
+          }
+        />
       </>
     )
-}
+  }
+
+  const renderWikidata = () => {
+    if (!wikipediaData) {
+      return null
+    }
+    return (
+      <WikipediaData>
+        <WikipediaTitle>Short Summary</WikipediaTitle>
+        <WikipediaDataContainer>
+          {wikipediaData.split(".").slice(0, 2).join(".")}.
+        </WikipediaDataContainer>
+
+        <WikipediaCredit>
+          Data from{" "}
+          <WikipediaLink
+            title={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+            href={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+          >
+            Wikipedia
+          </WikipediaLink>{" "}
+          API.
+        </WikipediaCredit>
+      </WikipediaData>
+    )
+  }
 
   useEffect(() => {
     getWikimediaImageUrl(result)
+    getWikipediaData(result)
   }, [result])
 
-
-  getWikimediaImageUrl(result)
+  //getWikimediaImageUrl(result)
   async function getWikimediaImageUrl(result) {
     if (!result || !result.extratags) {
-        return null
-      } else {
-        const res = await fetch(
-          `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "User-Agent": config.email,
-            },
-          }
-        )
-          const data = await res.json()
-          let imageUrl
-          if (data.claims) {
-            const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
-            const hash = md5(imageName)
-            imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
-        } 
-          
-
-          setwikimediaImageUrl(imageUrl);
-          
-        
+      return null
+    } else {
+      const res = await fetch(
+        `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": config.email,
+          },
+        }
+      )
+      const data = await res.json()
+      let imageUrl
+      if (data.claims) {
+        const imageName =
+          data.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
+        const hash = md5(imageName)
+        imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
       }
+
+      setwikimediaImageUrl(imageUrl)
+    }
   }
 
-  /*async function getWikipediaData (wikipedia) {
-    if (!wikipedia) {
-            return null 
-        } else {
-            const encode = encodeURI(name)
-        const res = await fetch(
-                `https://en.wikipedia.org/w/api.php?action=query&section=0&prop=pageimages&format=json&origin=*&titles=${encode}`,
-                {
-                  method: "GET",
-                  headers: { 
-                      "Content-Type": "application/json" ,
-                      "User-Agent"   : config.email
-                },
-                }
-              )
-              if (!res.ok) {
-                throw new Error(res.statusText);
-            } else {
-                const data = await res.json()
-                setWikipediaData(data)
-                setGotWikipediaData(true)
-            }
-        
-        return (
-            <div>    
-                {address.county ? `${address.county},` : null}
-                {address.street ? ` ${address.street} ` : null}
-                {address.housenumber ? ` ${address.housenumber},` : null}
-                {address.postcode ? ` ${address.postcode}` : null}
-                {address.city ? ` ${address.city},` : null}
-                {address.country ? ` ${address.country}` : null}        
-            </div>
-        )
-        }
-    }*/
+  async function getWikipediaData(result) {
+    console.log(result)
+    let wikipedia
+    if (!result || !result.extratags) 
+      return
+    
+      wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
+    
+    const encode = encodeURI(wikipedia)
+    const res = await fetch(
+      `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=${encode}&origin=*`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": config.email,
+        },
+      }
+    )
+    if (!res.ok) {
+      throw new Error(res.statusText)
+    } else {
+      const data = await res.json()
+      console.log(data)
+      setWikipediaData(data.query.pages[19058].extract.toString())
+    }
+  }
 
   const renderAdress = (address) => {
     if (!address) {
@@ -181,9 +238,7 @@ function Details({ result }) {
   } else {
     return (
       <DetailsWrapper>
-            <ImageWrapper>
-            {renderImage()}
-            </ImageWrapper>
+        <ImageWrapper>{renderImage()}</ImageWrapper>
         <Header>
           {result.display_name ? <Title>{result.display_name}</Title> : null}
           {/*renderAdress(result.address)*/}
@@ -205,13 +260,12 @@ function Details({ result }) {
             </a>
           ) : null}
           {result.extratags.phone ? (
-              <ActionWrapper
-              
+            <ActionWrapper
               title={result.extratags.phone}
               alt={`Phone number of ${result.display_name}`}
-              >
-                <FaPhone />
-              </ActionWrapper>
+            >
+              <FaPhone />
+            </ActionWrapper>
           ) : null}
           {result.extratags.email ? (
             <a
@@ -219,27 +273,19 @@ function Details({ result }) {
               title={result.extratags.email}
               alt={`Email of ${result.display_name}`}
             >
-            <ActionWrapper
-            >
-              <FaEnvelope />
-            </ActionWrapper>
+              <ActionWrapper>
+                <FaEnvelope />
+              </ActionWrapper>
             </a>
-        ) : null}
-        <ActionWrapper
-        title="Save this place"
-        >
+          ) : null}
+          <ActionWrapper title="Save this place">
             <FaBookmark />
           </ActionWrapper>
-        <ActionWrapper
-        title="Share this place"
-        >
+          <ActionWrapper title="Share this place">
             <FaShare />
           </ActionWrapper>
         </Actions>
-        {/*{wikipediaData ? 
-            <div dangerouslySetInnerHTML={{__html: wikipediaData.parse.text["*"]}} /> 
-            
-        : null}*/}
+        {renderWikidata()}
       </DetailsWrapper>
     )
   }

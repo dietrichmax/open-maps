@@ -19,9 +19,8 @@ import { FaSearch } from "react-icons/fa"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import Details from "@/components/search/details/details"
 import { config } from "config"
-import {Icon, Style} from 'ol/style';
-import { push } from "@socialgouv/matomo-next";
-
+import { Icon, Style } from "ol/style"
+import { push } from "@socialgouv/matomo-next"
 
 const Container = styled.div`
   position: absolute;
@@ -35,7 +34,6 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   width: 400px;
-  opacity: 0.9;
   ${media.lessThan("416px")`
     margin: 0;
     width: 100%;
@@ -249,7 +247,12 @@ function Autocomplete() {
     setGotFirstData(false)
     setGotSecondData(false)
     setInput(e.target.value)
-    setSearchQuery(e.target.value.replaceAll(",","+").replaceAll(" ","+").replaceAll("++","+"))
+    setSearchQuery(
+      e.target.value
+        .replaceAll(",", "+")
+        .replaceAll(" ", "+")
+        .replaceAll("++", "+")
+    )
   }
 
   useEffect(() => {
@@ -266,6 +269,13 @@ function Autocomplete() {
         : null
     }
   }, [suggestions])
+
+  useEffect(() => {
+    const difference = suggestionLimit - suggestions.length
+    if (difference != 0) {
+      getSecondSuggestionResults(lat, lon, zoom, input, difference)
+    }
+  }, [gotSecondData])
 
   const filterData = (data) => {
     let set = []
@@ -295,7 +305,7 @@ function Autocomplete() {
     setInput(searchTerm)
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
-    push(["trackEvent", "search", searchTerm]);
+    push(["trackEvent", "search", searchTerm])
   }
 
   const capitalizeFirstLetter = (string) => {
@@ -393,7 +403,7 @@ function Autocomplete() {
     setSuggestions((suggestions) =>
       [...filteredData, ...suggestions].slice(0, 5)
     )
-  
+
     setShowSuggestions(true)
   }
 
@@ -536,7 +546,9 @@ function Autocomplete() {
             </SearchButton>
           </SearchContainer>
         </Container>
-        {geocodingResult ? <Details result={geocodingResult} /> : null }
+        {geocodingResult ? (
+          <Details result={geocodingResult} lang={userLang} />
+        ) : null}
       </>
     </>
   )
