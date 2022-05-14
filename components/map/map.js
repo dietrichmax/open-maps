@@ -3,6 +3,7 @@ import MapContext from "./mapContext"
 import View from "ol/View"
 import Map from "ol/Map"
 
+
 const MapWrapper = ({ children, zoom, center }) => {
   const mapRef = useRef()
   const [map, setMap] = useState(null)

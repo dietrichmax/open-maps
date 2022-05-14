@@ -1,14 +1,11 @@
 import styled from "styled-components"
+import { GiHamburgerMenu } from "react-icons/gi"
 
-const BurgerWrapper = styled.button`
-  width: 25px;
-  height: 25px;
-  display: flex;
-  margin-right: var(--space-sm);
-`
 
 function Burger() {
-  return <BurgerWrapper title="Menu"></BurgerWrapper>
+  return (
+    <GiHamburgerMenu title="Menu" />
+  )
 }
 
 export default Burger

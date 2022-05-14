@@ -6,6 +6,20 @@ import { Layers, TileLayer } from "components/layers"
 import OSM from "ol/source/OSM"
 import XYZ from "ol/source/XYZ"
 
+import styled from "styled-components"
+
+const Attribution = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+  background-color: #fff;
+  opacity: 0.7;
+  font-size: 11px;
+  padding-left: 5px;
+`
+
+
 function Index() {
   const [center, setCenter] = useState([14, 46])
   const [zoom, setZoom] = useState(5)
@@ -53,6 +67,12 @@ function Index() {
       <Layers>
         <TileLayer source={new OSM()} zIndex={0} />
       </Layers>
+      <Attribution>
+        <div id="copyright"><a target="_blank" href="https://www.openstreetmap.org/">Map built with OpenStreetMap data</a> 
+        <span> | </span>
+        <a rel="license" target="_blank" href="https://opendatacommons.org/licenses/odbl/">Open Database License (ODbL)</a>
+        </div>
+      </Attribution>
     </Map>
   )
 }

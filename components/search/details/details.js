@@ -22,7 +22,7 @@ const DetailsWrapper = styled.div`
   background-color: #fff;
   width: var(--sidebar-width);
   border: 0;
-  box-shadow: 0 1px 2px rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
+  box-shadow: var(--box-shadow);
   opacounty: 1;
 `
 
@@ -34,9 +34,8 @@ const ImageWrapper = styled.div`
 `
 
 const Header = styled.div`
-  padding: 0 2rem 0 2rem;
+  padding: 1rem 2rem 2rem 2rem;
   display: block;
-  padding-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
 `
 
@@ -45,7 +44,6 @@ const Title = styled.h1`
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.75rem;
-  word
 `
 
 const Address = styled.h2`
@@ -139,7 +137,7 @@ function Details({ result, lang }) {
       <WikipediaData>
         <WikipediaTitle>Short Summary</WikipediaTitle>
         <WikipediaDataContainer>
-          {wikipediaData.split(".").slice(0, 2).join(".")}.
+          {wikipediaData.substr(0, wikipediaData.indexOf('. '))}.
         </WikipediaDataContainer>
 
         <WikipediaCredit>
@@ -164,8 +162,9 @@ function Details({ result, lang }) {
   //getWikimediaImageUrl(result)
   async function getWikimediaImageUrl(result) {
     if (!result || !result.extratags) {
+      setwikimediaImageUrl()
       return null
-    } else {
+    } 
       const res = await fetch(
         `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
         {
@@ -178,7 +177,7 @@ function Details({ result, lang }) {
       )
       const data = await res.json()
       let imageUrl
-      if (data.claims) {
+      if (data.claims && data.claims.P18) {
         const imageName =
           data.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
         const hash = md5(imageName)
@@ -186,20 +185,20 @@ function Details({ result, lang }) {
       }
 
       setwikimediaImageUrl(imageUrl)
-    }
+    
   }
 
   async function getWikipediaData(result) {
-    console.log(result)
     let wikipedia
-    if (!result || !result.extratags) 
-      return
+    if (!result || !result.extratags || !result.extratags.wikipedia) {
+      setWikipediaData()
+      return null
+    } 
     
-      wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
-    
+    wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
     const encode = encodeURI(wikipedia)
     const res = await fetch(
-      `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=${encode}&origin=*`,
+      `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${encode}&origin=*`,
       {
         method: "GET",
         headers: {
@@ -213,7 +212,7 @@ function Details({ result, lang }) {
     } else {
       const data = await res.json()
       console.log(data)
-      setWikipediaData(data.query.pages[19058].extract.toString())
+      setWikipediaData(data.query.pages[0].extract.toString())
     }
   }
 

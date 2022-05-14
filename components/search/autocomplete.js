@@ -17,6 +17,7 @@ import VectorSource from "ol/source/Vector"
 import VectorLayer from "ol/layer/Vector"
 import { FaSearch } from "react-icons/fa"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
+import { ImCross } from "react-icons/im"
 import Details from "@/components/search/details/details"
 import { config } from "config"
 import { Icon, Style } from "ol/style"
@@ -57,8 +58,8 @@ const PageWrap = styled.div`
   background: black;
 `
 
-const CloseButton = styled.button`
-  ::after { content: "\2714"; }
+const CloseButton = styled(ImCross)`
+cursor: pointer;
 `
 
 const Header = styled.div`
@@ -128,11 +129,17 @@ const AutoCompleteContainer = styled.div`
   margin-bottom: auto;
 `
 
+const AutoCompleteInputContainer = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 const AutoCompleteInput = styled(Input)`
   width: 100%;
   font-size: 15px;
   margin-top: auto;
   margin-bottom: auto;
+  padding-left: 1rem;
   max-width: 350px;
   ::placeholder {
     color: var(--gray);
@@ -184,11 +191,31 @@ const Country = styled.p`
   margin-left: 4px;
 `
 
+const SearchButtonWrapper = styled.div`
+display: flex;
+cursor: pointer;
+font-size: 100%;
+align-items: center;
+padding: 0;
+border: none;
+background: var(--body-bg);
+margin-right: .5rem;
+`
+
+
 const ButtonWrapper = styled.div`
   display: inline-block;
   width: 57px;
   text-align: center;
 `
+
+const DeleteSearchButtonWrapper = styled.div`
+
+display: flex;
+padding-right: .75rem;
+border-right: 1px solid var(--gray);
+`
+
 
 function Autocomplete() {
   const [visible, setVisible] = useState(false)
@@ -200,6 +227,7 @@ function Autocomplete() {
   const [gotSecondSuggestions, setGotSecondSuggestions] = useState(false)
   const [geocodingResult, setGeocodingResult] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [showResult, setShowResult] = useState(false)
   const [input, setInput] = useState("")
   const [markerLayer, setMarkerLayer] = useState()
   const [userLang, setUserLang] = useState("en")
@@ -257,7 +285,7 @@ function Autocomplete() {
 
   useEffect(() => {
     !gotFirstData
-      ? getFirstSuggestionResultsDelayed(extent, searchQuery, suggestionLimit)
+      ? getFirstSuggestionResultsDelayed(extent, searchQuery, 4)
       : null
   }, [extent])
 
@@ -305,7 +333,23 @@ function Autocomplete() {
     setInput(searchTerm)
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
+    setShowResult(true)
     push(["trackEvent", "search", searchTerm])
+  }
+
+  const deleteSearch = () => {
+    setInput("")
+    setGeocodingResult()
+    setShowResult(false)
+  }
+
+  const DeleteSearch = () => {
+    if (!showResult) return
+    return (
+      <DeleteSearchButtonWrapper>
+      <CloseButton style={{color:'var(--gray)'}} title="Delete search" onClick={deleteSearch}/>
+      </DeleteSearchButtonWrapper>
+    )
   }
 
   const capitalizeFirstLetter = (string) => {
@@ -315,7 +359,7 @@ function Autocomplete() {
   // Marker
   useEffect(() => {
     setShowSuggestions(false)
-    if (geocodingResult.boundingbox) {
+    if (geocodingResult && geocodingResult.boundingbox) {
       const transformedBbox = transformExtent(
         [
           geocodingResult.boundingbox[2],
@@ -348,13 +392,13 @@ function Autocomplete() {
     const vectorLayer = new VectorLayer({
       source: vectorSource,
       zIndex: 2,
-      /*style: new Style({
+      style: new Style({
         image: new Icon({
           crossOrigin: 'anonymous',
           // src: "marker.png",
           src: 'https://icons.iconarchive.com/icons/paomedia/small-n-flat/24/map-marker-icon.png'
         })
-      })*/
+      })
     })
     map.addLayer(vectorLayer)
   }
@@ -388,7 +432,7 @@ function Autocomplete() {
   async function getSecondSuggestionResults(lat, lon, zoom, input, limit) {
     const encodedInput = encodeURI(input)
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=0&location_bias_scale=0.1`,
+      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=1&location_bias_scale=0.1`,
       {
         method: "GET",
         headers: {
@@ -437,6 +481,7 @@ function Autocomplete() {
       return <FaMapMarkerAlt />
     }
   }
+
 
   const SuggestionsListComponent = () => {
     if (!suggestions || input.length === 0) {
@@ -492,7 +537,7 @@ function Autocomplete() {
           <SidebarContainer>
             <Header>
               <Logo />
-              <CloseButton onClick={handleVisability}>Close</CloseButton>
+              <CloseButton onClick={handleVisability} title="Close menu">Close</CloseButton>
             </Header>
             <Section>
               <SectionHeader>Draw Options</SectionHeader>
@@ -528,17 +573,20 @@ function Autocomplete() {
       ) : null}
       <>
         <Container>
-          <ButtonWrapper onClick={handleVisability}>
+          <SearchButtonWrapper onClick={handleVisability}>
             <BurgerIcon />
-          </ButtonWrapper>
+          </SearchButtonWrapper>
           <SearchContainer>
             <AutoCompleteContainer>
+            <AutoCompleteInputContainer>
               <AutoCompleteInput
                 type="text"
                 onChange={handleChange}
                 value={input}
                 placeholder="Search in mxd.codes Maps"
               />
+              {setShowResult ? <DeleteSearch/> : null}
+              </AutoCompleteInputContainer>
               {showSuggestions ? <SuggestionsListComponent /> : null}
             </AutoCompleteContainer>
             <SearchButton>
