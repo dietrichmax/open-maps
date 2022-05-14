@@ -19,6 +19,9 @@ import { FaSearch } from "react-icons/fa"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import Details from "@/components/search/details/details"
 import { config } from "config"
+import {Icon, Style} from 'ol/style';
+import { push } from "@socialgouv/matomo-next";
+
 
 const Container = styled.div`
   position: absolute;
@@ -32,6 +35,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   width: 400px;
+  opacity: 0.9;
   ${media.lessThan("416px")`
     margin: 0;
     width: 100%;
@@ -291,6 +295,7 @@ function Autocomplete() {
     setInput(searchTerm)
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
+    push(["trackEvent", "search", searchTerm]);
   }
 
   const capitalizeFirstLetter = (string) => {
@@ -333,6 +338,13 @@ function Autocomplete() {
     const vectorLayer = new VectorLayer({
       source: vectorSource,
       zIndex: 2,
+      /*style: new Style({
+        image: new Icon({
+          crossOrigin: 'anonymous',
+          // src: "marker.png",
+          src: 'https://icons.iconarchive.com/icons/paomedia/small-n-flat/24/map-marker-icon.png'
+        })
+      })*/
     })
     map.addLayer(vectorLayer)
   }
@@ -366,7 +378,7 @@ function Autocomplete() {
   async function getSecondSuggestionResults(lat, lon, zoom, input, limit) {
     const encodedInput = encodeURI(input)
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=1&location_bias_scale=0.1`,
+      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=0&location_bias_scale=0.1`,
       {
         method: "GET",
         headers: {
