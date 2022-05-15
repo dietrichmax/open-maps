@@ -40,7 +40,7 @@ const MapWrapper = ({ children, zoom, center }) => {
       <div
         ref={mapRef}
         className="ol-map"
-        style={{ height: "100vh", width: "100%", position:"relative"}}
+        style={{ height: "100vh", width: "100%", position: "relative" }}
       >
         {children}
       </div>

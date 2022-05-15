@@ -10,7 +10,7 @@ import {
   FaEnvelope,
   FaBookmark,
   FaThumbsUp,
-  FaThumbsDown
+  FaThumbsDown,
 } from "react-icons/fa"
 import { BsShareFill } from "react-icons/bs"
 import { ImCross } from "react-icons/im"
@@ -19,14 +19,17 @@ import Image from "next/image"
 import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
-
+import { fetchGET } from "@/components/utils/fetcher"
+import { fetchPOST } from "@/components/utils/fetcher"
+import useSWR from "swr"
 
 const DetailsWrapper = styled.div`
   position: absolute;
   top: 80px;
   left: 16px;
-  z-index: 1;
-  height: calc(100vh - 80px);
+  bottom: 16px;
+  z-index: 2;
+  max-height: calc(100vh - 96px);
   overflow: auto;
   background-color: #fff;
   width: var(--sidebar-width);
@@ -39,16 +42,16 @@ const DetailsWrapper = styled.div`
     width: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--body-bg); 
+    background: var(--body-bg);
   }
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: var(--gray); 
+    background: var(--gray);
   }
 
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--gray); 
+    background: var(--gray);
   }
   ${media.lessThan("432px")`
     top: 48px;
@@ -58,7 +61,6 @@ const DetailsWrapper = styled.div`
     border-radius: 0;
   `}
 `
-
 
 const ImageWrapper = styled.div`
   display: block;
@@ -82,26 +84,23 @@ const Title = styled.h1`
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.75rem;
-  margin-bottom: .25rem;
+  margin-bottom: 0.25rem;
 `
 
 const SubTitle = styled.h2`
-margin-top: 1rem;
-margin-bottom: 0.25rem;
-font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
 `
 
-
 const Type = styled.p`
-
-font-weight: 400;
+  font-weight: 400;
 `
 
 const Address = styled.h2`
   margin-top: 1rem;
   font-weight: 400;
 `
-
 
 const FeedbackContainer = styled.div`
   display: flex;
@@ -115,32 +114,31 @@ const FeedbackContainer = styled.div`
 `
 
 const FeedbackWrapper = styled.button`
-background-color: var(--border-color);
-border: none;
-display: flex;
-border-radius: 50%;
-cursor: pointer; 
-margin-right: 1rem;
-padding: 0.75rem;
-transition: 0.2s;
-:hover {
-  background: var(--body-bg);
-}
-:focus {
-  background: var(--secondary-color);
-}
+  background-color: var(--border-color);
+  border: none;
+  display: flex;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-right: 1rem;
+  padding: 0.75rem;
+  transition: 0.2s;
+  :hover {
+    background: var(--body-bg);
+  }
+  :focus {
+    background: var(--secondary-color);
+  }
 
-${media.lessThan("432px")`
+  ${media.lessThan("432px")`
 margin-bottom: 1rem;
 `}
 `
 
 const FeedbackResult = styled.div`
-margin-right: var(--space);
-display: flex;
-align-items: center;
+  margin-right: var(--space);
+  display: flex;
+  align-items: center;
 `
-
 
 const Actions = styled.div`
   display: flex;
@@ -156,23 +154,23 @@ const Actions = styled.div`
 `
 
 const ActionsResponsiveContainer = styled.div`
-display: flex;
+  display: flex;
 `
 
 const ActionsWrapper = styled(Button)`
-background-color: var(--body-bg);
-border: 1px solid var(--secondary-color);
-display: flex;
-border-radius: 50%;
-cursor: pointer; 
-margin-left: var(--space-sm);
-margin-right: .5rem;
-padding: 0.75rem;
-align-items: center;
-:hover {
-  background: var(--border-color);
-}
-${media.lessThan("432px")`
+  background-color: var(--body-bg);
+  border: 1px solid var(--secondary-color);
+  display: flex;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: var(--space-sm);
+  margin-right: 0.5rem;
+  padding: 0.75rem;
+  align-items: center;
+  :hover {
+    background: var(--border-color);
+  }
+  ${media.lessThan("432px")`
 margin-bottom: 1rem;
 margin-left: 0;
 margin-right: var(--space-sm);
@@ -180,19 +178,18 @@ margin-right: var(--space-sm);
 `
 
 const DirectionsButton = styled(Button)`
-display: flex;
-border-radius: var(--border-radius);
-margin-right: 0.5rem;
-padding: 0.75rem;
-min-width: 200px;
-justify-content: center;
-color: var(--body-bg);
-background-color: var(--secondary-color);
-:hover {
-  opacity: 0.8;
-
-}
-${media.lessThan("432px")`
+  display: flex;
+  border-radius: var(--border-radius);
+  margin-right: 0.5rem;
+  padding: 0.75rem;
+  min-width: 200px;
+  justify-content: center;
+  color: var(--body-bg);
+  background-color: var(--secondary-color);
+  :hover {
+    opacity: 0.8;
+  }
+  ${media.lessThan("432px")`
 margin-bottom: 1rem;
 min-width: 100%;
 `}
@@ -204,14 +201,13 @@ const WikipediaData = styled.div`
 
 const WikipediaDataContainer = styled.div``
 
-
 const WikipediaCredit = styled.div`
   margin-left: 2rem;
   margin-right: 2rem;
   margin-top: 1rem;
 `
 const WikipediaLink = styled.a`
-border-bottom: 1px solid var(--secondary-color);
+  border-bottom: 1px solid var(--secondary-color);
   :hover {
     border-bottom: none;
   }
@@ -240,7 +236,8 @@ const CloseDetailsContainer = styled.div`
   :hover {
     border: 1px solid var(--secondary-color);
   }
-`}`
+`}
+`
 
 const InformationContainer = styled.div`
   margin: 1rem 2rem;
@@ -256,24 +253,23 @@ const InformationIconWrapper = styled(Button)`
 `
 
 const InformationItem = styled.div`
-margin-top: .5rem;
-margin-bottom: .5rem;
-  display:flex;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
 `
 
 const InformationDetails = styled.div`
-display: block;
+  display: block;
 `
 
 const InformationDetailsTitle = styled.h4`
-font-size: .75rem;
-    color: #59595f;
-    font-weight: normal;
+  font-size: 0.75rem;
+  color: #59595f;
+  font-weight: normal;
 `
 
 const InformationDetailsValue = styled.a`
-font-size: .95rem;
-
+  font-size: 0.95rem;
 `
 
 const InformationWebsiteLink = styled.a`
@@ -282,12 +278,18 @@ const InformationWebsiteLink = styled.a`
     border-bottom: 1px solid var(--secondary-color);
   }
 `
+
 function Details({ result, displayName }) {
+  const [osmId, setOsmId] = useState()
   const [visible, setVisible] = useState(false)
   const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
   const [wikipediaData, setWikipediaData] = useState(false)
+  const [upvotes, setUpvotes] = useState(0)
+  const [downvotes, setDownvotes] = useState(0)
 
-  console.log(displayName)
+  useEffect(() => {
+    setOsmId(result.osm_id)
+  }, [])
 
   const renderImage = () => {
     if (!wikimediaImageUrl) {
@@ -319,15 +321,18 @@ function Details({ result, displayName }) {
   }
 
   const renderWikidata = () => {
-    if (!wikipediaData) {
+    if (!wikipediaData || wikipediaData.length === 2) {
       return null
+    }
+    let text = `${wikipediaData.substr(0, wikipediaData.indexOf(". "))}.`
+    if (text.length < 3) {
+      text = wikipediaData
+      console.log(text)
     }
     return (
       <WikipediaData>
         <SubTitle>Short Summary</SubTitle>
-        <WikipediaDataContainer>
-          {wikipediaData.substr(0, wikipediaData.indexOf(". "))}.
-        </WikipediaDataContainer>
+        <WikipediaDataContainer>{text}</WikipediaDataContainer>
       </WikipediaData>
     )
   }
@@ -343,17 +348,9 @@ function Details({ result, displayName }) {
       setwikimediaImageUrl()
       return null
     }
-    const res = await fetch(
-      `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": config.email,
-        },
-      }
+    const data = await fetchGET(
+      `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`
     )
-    const data = await res.json()
     let imageUrl
     if (data.claims && data.claims.P18) {
       const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(
@@ -375,42 +372,46 @@ function Details({ result, displayName }) {
     }
 
     wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
-    const res = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipedia}&origin=*`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": config.email,
-        },
-      }
+    const data = await fetchGET(
+      `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipedia}&origin=*`
     )
-    if (!res.ok) {
-      throw new Error(res.statusText)
-    } else {
-      const data = await res.json()
-      setWikipediaData(data.query.pages[0].extract.toString())
-    }
+    setWikipediaData(data.query.pages[0].extract.toString())
   }
-
-  const deleteSearch = () => {}
 
   const renderAdress = (result) => {
     if (!result.address) {
       return null
     }
     const address = result.address
-      return (
-        <div>
-          {address.street ? address.street : address.road ? address.road : null}
-          {address.house_number ? ` ${address.house_number}, ` : null}
-          {address.postcode ? ` ${address.postcode} `  : null}
-          {address.city ? ` ${address.city}, `  : address.village ? ` ${address.village}, ` : null}
-          {address.country ? `${address.country}` : null}
-        </div>
-      )
-    }
-  
+    return (
+      <div>
+        {address.street ? address.street : address.road ? address.road : null}
+        {address.house_number ? ` ${address.house_number}, ` : null}
+        {address.postcode ? ` ${address.postcode} ` : null}
+        {address.city
+          ? ` ${address.city}, `
+          : address.village
+          ? ` ${address.village}, `
+          : null}
+        {address.country ? `${address.country}` : null}
+      </div>
+    )
+  }
+
+  const getPoiDetails = () => {
+    const { data, error } = useSWR("/api/poi_details", fetchGET)
+    if (error) console.log(error)
+    console.log(data)
+  }
+  //getPoiDetails()
+
+  async function sendVote() {
+    const body = { osmId, upvotes, downvotes }
+    const res = await fetchPOST(`/api/poi_details`, body)
+    console.log(res)
+  }
+
+  //sendVote(2168233, 1, 0)
   if (result.length === 0) {
     return null
   } else {
@@ -419,108 +420,112 @@ function Details({ result, displayName }) {
         {renderImage()}
         <Header>
           {result.display_name ? <Title>{result.display_name}</Title> : null}
-          {result.type ? <Type>{capitalizeFirstLetter(result.type)}</Type> : null}
+          {result.type ? (
+            <Type>{capitalizeFirstLetter(result.type)}</Type>
+          ) : null}
           <FeedbackContainer>
-          <ActionsResponsiveContainer>
-          <FeedbackWrapper title="Upvote this place">
-            <FaThumbsUp />
-          </FeedbackWrapper>
-          <FeedbackWrapper title="Downvote this place">
-            <FaThumbsDown />
-          </FeedbackWrapper>
-          </ActionsResponsiveContainer>
-          <FeedbackResult>100% liked this place.</FeedbackResult>
+            <ActionsResponsiveContainer>
+              <FeedbackWrapper title="Upvote this place">
+                <FaThumbsUp />
+              </FeedbackWrapper>
+              <FeedbackWrapper title="Downvote this place">
+                <FaThumbsDown />
+              </FeedbackWrapper>
+            </ActionsResponsiveContainer>
+            <FeedbackResult>100% liked this place.</FeedbackResult>
           </FeedbackContainer>
         </Header>
         <Actions>
-          <DirectionsButton title="Get directions to this place" >
-            <FaRoute style={{marginRight:'.5rem'}} />Directions
-            </DirectionsButton>
+          <DirectionsButton title="Get directions to this place">
+            <FaRoute style={{ marginRight: ".5rem" }} />
+            Directions
+          </DirectionsButton>
 
-            <ActionsResponsiveContainer>
-          <ActionsWrapper title="Save this place">
-            <FaBookmark />
-          </ActionsWrapper>
-          <ActionsWrapper title="Share this place">
-            <BsShareFill />
-          </ActionsWrapper>
+          <ActionsResponsiveContainer>
+            <ActionsWrapper title="Save this place">
+              <FaBookmark />
+            </ActionsWrapper>
+            <ActionsWrapper title="Share this place">
+              <BsShareFill />
+            </ActionsWrapper>
           </ActionsResponsiveContainer>
         </Actions>
         {renderWikidata()}
         {result.extratags.wikipedia ? (
-        <WikipediaCredit>
-          <WikipediaLink
-            title={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
-            href={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
-          >
-           {`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
-          </WikipediaLink>{" "}
-        </WikipediaCredit>
-        ) : null }
+          <WikipediaCredit>
+            <WikipediaLink
+              title={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+              href={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+            >
+              {`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+            </WikipediaLink>{" "}
+          </WikipediaCredit>
+        ) : null}
         <InformationContainer>
-        <SubTitle>Information</SubTitle>
-        {result.address ? (
-          
-          <InformationItem>
-            <InformationIconWrapper>
-              <FaMapMarkerAlt title="Address details" />
-            </InformationIconWrapper>
-            <InformationDetails>
-            <InformationDetailsTitle>Address</InformationDetailsTitle>
-            <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
-            </InformationDetails>
+          <SubTitle>Information</SubTitle>
+          {result.address ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaMapMarkerAlt title="Address details" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Address</InformationDetailsTitle>
+                <InformationDetailsValue>
+                  {renderAdress(result)}
+                </InformationDetailsValue>
+              </InformationDetails>
             </InformationItem>
           ) : null}
-        {result.extratags.website ? (
-          
-          <InformationItem>
-            <InformationIconWrapper>
-              <FaHome title="Website Link" />
-            </InformationIconWrapper>
-            <InformationDetails>
-            <InformationDetailsTitle>Website</InformationDetailsTitle>
-            <InformationWebsiteLink
-              href={result.extratags.website}
-              title={result.extratags.website}
-              alt={`Link to website of ${result.display_name}`}
-            >{result.extratags.website}
-            </InformationWebsiteLink>
-            </InformationDetails>
+          {result.extratags.website ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaHome title="Website Link" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Website</InformationDetailsTitle>
+                <InformationWebsiteLink
+                  href={result.extratags.website}
+                  title={result.extratags.website}
+                  alt={`Link to website of ${result.display_name}`}
+                >
+                  {result.extratags.website}
+                </InformationWebsiteLink>
+              </InformationDetails>
             </InformationItem>
           ) : null}
-         {result.extratags.phone ? (
-          
-          <InformationItem>
-            <InformationIconWrapper>
-              <FaPhone title="Phone number" />
-            </InformationIconWrapper>
-            <InformationDetails>
-            <InformationDetailsTitle>Phone</InformationDetailsTitle>
-            <InformationWebsiteLink
-              title={result.extratags.phone}
-              alt={`Phone number of ${result.name}`}
-            >{result.extratags.phone}
-            </InformationWebsiteLink>
-            </InformationDetails>
+          {result.extratags.phone ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaPhone title="Phone number" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Phone</InformationDetailsTitle>
+                <InformationWebsiteLink
+                  title={result.extratags.phone}
+                  alt={`Phone number of ${result.name}`}
+                >
+                  {result.extratags.phone}
+                </InformationWebsiteLink>
+              </InformationDetails>
             </InformationItem>
           ) : null}
           {result.extratags.email ? (
-           
-           <InformationItem>
-             <InformationIconWrapper>
-               <FaEnvelope />
-             </InformationIconWrapper>
-             <InformationDetails>
-             <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
-             <InformationWebsiteLink
-               title={result.extratags.email}
-               alt={`Email address of ${result.name}`}
-               href={`mailto:${result.extratags.email}`}
-             >{result.extratags.email}
-             </InformationWebsiteLink>
-             </InformationDetails>
-             </InformationItem>
-           ) : null}
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaEnvelope />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
+                <InformationWebsiteLink
+                  title={result.extratags.email}
+                  alt={`Email address of ${result.name}`}
+                  href={`mailto:${result.extratags.email}`}
+                >
+                  {result.extratags.email}
+                </InformationWebsiteLink>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
         </InformationContainer>
       </DetailsWrapper>
     )

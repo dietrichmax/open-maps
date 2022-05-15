@@ -27,7 +27,7 @@ const Container = styled.div`
   position: absolute;
   top: var(--space-sm);
   left: var(--space-sm);
-  z-index: 2;
+  z-index: 3;
   border-radius: var(--border-radius);
   background-color: var(--body-bg);
   display: flex;
@@ -152,7 +152,7 @@ const SuggestionsContainer = styled.div`
   position: absolute;
   width: 100%;
   left: 0;
-  top: 61px;
+  top: 64px;
 `
 
 const ListContainer = styled.ol`
@@ -325,7 +325,6 @@ function Autocomplete() {
   }
 
   const selectResult = (searchTerm, osmId, osmType) => {
-    removeMarker()
     setInput(searchTerm)
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
@@ -352,11 +351,11 @@ function Autocomplete() {
     )
   }
 
-
   // Marker
   useEffect(() => {
     setShowSuggestions(false)
     if (geocodingResult && geocodingResult.boundingbox) {
+      removeMarker()
       const transformedBbox = transformExtent(
         [
           geocodingResult.boundingbox[2],
@@ -376,36 +375,52 @@ function Autocomplete() {
   }, [geocodingResult])
 
   const addMarker = (geocodingResult) => {
+    let markerLayer
+    map.getLayers().forEach((layer) => {
+      if (layer.get("name") === "layer-markers") {
+        markerLayer = layer.getSource()
+      }
+    })
+
     const marker = new Feature({
       geometry: new Point(
         fromLonLat([geocodingResult.lon, geocodingResult.lat])
       ),
       name: "Marker",
     })
-    const vectorSource = new VectorSource({
-      features: [marker],
-    })
 
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
-      zIndex: 2,
-      style: new Style({
-        image: new Icon({
-          crossOrigin: "anonymous",
-          // src: "marker.png",
-          src: "https://icons.iconarchive.com/icons/paomedia/small-n-flat/24/map-marker-icon.png",
+    if (markerLayer) {
+      markerLayer.addFeature(marker)
+    } else {
+      const vectorSource = new VectorSource({
+        features: [marker],
+      })
+
+      const vectorLayer = new VectorLayer({
+        source: vectorSource,
+        zIndex: 2,
+        style: new Style({
+          image: new Icon({
+            // src: "marker.png",
+            src: "/assets/map-marker-icon.png",
+          }),
         }),
-      }),
-    })
-    map.addLayer(vectorLayer)
+        properties: {
+          name: "layer-markers",
+        },
+      })
+      map.addLayer(vectorLayer)
+    }
   }
 
   const removeMarker = () => {
-    //markerLayer.clear()
-    map.removeLayer(markerLayer)
+    map.getLayers().forEach((layer) => {
+      if (layer.get("name") === "layer-markers") {
+        layer.getSource().clear()
+      }
+    })
   }
 
-  
   const getFirstSuggestionResultsDelayed = useCallback(
     debounce((lat, lon, input, limit, callback) => {
       getFirstSuggestionResults(lat, lon, input, limit).then(callback)
@@ -416,6 +431,7 @@ function Autocomplete() {
   async function getFirstSuggestionResults(lat, lon, input, limit) {
     if (!input || input.length < 1) return
     const encodedInput = encodeURI(input)
+
     const response = await fetch(
       `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${zoom}&location_bias_scale=0.4`,
       {
@@ -457,7 +473,6 @@ function Autocomplete() {
     setShowSuggestions(true)
   }*/
 
-
   async function getGeocodingResults(osmId, osmType) {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1`,
@@ -490,10 +505,15 @@ function Autocomplete() {
         <SuggestionsContainer>
           <ListContainer Name="suggestions">
             {suggestions.map((suggestion, index) => {
-              console.log(suggestion.properties.housenumber)
-              const searchTerm = `${suggestion.properties.name ? suggestion.properties.name : 
-                suggestion.properties.street ? suggestion.properties.street : 
-                suggestion.properties.housenumber ? suggestion.properties.housenumber : null}${
+              const searchTerm = `${
+                suggestion.properties.name
+                  ? suggestion.properties.name
+                  : suggestion.properties.street
+                  ? suggestion.properties.street
+                  : suggestion.properties.housenumber
+                  ? suggestion.properties.housenumber
+                  : null
+              }${
                 suggestion.properties.city
                   ? ", " + suggestion.properties.city
                   : ""
@@ -599,13 +619,11 @@ function Autocomplete() {
               {showSuggestions ? <SuggestionsListComponent /> : null}
             </AutoCompleteContainer>
           </SearchContainer>
-            <SearchButton>
-              <FaSearch title="Search" />
-            </SearchButton>
+          <SearchButton>
+            <FaSearch title="Search" />
+          </SearchButton>
         </Container>
-        {geocodingResult ? (
-          <Details result={geocodingResult} />
-        ) : null}
+        {geocodingResult ? <Details result={geocodingResult} /> : null}
       </>
     </>
   )
