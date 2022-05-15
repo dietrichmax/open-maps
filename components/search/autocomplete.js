@@ -153,7 +153,7 @@ const SuggestionsContainer = styled.div`
   width: 100%;
   left: 0;
   top: 64px;
-  
+
   ${media.lessThan("432px")`
   top: 48px;
   `}
@@ -291,23 +291,6 @@ function Autocomplete() {
       ? getFirstSuggestionResultsDelayed(lat, lon, searchQuery, suggestionLimit)
       : null
   }, [extent])
-
-  useEffect(() => {
-    /*const difference = suggestionLimit - suggestions.length
-    if (difference != 0) {
-      gotFirstData && !gotSecondData
-        ? getSecondSuggestionResults(lat, lon, zoom, input, difference)
-        : null
-    }*/
-    //console.log(showSuggestions)
-  }, [suggestions])
-
-  /*useEffect(() => {
-    const difference = suggestionLimit - suggestions.length
-    if (difference != 0) {
-      getSecondSuggestionResults(lat, lon, zoom, input, difference)
-    }
-  }, [gotSecondData])*/
 
   const filterData = (data) => {
     let set = []
@@ -553,7 +536,9 @@ function Autocomplete() {
                     <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail>
                   ) : null}
                   {suggestion.properties.AdressDetail ? (
-                    <AdressDetail>{suggestion.properties.AdressDetail}</AdressDetail>
+                    <AdressDetail>
+                      {suggestion.properties.AdressDetail}
+                    </AdressDetail>
                   ) : null}
                 </ListItem>
               )

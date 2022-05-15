@@ -6,7 +6,7 @@ function OSMLayer() {
     name: "OpenStreetMap",
     attribution: `
     <a target="_blank" href="https://www.openstreetmap.org/">
-        Map built with OpenStreetMap data
+        OpenStreetMap contributors
     </a>
     <span> | </span>
     <a

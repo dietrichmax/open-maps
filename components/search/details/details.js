@@ -128,7 +128,6 @@ const FeedbackWrapper = styled.button`
   :focus {
     background: var(--secondary-color);
   }
-
 `
 
 const FeedbackResult = styled.div`
@@ -428,7 +427,7 @@ function Details({ result, displayName }) {
               <FeedbackWrapper title="Downvote this place">
                 <FaThumbsDown />
               </FeedbackWrapper>
-            <FeedbackResult>100% liked this place.</FeedbackResult>
+              <FeedbackResult>100% liked this place.</FeedbackResult>
             </ActionsResponsiveContainer>
           </FeedbackContainer>
         </Header>

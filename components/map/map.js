@@ -35,6 +35,25 @@ const MapWrapper = ({ children, zoom, center }) => {
     map.getView().setCenter(center)
   }, [center])
 
+  useEffect(() => {
+    if (!map) return
+    map.on("click", function (evt) {
+      const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+        return feature
+      })
+      if (feature) {
+        console.log("click")
+      }
+    })
+
+    // change mouse cursor when over marker
+    map.on("pointermove", function (e) {
+      const pixel = map.getEventPixel(e.originalEvent)
+      const hit = map.hasFeatureAtPixel(pixel)
+      map.getTarget().style.cursor = hit ? "pointer" : ""
+    })
+  }, [map])
+
   return (
     <MapContext.Provider value={{ map }}>
       <div
