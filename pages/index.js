@@ -23,7 +23,7 @@ function Index() {
   const [center, setCenter] = useState([14, 46])
   const [zoom, setZoom] = useState(5)
 
-  useEffect(() => {
+  /*useEffect(() => {
     getLocation()
   }, [])
 
@@ -58,7 +58,7 @@ function Index() {
 
   function showPosition(position) {
     setCenter([position.coords.longitude, position.coords.latitude])
-  }
+  }*/
 
   return (
     <Map center={fromLonLat(center)} zoom={zoom}>
