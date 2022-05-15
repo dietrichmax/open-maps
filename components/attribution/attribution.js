@@ -27,6 +27,7 @@ function Attribution() {
 
   useEffect(() => {
     if (layers) {
+      console.log(layers)
       setAttributionText(layers[0].getProperties().attribution)
     }
   }, [layers])

@@ -2,11 +2,15 @@ import OSM from "ol/source/OSM"
 import TileLayer from "@/components/layers/tileLayer"
 
 function OSMLayer() {
+  const source = new OSM({
+    tilePixelRatio: 2,
+  })
+
   const properties = {
     name: "OpenStreetMap",
     attribution: `
     <a target="_blank" href="https://www.openstreetmap.org/">
-        OpenStreetMap contributors
+      © OpenStreetMap contributors
     </a>
     <span> | </span>
     <a

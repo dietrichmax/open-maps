@@ -45,9 +45,9 @@ const Container = styled.div`
 
 const SidebarContainer = styled.div`
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   background-color: var(--body-bg);
-  width: var(--sidebar-width);
+  width: calc(var(--sidebar-width) + 16px);
   height: 100vh;
 `
 

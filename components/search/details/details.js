@@ -66,6 +66,7 @@ const ImageWrapper = styled.div`
   display: block;
   width: var(--sidebar-width);
   height: 250px;
+  object-fit: cover;
   ${media.lessThan("432px")`
   width: 100%
 
@@ -301,6 +302,7 @@ function Details({ result, displayName }) {
           }
           height="250"
           width="400"
+          style={{ objectFit: "cover" }}
           alt={
             wikimediaImageUrl
               ? `Image of ${result.display_name} from Wikimeda`
@@ -427,16 +429,23 @@ function Details({ result, displayName }) {
               <FeedbackWrapper title="Downvote this place">
                 <FaThumbsDown />
               </FeedbackWrapper>
-              <FeedbackResult>100% liked this place.</FeedbackResult>
+              <FeedbackResult>100% liked this place</FeedbackResult>
             </ActionsResponsiveContainer>
           </FeedbackContainer>
         </Header>
         <Actions>
-          <DirectionsButton title="Get directions to this place">
-            <FaRoute style={{ marginRight: ".5rem" }} />
-            Directions
-          </DirectionsButton>
-
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&origin=&destination=${encodeURI(
+              result.display_name
+            )}&travelmode=driving&dir_action=navigate`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <DirectionsButton title="Get directions to this place">
+              <FaRoute style={{ marginRight: ".5rem" }} />
+              Directions
+            </DirectionsButton>
+          </a>
           <ActionsResponsiveContainer>
             <ActionsWrapper title="Save this place">
               <FaBookmark />
