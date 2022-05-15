@@ -153,6 +153,10 @@ const SuggestionsContainer = styled.div`
   width: 100%;
   left: 0;
   top: 64px;
+  
+  ${media.lessThan("432px")`
+  top: 48px;
+  `}
 `
 
 const ListContainer = styled.ol`
@@ -162,6 +166,9 @@ const ListContainer = styled.ol`
   box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   border-radius: var(--border-radius);
   overflow: hidden;
+  ${media.lessThan("432px")`
+  border-radius: 0;
+  `}
 `
 
 const ListItem = styled.li`
@@ -190,7 +197,7 @@ const County = styled.span`
   font-size: 0.7rem;
 `
 
-const Country = styled.p`
+const AdressDetail = styled.p`
   display: inline-block;
   font-size: 0.7rem;
   margin-left: 4px;
@@ -307,7 +314,7 @@ function Autocomplete() {
     if (data.features) {
       set = data.features.filter((hit) => {
         if (
-          hit.properties.osm_value === "country" ||
+          hit.properties.osm_value === "AdressDetail" ||
           hit.properties.osm_value === "continent" ||
           hit.properties.osm_value === "state" ||
           hit.properties.osm_value === "municipality"
@@ -537,16 +544,16 @@ function Autocomplete() {
                     <Place>{`${suggestion.properties.name}`}</Place>
                   ) : null}
                   {suggestion.properties.street ? (
-                    <County>{`${suggestion.properties.street}`}</County>
+                    <AdressDetail>{`${suggestion.properties.street} `}</AdressDetail>
                   ) : null}
                   {suggestion.properties.housenumber ? (
-                    <County>{suggestion.properties.housenumber}</County>
+                    <AdressDetail>{`${suggestion.properties.housenumber}`}</AdressDetail>
                   ) : null}
                   {suggestion.properties.city ? (
-                    <Country>{`${suggestion.properties.city}`}</Country>
+                    <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail>
                   ) : null}
-                  {suggestion.properties.country ? (
-                    <Country>{suggestion.properties.country}</Country>
+                  {suggestion.properties.AdressDetail ? (
+                    <AdressDetail>{suggestion.properties.AdressDetail}</AdressDetail>
                   ) : null}
                 </ListItem>
               )

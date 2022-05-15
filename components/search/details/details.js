@@ -129,13 +129,9 @@ const FeedbackWrapper = styled.button`
     background: var(--secondary-color);
   }
 
-  ${media.lessThan("432px")`
-margin-bottom: 1rem;
-`}
 `
 
 const FeedbackResult = styled.div`
-  margin-right: var(--space);
   display: flex;
   align-items: center;
 `
@@ -155,6 +151,7 @@ const Actions = styled.div`
 
 const ActionsResponsiveContainer = styled.div`
   display: flex;
+  align-items: center;
 `
 
 const ActionsWrapper = styled(Button)`
@@ -171,8 +168,8 @@ const ActionsWrapper = styled(Button)`
     background: var(--border-color);
   }
   ${media.lessThan("432px")`
-margin-bottom: 1rem;
 margin-left: 0;
+margin-bottom: 0;
 margin-right: var(--space-sm);
 `}
 `
@@ -431,8 +428,8 @@ function Details({ result, displayName }) {
               <FeedbackWrapper title="Downvote this place">
                 <FaThumbsDown />
               </FeedbackWrapper>
-            </ActionsResponsiveContainer>
             <FeedbackResult>100% liked this place.</FeedbackResult>
+            </ActionsResponsiveContainer>
           </FeedbackContainer>
         </Header>
         <Actions>
