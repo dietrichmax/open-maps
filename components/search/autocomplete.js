@@ -237,14 +237,23 @@ function Autocomplete() {
           hit.properties.osm_value === "municipality"
         ) {
           return false
-        } else if (hit.properties.type === "county") {
+        } else if (
+          hit.properties.type === "county" ||
+          hit.properties.type === "country"
+          
+        ) {
           return false
         } else if (hit.properties.osm_key === "boundary") {
           return false
         }
         return true
       })
-      return set.slice(0, 5)
+      /*const lookup = set.reduce((a, e) => {
+        a[e.name] = ++a[e.name] || 0;
+        return a;
+      }, {});
+      set.filter(e => lookup[e.properties])*/
+      return set.slice(0,5)
     }
   }
 
@@ -268,7 +277,7 @@ function Autocomplete() {
     return (
       <DeleteSearchButtonWrapper>
         <CloseButton
-          style={{ color: "var(--gray)", fontSize: '11px'  }}
+          style={{ color: "var(--gray)", fontSize: "11px" }}
           title="Delete search"
           onClick={deleteSearch}
         />
@@ -293,7 +302,7 @@ function Autocomplete() {
       )
       map.getView().fit(transformedBbox, {
         duration: 1000,
-        padding: [100, 100, 100, 100]
+        padding: [100, 100, 100, 100],
       })
       addMarker(geocodingResult)
     }
@@ -515,7 +524,9 @@ function Autocomplete() {
             <FaSearch title="Search" />
           </SearchButton>
         </Container>
-        {geocodingResult ? <Details result={geocodingResult} name={name} /> : null}
+        {geocodingResult ? (
+          <Details result={geocodingResult} name={name} />
+        ) : null}
       </>
     </>
   )

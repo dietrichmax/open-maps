@@ -97,13 +97,13 @@ const SubTitle = styled.h2`
 const Type = styled.p`
   font-weight: 400;
   color: var(--gray);
-  font-size: .95rem;
-  letter-spacing: .05rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.05rem;
 `
 
 const FeedbackContainer = styled.div`
   display: flex;
-  margin-bottom: .75rem;
+  margin-bottom: 0.75rem;
 
   ${media.lessThan("432px")`
   display: block;
@@ -127,8 +127,9 @@ const FeedbackWrapper = styled.button`
 const FeedbackResult = styled.div`
   display: flex;
   align-items: center;
-  font-size: .85rem;
-  color: ${props => props.value > 85 ? "var(--success-color)" : "var(--failure-color)"};
+  font-size: 0.85rem;
+  color: ${(props) =>
+    props.value > 85 ? "var(--success-color)" : "var(--failure-color)"};
 `
 
 const Actions = styled.div`
@@ -151,7 +152,7 @@ const ActionsResponsiveContainer = styled.div`
 `
 
 const ActionsWrapper = styled(Button)`
-background-color: var(--border-color);
+  background-color: var(--border-color);
   display: flex;
   border-radius: 50%;
   cursor: pointer;
@@ -334,29 +335,28 @@ function Details({ result, name }) {
     }
     return (
       <ImageWrapper>
-        
         <a href={wikimediaImageUrl}>
-        <Image
-          src={
-            wikimediaImageUrl
-              ? wikimediaImageUrl
-              : `https://source.unsplash.com/random/300×450/?${result.display_name}`
-          }
-          height="250"
-          width="400"
-          target="_blank"
-          rel="nofollow noopener noreferrer"
-          alt={
-            wikimediaImageUrl
-              ? `Image of ${result.display_name} from Wikimeda`
-              : "Random image from Unsplash"
-          }
-          title={
-            wikimediaImageUrl
-              ? `Image of '${result.display_name}' from Wikimedia`
-              : "Random image from Unsplash"
-          }
-        />
+          <Image
+            src={
+              wikimediaImageUrl
+                ? wikimediaImageUrl
+                : `https://source.unsplash.com/random/300×450/?${result.display_name}`
+            }
+            height="250"
+            width="400"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            alt={
+              wikimediaImageUrl
+                ? `Image of ${result.display_name} from Wikimeda`
+                : "Random image from Unsplash"
+            }
+            title={
+              wikimediaImageUrl
+                ? `Image of '${result.display_name}' from Wikimedia`
+                : "Random image from Unsplash"
+            }
+          />
         </a>
       </ImageWrapper>
     )
@@ -450,22 +450,24 @@ function Details({ result, name }) {
         {renderImage()}
         <Header>
           {result.display_name ? <Title>{name}</Title> : null}
-          
+
           <FeedbackContainer>
             <ActionsResponsiveContainer>
               <FeedbackWrapper
                 onClick={() => handleRating("upvote")}
                 title="Upvote this place"
               >
-                <FaThumbsUp style={{color:'var(--success-color)' }}/>
+                <FaThumbsUp style={{ color: "var(--success-color)" }} />
               </FeedbackWrapper>
               <FeedbackWrapper
                 onClick={() => handleRating("downvote")}
                 title="Downvote this place"
               >
-                <FaThumbsDown style={{color:'var(--failure-color)'}} />
+                <FaThumbsDown style={{ color: "var(--failure-color)" }} />
               </FeedbackWrapper>
-              <FeedbackResult value={parseInt((currentUpvotes / currentDownvotes) * 100)}>
+              <FeedbackResult
+                value={parseInt((currentUpvotes / currentDownvotes) * 100)}
+              >
                 {parseInt((currentUpvotes / currentDownvotes) * 100) > 100
                   ? 100
                   : parseInt((currentUpvotes / currentDownvotes) * 100)}
@@ -504,7 +506,7 @@ function Details({ result, name }) {
           <WikipediaCredit>
             <WikipediaLink
               title={`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
-              href={`https:/${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+              href={`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
             >
               {`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
             </WikipediaLink>{" "}
