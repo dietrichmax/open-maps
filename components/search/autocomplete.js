@@ -167,6 +167,7 @@ function Autocomplete() {
   const [lon, setLon] = useState(0)
   const [extent, setExtent] = useState(0)
   const [suggestions, setSuggestions] = useState([])
+  const [name, setName] = useState()
   const [geocodingResult, setGeocodingResult] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [showResult, setShowResult] = useState(false)
@@ -247,8 +248,9 @@ function Autocomplete() {
     }
   }
 
-  const selectResult = (searchTerm, osmId, osmType) => {
+  const selectResult = (searchTerm, osmId, osmType, name) => {
     setInput(searchTerm)
+    setName(name)
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
     setShowResult(true)
@@ -441,6 +443,7 @@ function Autocomplete() {
                   ? ", " + suggestion.properties.city
                   : ""
               }`
+              const name = suggestion.properties.name
               const osmId = suggestion.properties.osm_id
               const osmType = suggestion.properties.osm_type
               /*const secondPart = suggestion.properties.name.replace(
@@ -451,7 +454,7 @@ function Autocomplete() {
               return (
                 <ListItem
                   key={index}
-                  onClick={() => selectResult(searchTerm, osmId, osmType)}
+                  onClick={() => selectResult(searchTerm, osmId, osmType, name)}
                 >
                   <ButtonWrapper>
                     {getSymbol(suggestion.properties.osm_value)}
@@ -511,7 +514,7 @@ function Autocomplete() {
             <FaSearch title="Search" />
           </SearchButton>
         </Container>
-        {geocodingResult ? <Details result={geocodingResult} /> : null}
+        {geocodingResult ? <Details result={geocodingResult} name={name} /> : null}
       </>
     </>
   )

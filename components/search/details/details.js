@@ -276,7 +276,7 @@ const InformationWebsiteLink = styled.a`
   }
 `
 
-function Details({ result, displayName }) {
+function Details({ result, name }) {
   const [osmId, setOsmId] = useState()
   const [visible, setVisible] = useState(false)
   const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
@@ -449,7 +449,7 @@ function Details({ result, displayName }) {
       <DetailsWrapper>
         {renderImage()}
         <Header>
-          {result.display_name ? <Title>{result.display_name}</Title> : null}
+          {result.display_name ? <Title>{name}</Title> : null}
           {result.type ? (
             <Type>{capitalizeFirstLetter(result.type)}</Type>
           ) : null}
