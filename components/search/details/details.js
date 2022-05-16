@@ -85,7 +85,7 @@ const Title = styled.h1`
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.75rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 1rem;
 `
 
 const SubTitle = styled.h2`
@@ -96,18 +96,14 @@ const SubTitle = styled.h2`
 
 const Type = styled.p`
   font-weight: 400;
-`
-
-const Address = styled.h2`
-  margin-top: 1rem;
-  font-weight: 400;
+  color: var(--gray);
+  font-size: .95rem;
+  letter-spacing: .05rem;
 `
 
 const FeedbackContainer = styled.div`
   display: flex;
-  padding-top: 1rem;
-  margin-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  margin-bottom: .75rem;
 
   ${media.lessThan("432px")`
   display: block;
@@ -126,20 +122,20 @@ const FeedbackWrapper = styled.button`
   :hover {
     background: var(--body-bg);
   }
-  :focus {
-    background: var(--secondary-color);
-  }
 `
 
 const FeedbackResult = styled.div`
   display: flex;
   align-items: center;
+  font-size: .85rem;
+  color: ${props => props.value > 85 ? "var(--success-color)" : "var(--failure-color)"};
 `
 
 const Actions = styled.div`
   display: flex;
+  border-top: 1px solid var(--border-color);
   padding-top: 1rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1rem;
   margin-left: 2rem;
   margin-right: 2rem;
   ${media.lessThan("432px")`
@@ -155,8 +151,7 @@ const ActionsResponsiveContainer = styled.div`
 `
 
 const ActionsWrapper = styled(Button)`
-  background-color: var(--body-bg);
-  border: 1px solid var(--secondary-color);
+background-color: var(--border-color);
   display: flex;
   border-radius: 50%;
   cursor: pointer;
@@ -165,7 +160,7 @@ const ActionsWrapper = styled(Button)`
   padding: 0.75rem;
   align-items: center;
   :hover {
-    background: var(--border-color);
+    background: var(--body-bg);
   }
   ${media.lessThan("432px")`
 margin-left: 0;
@@ -187,8 +182,8 @@ const DirectionsButton = styled(Button)`
     opacity: 0.8;
   }
   ${media.lessThan("432px")`
-margin-bottom: 1rem;
-min-width: 100%;
+  margin-bottom: 1rem;
+  min-width: 100%;
 `}
 `
 
@@ -339,6 +334,8 @@ function Details({ result, name }) {
     }
     return (
       <ImageWrapper>
+        
+        <a href={wikimediaImageUrl}>
         <Image
           src={
             wikimediaImageUrl
@@ -347,6 +344,8 @@ function Details({ result, name }) {
           }
           height="250"
           width="400"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
           alt={
             wikimediaImageUrl
               ? `Image of ${result.display_name} from Wikimeda`
@@ -358,6 +357,7 @@ function Details({ result, name }) {
               : "Random image from Unsplash"
           }
         />
+        </a>
       </ImageWrapper>
     )
   }
@@ -450,24 +450,22 @@ function Details({ result, name }) {
         {renderImage()}
         <Header>
           {result.display_name ? <Title>{name}</Title> : null}
-          {result.type ? (
-            <Type>{capitalizeFirstLetter(result.type)}</Type>
-          ) : null}
+          
           <FeedbackContainer>
             <ActionsResponsiveContainer>
               <FeedbackWrapper
                 onClick={() => handleRating("upvote")}
                 title="Upvote this place"
               >
-                <FaThumbsUp />
+                <FaThumbsUp style={{color:'var(--success-color)' }}/>
               </FeedbackWrapper>
               <FeedbackWrapper
                 onClick={() => handleRating("downvote")}
                 title="Downvote this place"
               >
-                <FaThumbsDown />
+                <FaThumbsDown style={{color:'var(--failure-color)'}} />
               </FeedbackWrapper>
-              <FeedbackResult>
+              <FeedbackResult value={parseInt((currentUpvotes / currentDownvotes) * 100)}>
                 {parseInt((currentUpvotes / currentDownvotes) * 100) > 100
                   ? 100
                   : parseInt((currentUpvotes / currentDownvotes) * 100)}
@@ -475,6 +473,9 @@ function Details({ result, name }) {
               </FeedbackResult>
             </ActionsResponsiveContainer>
           </FeedbackContainer>
+          {result.type ? (
+            <Type>{capitalizeFirstLetter(result.type)}</Type>
+          ) : null}
         </Header>
         <Actions>
           <a

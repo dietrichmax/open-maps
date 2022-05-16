@@ -142,7 +142,9 @@ body {
   --thirdy-color: #dbe2ef;
   --body-bg: #fff;
   --border-color: #ececec;
-  --gray: #c9d1d9;
+  --gray: #5a5a5a;
+  --success-color: #10622c;
+  --failure-color: #621010;
   --gap: 1rem;
   --border: var(--thirdy-color);
   --border-radius: 0.5rem;

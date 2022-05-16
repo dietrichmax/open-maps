@@ -268,7 +268,7 @@ function Autocomplete() {
     return (
       <DeleteSearchButtonWrapper>
         <CloseButton
-          style={{ color: "var(--gray)" }}
+          style={{ color: "var(--gray)", fontSize: '11px'  }}
           title="Delete search"
           onClick={deleteSearch}
         />
@@ -293,6 +293,7 @@ function Autocomplete() {
       )
       map.getView().fit(transformedBbox, {
         duration: 1000,
+        padding: [100, 100, 100, 100]
       })
       addMarker(geocodingResult)
     }
