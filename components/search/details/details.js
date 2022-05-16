@@ -281,12 +281,57 @@ function Details({ result, displayName }) {
   const [visible, setVisible] = useState(false)
   const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
   const [wikipediaData, setWikipediaData] = useState(false)
-  const [upvotes, setUpvotes] = useState(0)
-  const [downvotes, setDownvotes] = useState(0)
+  const [rating, setRating] = useState()
+  const [currentUpvotes, setCurrentUpvotes] = useState(0)
+  const [currentDownvotes, setCurrentDownvotes] = useState(0)
+  const [newUpvotes, setNewUpvotes] = useState(1)
+  const [newDownvotes, setNewDownvotes] = useState(1)
+  const [wikipediaLang, setWikipediaLang] = useState("en")
 
   useEffect(() => {
+    getWikimediaImageUrl(result)
+    getWikipediaData(result)
     setOsmId(result.osm_id)
-  }, [])
+  }, [result])
+
+  useEffect(() => {
+    if (osmId) {
+      getRating()
+    }
+  }, [osmId])
+
+  async function getRating() {
+    const data = await fetchGET(`/api/poi_details/${osmId}`)
+    if (!data) {
+      setCurrentUpvotes(1)
+      setCurrentDownvotes(1)
+    } else {
+      setCurrentUpvotes(data.currentUpvotes > 0 ? data.currentUpvotes : 1)
+      setCurrentDownvotes(data.currentDownvotes > 0 ? data.currentDownvotes : 1)
+    }
+  }
+
+  async function sendRating(osmId, newUpvotes, newDownvotes) {
+    const body = { osmId, newUpvotes, newDownvotes }
+    const data = await fetchPOST(`/api/poi_details`, body)
+    if (!data) {
+      console.log("error")
+    }
+  }
+
+  const handleRating = (string) => {
+    if (string === "upvote") {
+      setCurrentUpvotes(currentUpvotes + 1)
+    } else if (string === "downvote") {
+      setCurrentDownvotes(currentDownvotes + 1)
+    }
+    sendRating(osmId, currentUpvotes, currentDownvotes)
+  }
+
+  useEffect(() => {
+    //console.log(newUpvotes, newDownvotes)
+    //sendRating(osmId, newUpvotes, newDownvotes)
+  }, [newUpvotes, newDownvotes])
 
   const renderImage = () => {
     if (!wikimediaImageUrl) {
@@ -302,7 +347,6 @@ function Details({ result, displayName }) {
           }
           height="250"
           width="400"
-          style={{ objectFit: "cover" }}
           alt={
             wikimediaImageUrl
               ? `Image of ${result.display_name} from Wikimeda`
@@ -325,7 +369,6 @@ function Details({ result, displayName }) {
     let text = `${wikipediaData.substr(0, wikipediaData.indexOf(". "))}.`
     if (text.length < 3) {
       text = wikipediaData
-      console.log(text)
     }
     return (
       <WikipediaData>
@@ -334,11 +377,6 @@ function Details({ result, displayName }) {
       </WikipediaData>
     )
   }
-
-  useEffect(() => {
-    getWikimediaImageUrl(result)
-    getWikipediaData(result)
-  }, [result])
 
   //getWikimediaImageUrl(result)
   async function getWikimediaImageUrl(result) {
@@ -363,16 +401,22 @@ function Details({ result, displayName }) {
   }
 
   async function getWikipediaData(result) {
-    let wikipedia
     if (!result || !result.extratags || !result.extratags.wikipedia) {
       setWikipediaData()
       return null
     }
 
-    wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
+    setWikipediaLang(
+      result.extratags.wikipedia.substr(
+        0,
+        result.extratags.wikipedia.indexOf(":")
+      )
+    )
+    const wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
     const data = await fetchGET(
       `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipedia}&origin=*`
     )
+    if (!data.query.pages[0].extract) return
     setWikipediaData(data.query.pages[0].extract.toString())
   }
 
@@ -390,26 +434,14 @@ function Details({ result, displayName }) {
           ? ` ${address.city}, `
           : address.village
           ? ` ${address.village}, `
+          : address.town
+          ? ` ${address.town}, `
           : null}
         {address.country ? `${address.country}` : null}
       </div>
     )
   }
 
-  const getPoiDetails = () => {
-    const { data, error } = useSWR("/api/poi_details", fetchGET)
-    if (error) console.log(error)
-    console.log(data)
-  }
-  //getPoiDetails()
-
-  async function sendVote() {
-    const body = { osmId, upvotes, downvotes }
-    const res = await fetchPOST(`/api/poi_details`, body)
-    console.log(res)
-  }
-
-  //sendVote(2168233, 1, 0)
   if (result.length === 0) {
     return null
   } else {
@@ -423,13 +455,24 @@ function Details({ result, displayName }) {
           ) : null}
           <FeedbackContainer>
             <ActionsResponsiveContainer>
-              <FeedbackWrapper title="Upvote this place">
+              <FeedbackWrapper
+                onClick={() => handleRating("upvote")}
+                title="Upvote this place"
+              >
                 <FaThumbsUp />
               </FeedbackWrapper>
-              <FeedbackWrapper title="Downvote this place">
+              <FeedbackWrapper
+                onClick={() => handleRating("downvote")}
+                title="Downvote this place"
+              >
                 <FaThumbsDown />
               </FeedbackWrapper>
-              <FeedbackResult>100% liked this place</FeedbackResult>
+              <FeedbackResult>
+                {parseInt((currentUpvotes / currentDownvotes) * 100) > 100
+                  ? 100
+                  : parseInt((currentUpvotes / currentDownvotes) * 100)}
+                % liked this place
+              </FeedbackResult>
             </ActionsResponsiveContainer>
           </FeedbackContainer>
         </Header>
@@ -437,7 +480,7 @@ function Details({ result, displayName }) {
           <a
             href={`https://www.google.com/maps/dir/?api=1&origin=&destination=${encodeURI(
               result.display_name
-            )}&travelmode=driving&dir_action=navigate`}
+            )}&travelmode=driving`} //&dir_action=navigate
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -459,10 +502,10 @@ function Details({ result, displayName }) {
         {result.extratags.wikipedia ? (
           <WikipediaCredit>
             <WikipediaLink
-              title={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
-              href={`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+              title={`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+              href={`https:/${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
             >
-              {`https://en.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+              {`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
             </WikipediaLink>{" "}
           </WikipediaCredit>
         ) : null}

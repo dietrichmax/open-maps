@@ -22,6 +22,8 @@ import Details from "@/components/search/details/details"
 import { config } from "config"
 import { Icon, Style } from "ol/style"
 import { push } from "@socialgouv/matomo-next"
+import { Sidebar } from "@/components/sidebar"
+import { set } from "lodash"
 
 const Container = styled.div`
   position: absolute;
@@ -43,74 +45,6 @@ const Container = styled.div`
   `}
 `
 
-const SidebarContainer = styled.div`
-  position: absolute;
-  z-index: 4;
-  background-color: var(--body-bg);
-  width: calc(var(--sidebar-width) + 16px);
-  height: 100vh;
-`
-
-const PageWrap = styled.div`
-  position: absolute;
-  z-index: 1;
-  height: 100%;
-  width: 100%;
-  opacity: 0.3;
-  background: black;
-`
-
-const CloseButton = styled(ImCross)`
-  cursor: pointer;
-`
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  padding: 1rem 0 1rem 0;
-`
-const SectionHeader = styled.p`
-  margin-bottom: 0.5rem;
-  text-decoration: underline;
-`
-
-const SectionItem = styled.li`
-  padding: 4px 0;
-  list-style: none;
-  cursor: pointer;
-  :hover {
-    text-decoration: underline;
-  }
-`
-
-const Section = styled.div`
-  border-top: 1px solid #d9d9d9;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  padding: 1rem 0;
-`
-
-const InfoSection = styled.div`
-  border-top: 1px solid #d9d9d9;
-  margin-top: auto;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  padding: 1rem 0;
-`
-
-const InfoLinks = styled.a`
-  color: var(--text-color);
-  border-bottom: 1px solid var(--secondary-color);
-  cursor: pointer;
-  font-size: 0.75rem;
-  margin-right: 1rem;
-  :hover {
-    border-bottom: none;
-  }
-`
-
 // autocomplete
 
 const SearchContainer = styled.div`
@@ -120,7 +54,7 @@ const SearchContainer = styled.div`
 
 const SearchButton = styled(Button)`
   display: flex;
-  font-size: 100%;
+  font-size: 18px;
   padding: 1rem;
   padding-right: 1.25rem;
 `
@@ -189,12 +123,6 @@ const Place = styled.p`
   display: inline-block;
   font-size: 0.9rem;
   font-weight: bold;
-  margin-right: 4px;
-`
-
-const County = styled.span`
-  display: inline-block;
-  font-size: 0.7rem;
 `
 
 const AdressDetail = styled.p`
@@ -206,7 +134,7 @@ const AdressDetail = styled.p`
 const SearchButtonWrapper = styled.div`
   display: flex;
   cursor: pointer;
-  font-size: 100%;
+  font-size: 18px;
   align-items: center;
   padding: 0;
   border: none;
@@ -228,6 +156,10 @@ const DeleteSearchButtonWrapper = styled.div`
   border-right: 1px solid var(--gray);
 `
 
+const CloseButton = styled(ImCross)`
+  cursor: pointer;
+`
+
 function Autocomplete() {
   const [visible, setVisible] = useState(false)
   const [zoom, setZoom] = useState(8)
@@ -245,7 +177,7 @@ function Autocomplete() {
 
   const { map } = useContext(MapContext)
 
-  const suggestionLimit = 20
+  const suggestionLimit = 30
 
   useEffect(() => {
     getOptions()
@@ -272,6 +204,7 @@ function Autocomplete() {
   }
 
   const handleVisability = () => {
+    //console.log(visible)
     visible ? setVisible(false) : setVisible(true)
   }
 
@@ -535,6 +468,9 @@ function Autocomplete() {
                   {suggestion.properties.city ? (
                     <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail>
                   ) : null}
+                  {suggestion.properties.country ? (
+                    <AdressDetail>{`${suggestion.properties.country}`}</AdressDetail>
+                  ) : null}
                   {suggestion.properties.AdressDetail ? (
                     <AdressDetail>
                       {suggestion.properties.AdressDetail}
@@ -551,47 +487,7 @@ function Autocomplete() {
 
   return (
     <>
-      {visible ? (
-        <>
-          <SidebarContainer>
-            <Header>
-              <Logo />
-              <CloseButton onClick={handleVisability} title="Close menu">
-                Close
-              </CloseButton>
-            </Header>
-            <Section>
-              <SectionHeader>Draw Options</SectionHeader>
-              <SectionItem onClick={DrawShapes("Square")}>
-                Rectangles{" "}
-              </SectionItem>
-              <SectionItem>Point</SectionItem>
-              <SectionItem onClick={DrawShapes("Box")}>Polygon</SectionItem>
-            </Section>
-            <Section>
-              <SectionItem>Share Map</SectionItem>
-              <SectionItem>Embed Map</SectionItem>
-              <SectionItem>Print Map</SectionItem>
-            </Section>
-            <Section>
-              <SectionHeader>Improve this map</SectionHeader>
-              <SectionItem>OpenStreetMap</SectionItem>
-            </Section>
-            <InfoSection>
-              <InfoLinks title="Privacy" href="https://mxd.codes/privacy">
-                Privacy
-              </InfoLinks>
-              <InfoLinks
-                title="Site Notice"
-                href="https://mxd.codes/site-notice"
-              >
-                Site-Notice
-              </InfoLinks>
-            </InfoSection>
-          </SidebarContainer>
-          <PageWrap onClick={handleVisability} />
-        </>
-      ) : null}
+      {visible ? <Sidebar visible={visible} /> : null}
       <>
         <Container>
           <SearchButtonWrapper onClick={handleVisability}>

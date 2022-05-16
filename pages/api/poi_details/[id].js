@@ -14,17 +14,10 @@ export default async function handle(req, res) {
 
 // GET /api/poi_details/:id
 async function handleGET(osm_id, res) {
+  if (!osm_id) return
   const poi_details = await prisma.poi_details.findUnique({
-    where: { osm_id: osm_id },
+    where: { osm_id: parseInt(osm_id) },
     //include: { author: true },
   })
   res.json(poi_details)
 }
-
-/* DELETE /api/poi_details/:id
-async function handleDELETE(osm_id, res) {
-  const poi_details = await prisma.poi_details.delete({
-    where: { osm_id: osm_id },
-  })
-  res.json(poi_details)
-}*/

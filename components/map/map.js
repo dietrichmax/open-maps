@@ -10,7 +10,7 @@ const MapWrapper = ({ children, zoom, center }) => {
   // on component mount
   useEffect(() => {
     let options = {
-      view: new View({ zoom, center }),
+      view: new View({ zoom, center, maxZoom: 20 }),
       layers: [],
       controls: [],
       overlays: [],

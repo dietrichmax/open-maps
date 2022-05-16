@@ -1,1 +1,2 @@
-export { default } from "./sidebar"
+import Sidebar from "@/components/sidebar/sidebar"
+export { Sidebar }
