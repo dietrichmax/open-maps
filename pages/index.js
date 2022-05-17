@@ -6,52 +6,38 @@ import { Layers } from "components/layers"
 import { OSMLayer } from "components/layers"
 import Attribution from "@/components/attribution/attribution"
 import { useRouter } from "next/router"
-/*const router = useRouter();
-router.query.NEWPARAMS = "VALUE"
-router.push(router)*/
+import MapContext from "@/components/map/mapContext"
+import { XYZ } from "ol/source"
+import { TileLayer } from "components/layers"
+import LayerSwitcher from "@/components/layers/layerSwitcher"
+
 function Index() {
   const [center, setCenter] = useState([14, 46])
   const [zoom, setZoom] = useState(5)
 
-  /*function getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition, handleError)
-    } else {
-      console.error("Geolocation is not supported by this browser.")
-    }
+  const OSMBrightSource = new XYZ({
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    tilePixelRatio: 2, // THIS IS IMPORTANT
+  })
+
+  const OSMBrightProperties = {
+    name: "Stadia",
+    attribution: `&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors`,
   }
 
-  function handleError(error) {
-    let errorStr
-    switch (error.code) {
-      case error.PERMISSION_DENIED:
-        errorStr = "User denied the request for Geolocation."
-        break
-      case error.POSITION_UNAVAILABLE:
-        errorStr = "Location information is unavailable."
-        break
-      case error.TIMEOUT:
-        errorStr = "The request to get user location timed out."
-        break
-      case error.UNKNOWN_ERROR:
-        errorStr = "An unknown error occurred."
-        break
-      default:
-        errorStr = "An unknown error occurred."
-    }
-    console.error("Error occurred: " + errorStr)
-  }
-
-  function showPosition(position) {
-    setCenter([position.coords.longitude, position.coords.latitude])
-  }*/
-
+  //properties={stadiaOSMBrightProps}
   return (
     <Map center={fromLonLat(center)} zoom={zoom}>
       <Autocomplete />
       <Layers>
+        <TileLayer
+          source={OSMBrightSource}
+          properties={OSMBrightProperties}
+          name="test"
+        />
         <OSMLayer />
       </Layers>
+      <LayerSwitcher />
       <Attribution />
     </Map>
   )

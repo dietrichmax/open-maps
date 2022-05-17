@@ -6,7 +6,6 @@ import { DrawShapes } from "@/components/draw"
 import media from "styled-media-query"
 import { Input } from "@/styles/templates/input"
 import { Button } from "@/styles/templates/button"
-import MapContext from "../map/mapContext"
 import { fromLonLat } from "ol/proj"
 import { transform } from "ol/proj"
 import { Point } from "ol/geom"
@@ -24,6 +23,7 @@ import { Icon, Style } from "ol/style"
 import { push } from "@socialgouv/matomo-next"
 import { Sidebar } from "@/components/sidebar"
 import { set } from "lodash"
+import MapContext from "@/components/map/mapContext"
 
 const Container = styled.div`
   position: absolute;
@@ -35,7 +35,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   width: 400px;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
+  box-shadow: var(--box-shadow);
   ${media.lessThan("432px")`
   top: 0px;
   left: 0px;
@@ -176,15 +176,34 @@ function Autocomplete() {
 
   const { map } = useContext(MapContext)
 
+  var updateUrlHash = function () {
+    //this is bound to the map, so:
+    var zoom = map.getView().getZoom().toFixed(2)
+    var lonLat = transform(map.getView().getCenter(), "EPSG:3857", "EPSG:4326")
+    if (geocodingResult.osm_id) {
+      window.location.hash =
+        lonLat[0].toFixed(4) +
+        "," +
+        lonLat[1].toFixed(4) +
+        "," +
+        zoom +
+        "/place/" +
+        geocodingResult.osm_id
+    } else {
+      window.location.hash =
+        lonLat[0].toFixed(4) + "," + lonLat[1].toFixed(4) + "," + zoom
+    }
+  }
+
+  if (map) {
+    map.on("moveend", updateUrlHash)
+  }
+
   const suggestionLimit = 30
 
   useEffect(() => {
     getOptions()
   }, [searchQuery])
-
-  useEffect(() => {
-    console.log(showResult)
-  }, [showResult])
 
   const getOptions = () => {
     if (map) {
@@ -329,7 +348,7 @@ function Autocomplete() {
   const addMarker = (geocodingResult) => {
     let markerLayer
     map.getLayers().forEach((layer) => {
-      if (layer.get("name") === "layer-markers") {
+      if (layer.get("name") === "Marker Layer") {
         markerLayer = layer.getSource()
       }
     })
@@ -358,7 +377,7 @@ function Autocomplete() {
           }),
         }),
         properties: {
-          name: "layer-markers",
+          name: "Marker Layer",
         },
       })
       map.addLayer(vectorLayer)
@@ -367,7 +386,7 @@ function Autocomplete() {
 
   const removeMarker = () => {
     map.getLayers().forEach((layer) => {
-      if (layer.get("name") === "layer-markers") {
+      if (layer.get("name") === "Marker Layer") {
         layer.getSource().clear()
       }
     })
@@ -496,7 +515,7 @@ function Autocomplete() {
       {visible ? <Sidebar visible={visible} /> : null}
       <>
         <Container>
-          <SearchButtonWrapper onClick={handleVisability}>
+          <SearchButtonWrapper onClick={() => handleVisability()}>
             <BurgerIcon />
           </SearchButtonWrapper>
           <SearchContainer>

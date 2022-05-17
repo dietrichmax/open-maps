@@ -28,8 +28,10 @@ function Attribution() {
 
   useEffect(() => {
     if (layers) {
-      setAttributionText(layers[0].getProperties().attribution)
-      setAttributionName(layers[0].getProperties().name)
+      setAttributionText(
+        layers[0] ? layers[0].getProperties().attribution : null
+      )
+      setAttributionName(layers[0] ? layers[0].getProperties().name : null)
     }
   }, [layers])
 

@@ -14,7 +14,7 @@ function OSMLayer() {
     </a>`,
   }
 
-  return <TileLayer source={new OSM()} zIndex={0} properties={properties} />
+  return <TileLayer source={source} zIndex={0} properties={properties} />
 }
 
 export default OSMLayer

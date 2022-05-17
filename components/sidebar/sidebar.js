@@ -74,14 +74,19 @@ const InfoLinks = styled.a`
   }
 `
 function Sidebar({ visible }) {
-  console.log(visible)
   const [showSidebar, setShowSidebar] = useState(visible)
+  const [layers, setLayers] = useState()
+
+  const { map } = useContext(MapContext)
 
   useEffect(() => {
     setShowSidebar(visible)
   }, [visible])
-
-  const { map } = useContext(MapContext)
+  useEffect(() => {
+    if (map) {
+      setLayers(map.getLayers().getArray())
+    }
+  }, [map])
 
   const handleVisability = () => {
     showSidebar ? setShowSidebar(false) : setShowSidebar(true)

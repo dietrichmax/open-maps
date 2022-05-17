@@ -7,5 +7,5 @@ export const config = {
   theme_color: "#3f72af",
   backgroundColor: "red",
   homepath: "/",
-  twitter: "@mxdietrich"
+  twitter: "@mxdietrich",
 }
