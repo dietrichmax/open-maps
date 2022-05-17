@@ -3,26 +3,20 @@ import { useState, useEffect } from "react"
 import { config } from "config"
 import {
   FaRoute,
-  FaDirections,
   FaMapMarkerAlt,
   FaHome,
   FaPhone,
   FaEnvelope,
   FaBookmark,
-  FaThumbsUp,
-  FaThumbsDown,
 } from "react-icons/fa"
 import { BsShareFill } from "react-icons/bs"
-import { ImCross } from "react-icons/im"
 const md5 = require("md5")
 import Image from "next/image"
 import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
 import { fetchGET } from "@/components/utils/fetcher"
-import { fetchPOST } from "@/components/utils/fetcher"
-
-
+import Rating from "@/components/search/details/rating/rating"
 
 const DetailsWrapper = styled.div`
   position: absolute;
@@ -273,65 +267,16 @@ const InformationWebsiteLink = styled.a`
   }
 `
 
-
-
 function Details({ result, name }) {
-  const [osmId, setOsmId] = useState()
   const [visible, setVisible] = useState(false)
   const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
   const [wikipediaData, setWikipediaData] = useState(false)
-  const [upvotes, setUpvotes] = useState(1)
-  const [downvotes, setDownvotes] = useState(1)
-  const [votesChanged, setVotesChanged] = useState(false)
   const [wikipediaLang, setWikipediaLang] = useState("en")
-  const [percent, setPercent] = useState(100)
 
   useEffect(() => {
     getWikimediaImageUrl(result)
     getWikipediaData(result)
-    setOsmId(result.osm_id)
   }, [result])
-
-  useEffect(() => {
-    if (osmId) {
-      getRating(osmId)
-    }
-  }, [osmId])
-
-  async function getRating(osmId) {
-    const data = await fetchGET(`/api/poi_details/${parseInt(osmId)}`)
-    setUpvotes(!data ? 0 : data.upvotes)
-    setDownvotes(!data ? 0 : data.downvotes)
-  }
-
-  useEffect(() => {
-    votesChanged ? sendRating(osmId, upvotes, downvotes) : null
-  }, [votesChanged, downvotes, upvotes])
-
-  useEffect(() => {
-    const ratio = upvotes / downvotes
-    setPercent(ratio * 100 > 100 || isNaN(ratio) ? 100 : parseInt(ratio * 100))
-  }, [ downvotes, upvotes])
-  
-  const handleRating = (string) => {
-    if (string === "upvote") {
-      setUpvotes(prevUpvotes => prevUpvotes + 1)
-    } else if (string === "downvote") {
-      setDownvotes(prevDownvotes => prevDownvotes + 1)
-    }
-    setVotesChanged(true)
-  }
-
-  async function sendRating(osmId, upvotes, downvotes) {
-    const body = { osmId, upvotes, downvotes }
-    const data = await fetchPOST(`/api/poi_details`, body)
-    if (!data) {
-      console.log("error")
-    }
-    setVotesChanged(false)
-  }
-
-
 
   const renderImage = () => {
     if (!wikimediaImageUrl) {
@@ -454,29 +399,7 @@ function Details({ result, name }) {
         {renderImage()}
         <Header>
           {result.display_name ? <Title>{name}</Title> : null}
-
-          <FeedbackContainer>
-            <ActionsResponsiveContainer>
-              <FeedbackWrapper
-                onClick={() => handleRating("upvote")}
-                title="Upvote this place"
-              >
-                <FaThumbsUp style={{ color: "var(--success-color)" }} />
-              </FeedbackWrapper>
-              <FeedbackWrapper
-                onClick={() => handleRating("downvote")}
-                title="Downvote this place"
-              >
-                <FaThumbsDown style={{ color: "var(--failure-color)" }} />
-              </FeedbackWrapper>
-              <FeedbackResult
-                value={percent}
-              >
-                {percent}
-                % liked this place
-              </FeedbackResult>
-            </ActionsResponsiveContainer>
-          </FeedbackContainer>
+          <Rating result={result} />
           {result.type ? (
             <Type>{capitalizeFirstLetter(result.type)}</Type>
           ) : null}

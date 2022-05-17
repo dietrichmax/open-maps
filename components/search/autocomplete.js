@@ -52,7 +52,7 @@ const SearchContainer = styled.div`
   display: flex;
 `
 
-const SearchButton = styled(Button)`
+const SearchAction = styled.div`
   display: flex;
   font-size: 18px;
   padding: 1rem;
@@ -152,8 +152,6 @@ const ButtonWrapper = styled.div`
 
 const DeleteSearchButtonWrapper = styled.div`
   display: flex;
-  padding-right: 0.75rem;
-  border-right: 1px solid var(--gray);
 `
 
 const CloseButton = styled(ImCross)`
@@ -183,6 +181,10 @@ function Autocomplete() {
   useEffect(() => {
     getOptions()
   }, [searchQuery])
+
+  useEffect(() => {
+    console.log(showResult)
+  }, [showResult])
 
   const getOptions = () => {
     if (map) {
@@ -240,7 +242,6 @@ function Autocomplete() {
         } else if (
           hit.properties.type === "county" ||
           hit.properties.type === "country"
-          
         ) {
           return false
         } else if (hit.properties.osm_key === "boundary") {
@@ -253,12 +254,19 @@ function Autocomplete() {
         return a;
       }, {});
       set.filter(e => lookup[e.properties])*/
-      return set.slice(0,5)
+      return set.slice(0, 5)
     }
   }
 
   const selectResult = (searchTerm, osmId, osmType, name) => {
     setInput(searchTerm)
+    setName(name)
+    getGeocodingResults(osmId, osmType)
+    setShowSuggestions(false)
+    setShowResult(true)
+  }
+
+  const selectInput = () => {
     setName(name)
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
@@ -272,8 +280,17 @@ function Autocomplete() {
     setShowResult(false)
   }
 
-  const DeleteSearch = () => {
-    if (!showResult) return
+  const HandleSearch = () => {
+    if (!showResult)
+      return (
+        /*<DeleteSearchButtonWrapper>
+      <FaSearch 
+          style={{ color: "var(--gray)", fontSize: "11px" }}
+          title="Search"
+          onClick={selectInput}/>
+    </DeleteSearchButtonWrapper>*/
+        null
+      )
     return (
       <DeleteSearchButtonWrapper>
         <CloseButton
@@ -366,7 +383,6 @@ function Autocomplete() {
   async function getFirstSuggestionResults(lat, lon, input, limit) {
     if (!input || input.length < 1) return
     const encodedInput = encodeURI(input)
-
     const response = await fetch(
       `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${zoom}&location_bias_scale=0.4`,
       {
@@ -381,34 +397,11 @@ function Autocomplete() {
     setGotFirstData(true)
     const filteredData = filterData(data)
     setSuggestions(filteredData)
-    //console.log(filteredData)
     setShowSuggestions(true)
   }
 
-  /*async function getSecondSuggestionResults(lat, lon, zoom, input, limit) {
-    const encodedInput = encodeURI(input)
-    const response = await fetch(
-      https://photon.komoot.io/api/?q=${input}&limit=${limit}&lang=${userLang}${extent ? "&bbox=" + extent : ""
-      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=${userLang}&lon=${lon}&lat=${lat}&zoom=1&location_bias_scale=0.1`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": config.email,
-        },
-      }
-    )
-    const data = await response.json()
-    setGotSecondData(true)
-    const filteredData = filterData(data)
-    setSuggestions((suggestions) =>
-      [...filteredData, ...suggestions].slice(0, 5)
-    )
-
-    setShowSuggestions(true)
-  }*/
-
   async function getGeocodingResults(osmId, osmType) {
+    push(["trackEvent", "search", true])
     const response = await fetch(
       `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1`,
       {
@@ -515,14 +508,13 @@ function Autocomplete() {
                   value={input}
                   placeholder="Search in mxd.codes Maps"
                 />
-                {setShowResult ? <DeleteSearch /> : null}
               </AutoCompleteInputContainer>
               {showSuggestions ? <SuggestionsListComponent /> : null}
             </AutoCompleteContainer>
           </SearchContainer>
-          <SearchButton>
-            <FaSearch title="Search" />
-          </SearchButton>
+          <SearchAction>
+            <HandleSearch />
+          </SearchAction>
         </Container>
         {geocodingResult ? (
           <Details result={geocodingResult} name={name} />

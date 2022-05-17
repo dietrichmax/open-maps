@@ -4,16 +4,18 @@ import styled from "styled-components"
 
 const AttributionContainer = styled.div`
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 16px;
+  right: 16px;
   z-index: 1;
-  background: rgba(255,255,255,.6);
+  background: rgba(255, 255, 255, 0.8);
   font-size: 11px;
-  padding-left: 5px;
-  padding-right: 5px;
+  box-shadow: var(--box-shadow);
+  border-radius: var(--border-radius);
+  padding: 3px 5px;
 `
 function Attribution() {
   const [attributionText, setAttributionText] = useState()
+  const [attributionName, setAttributionName] = useState()
   const [layers, setLayers] = useState()
 
   const { map } = useContext(MapContext)
@@ -27,6 +29,7 @@ function Attribution() {
   useEffect(() => {
     if (layers) {
       setAttributionText(layers[0].getProperties().attribution)
+      setAttributionName(layers[0].getProperties().name)
     }
   }, [layers])
 
@@ -35,6 +38,7 @@ function Attribution() {
     <AttributionContainer
       id="copyright"
       dangerouslySetInnerHTML={{ __html: attributionText }}
+      title={attributionName}
     />
   )
 }

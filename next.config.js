@@ -1,3 +1,5 @@
+const withPWA = require("next-pwa")
+
 module.exports = {
   reactStrictMode: true,
   webpack(config, { dev, isServer }) {
@@ -22,5 +24,10 @@ module.exports = {
   },
   images: {
     domains: ["upload.wikimedia.org", "source.unsplash.com"],
+  },
+  withPWA: {
+    pwa: {
+      dest: "public",
+    },
   },
 }
