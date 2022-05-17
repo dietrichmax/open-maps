@@ -18,7 +18,7 @@ const LayerSwitcherContainer = styled.div`
   justify-content: center;
   align-items: center;
   bottom: var(--space-sm);
-  left: ${(props) => props.sidebarVisible ? "432px" : "var(--space-sm)"};
+  left: ${(props) => (props.sidebarVisible ? "432px" : "var(--space-sm)")};
   z-index: 1;
   cursor: pointer;
   background: rgba(255, 255, 255, 1);
@@ -31,7 +31,7 @@ const LayerSwitcherContainer = styled.div`
 const LayerGroupContainer = styled.div`
   position: absolute;
   bottom: calc(50px + var(--space));
-  left: ${(props) => props.sidebarVisible ? "432px" : "var(--space-sm)"};
+  left: ${(props) => (props.sidebarVisible ? "432px" : "var(--space-sm)")};
   z-index: 1;
   font-size: 20px;
   cursor: pointer;
@@ -51,17 +51,15 @@ const LayerGroupWrapper = styled.div`
 
 const LayerName = styled.p``
 
-function LayerSwitcher({sidebarVisible}) {
+function LayerSwitcher({ sidebarVisible }) {
   const [layers, setLayers] = useState()
   const [visible, setVisible] = useState(false)
   const [layerIsVisible, setLayerIsVisible] = useState(true)
   const [movePosition, setMovePosition] = useState(false)
-  
-  const { map } = useContext(MapContext)
-  
 
-  useEffect(() => {
-  }, [])
+  const { map } = useContext(MapContext)
+
+  useEffect(() => {}, [])
 
   useEffect(() => {
     if (map) {

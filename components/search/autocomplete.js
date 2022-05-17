@@ -190,7 +190,7 @@ function Autocomplete() {
         zoom +
         "/place/" +
         geocodingResult.osm_id
-    }  else {
+    } else {
       window.location.hash =
         lonLat[0].toFixed(4) + "," + lonLat[1].toFixed(4) + "," + zoom
     }
@@ -345,7 +345,7 @@ function Autocomplete() {
       addMarker(geocodingResult)
     }
     setShowSuggestions(false)
-    if(map) {
+    if (map) {
       updateUrlHash()
     }
   }, [geocodingResult])
@@ -408,7 +408,9 @@ function Autocomplete() {
     if (!input || input.length < 1) return
     const encodedInput = encodeURI(input)
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${zoom - 4}&location_bias_scale=0.6`,
+      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${
+        zoom - 4
+      }&location_bias_scale=0.6`,
       {
         method: "GET",
         headers: {
