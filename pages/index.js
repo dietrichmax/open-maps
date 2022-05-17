@@ -9,7 +9,6 @@ import { useRouter } from "next/router"
 import MapContext from "@/components/map/mapContext"
 import { XYZ } from "ol/source"
 import { TileLayer } from "components/layers"
-import LayerSwitcher from "@/components/layers/layerSwitcher"
 
 function Index() {
   const [center, setCenter] = useState([14, 46])
@@ -37,7 +36,6 @@ function Index() {
         />
         <OSMLayer />
       </Layers>
-      <LayerSwitcher />
       <Attribution />
     </Map>
   )

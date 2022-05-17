@@ -18,7 +18,7 @@ const LayerSwitcherContainer = styled.div`
   justify-content: center;
   align-items: center;
   bottom: var(--space-sm);
-  left: var(--space-sm);
+  left: ${(props) => props.sidebarVisible ? "432px" : "var(--space-sm)"};
   z-index: 1;
   cursor: pointer;
   background: rgba(255, 255, 255, 1);
@@ -51,12 +51,17 @@ const LayerGroupWrapper = styled.div`
 
 const LayerName = styled.p``
 
-function LayerSwitcher() {
+function LayerSwitcher({sidebarVisible}) {
   const [layers, setLayers] = useState()
-  const [visible, setVisible] = useState(true)
+  const [visible, setVisible] = useState(false)
   const [layerIsVisible, setLayerIsVisible] = useState(true)
-
+  const [movePosition, setMovePosition] = useState(false)
+  
   const { map } = useContext(MapContext)
+  
+
+  useEffect(() => {
+  }, [])
 
   useEffect(() => {
     if (map) {
@@ -65,7 +70,7 @@ function LayerSwitcher() {
   }, [map])
 
   useEffect(() => {
-    console.log(layers)
+    //console.log(layers)
   }, [layers])
 
   const handleVisability = () => {
@@ -92,6 +97,7 @@ function LayerSwitcher() {
       <LayerSwitcherContainer
         onClick={() => handleVisability()}
         title="Show layers"
+        sidebarVisible={sidebarVisible}
       >
         <FaLayerGroup />
       </LayerSwitcherContainer>

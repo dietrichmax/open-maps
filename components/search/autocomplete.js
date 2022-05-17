@@ -24,6 +24,7 @@ import { push } from "@socialgouv/matomo-next"
 import { Sidebar } from "@/components/sidebar"
 import { set } from "lodash"
 import MapContext from "@/components/map/mapContext"
+import LayerSwitcher from "@/components/layers/layerSwitcher"
 
 const Container = styled.div`
   position: absolute;
@@ -180,7 +181,7 @@ function Autocomplete() {
     //this is bound to the map, so:
     var zoom = map.getView().getZoom().toFixed(2)
     var lonLat = transform(map.getView().getCenter(), "EPSG:3857", "EPSG:4326")
-    if (geocodingResult.osm_id) {
+    if (geocodingResult && geocodingResult.osm_id) {
       window.location.hash =
         lonLat[0].toFixed(4) +
         "," +
@@ -297,6 +298,7 @@ function Autocomplete() {
     setInput("")
     setGeocodingResult()
     setShowResult(false)
+    removeMarker()
   }
 
   const HandleSearch = () => {
@@ -403,7 +405,7 @@ function Autocomplete() {
     if (!input || input.length < 1) return
     const encodedInput = encodeURI(input)
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${zoom}&location_bias_scale=0.4`,
+      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${zoom - 4}&location_bias_scale=0.6`,
       {
         method: "GET",
         headers: {
@@ -538,6 +540,7 @@ function Autocomplete() {
         {geocodingResult ? (
           <Details result={geocodingResult} name={name} />
         ) : null}
+        <LayerSwitcher sidebarVisible={showResult} />
       </>
     </>
   )
