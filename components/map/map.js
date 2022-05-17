@@ -2,13 +2,32 @@ import React, { useRef, useState, useEffect } from "react"
 import MapContext from "./mapContext"
 import View from "ol/View"
 import Map from "ol/Map"
+import { transform } from "ol/proj"
 
 const MapWrapper = ({ children, zoom, center }) => {
   const mapRef = useRef()
   const [map, setMap] = useState(null)
+  const [lon, setLon] = useState()
+  const [lat, setLat] = useState()
+  const [aZoom, setAZoom] = useState()
+
+  const getHash = () => {
+    if (window.location.hash.length === 0) return
+    setLon(window.location.hash.substring(1, 8))
+    setLat(window.location.hash.substring(9, 16))
+    setAZoom(window.location.hash.substring(17, 20))
+  }
+
+  useEffect(() => {
+    if (map) {
+      map.getView().setCenter(transform([lon, lat], "EPSG:4326", "EPSG:3857"))
+      map.getView().setZoom(aZoom)
+    }
+  }, [lat, lon, zoom])
 
   // on component mount
   useEffect(() => {
+    getHash()
     let options = {
       view: new View({ zoom, center, maxZoom: 20 }),
       layers: [],

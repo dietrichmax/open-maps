@@ -172,16 +172,35 @@ function Autocomplete() {
   const [showResult, setShowResult] = useState(false)
   const [input, setInput] = useState("")
   const [markerLayer, setMarkerLayer] = useState()
+  const [osm_id, setOsm_id] = useState()
   const [gotFirstData, setGotFirstData] = useState(false)
   const [searchQuery, setSearchQuery] = useState(false)
 
   const { map } = useContext(MapContext)
 
-  var updateUrlHash = function () {
-    //this is bound to the map, so:
-    var zoom = map.getView().getZoom().toFixed(2)
-    var lonLat = transform(map.getView().getCenter(), "EPSG:3857", "EPSG:4326")
+  const getHash = () => {
+    console.log("1")
+    if (window.location.hash.includes("place")) {
+      const osmId = window.location.hash.split("place/").pop()
+      setOsm_id(osmId)
+    }
+  }
+
+  useEffect(() => {
+    if (osm_id) {
+      console.log(osm_id)
+    }
+  }, [osm_id])
+
+  const updateHash = () => {
+    const zoom = map.getView().getZoom().toFixed(2)
+    const lonLat = transform(
+      map.getView().getCenter(),
+      "EPSG:3857",
+      "EPSG:4326"
+    )
     if (geocodingResult && geocodingResult.osm_id) {
+      //console.log("asd")
       window.location.hash =
         lonLat[0].toFixed(4) +
         "," +
@@ -191,13 +210,15 @@ function Autocomplete() {
         "/place/" +
         geocodingResult.osm_id
     } else {
+      //console.log("asd1")
       window.location.hash =
         lonLat[0].toFixed(4) + "," + lonLat[1].toFixed(4) + "," + zoom
     }
   }
 
   if (map) {
-    map.on("moveend", updateUrlHash)
+    map.on("moveend", updateHash)
+    //map.on("moveend", getHash)
   }
 
   const suggestionLimit = 30
@@ -227,7 +248,6 @@ function Autocomplete() {
   }
 
   const handleVisability = () => {
-    //console.log(visible)
     visible ? setVisible(false) : setVisible(true)
   }
 
@@ -346,7 +366,7 @@ function Autocomplete() {
     }
     setShowSuggestions(false)
     if (map) {
-      updateUrlHash()
+      updateHash()
     }
   }, [geocodingResult])
 

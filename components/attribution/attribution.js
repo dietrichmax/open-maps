@@ -16,24 +16,22 @@ const AttributionContainer = styled.div`
 function Attribution() {
   const [attributionText, setAttributionText] = useState()
   const [attributionName, setAttributionName] = useState()
-  const [layers, setLayers] = useState()
 
   const { map } = useContext(MapContext)
 
-  useEffect(() => {
-    if (map) {
-      setLayers(map.getLayers().getArray())
-    }
-  }, [map])
+  const setAttribution = () => {
+    const layers = map.getLayers().getArray()
+    layers.map((layer) => {
+      if (layer.getVisible() === true) {
+        setAttributionText(layer.getProperties().attribution)
+        setAttributionName(layer.getProperties().name)
+      }
+    })
+  }
 
-  useEffect(() => {
-    if (layers) {
-      setAttributionText(
-        layers[0] ? layers[0].getProperties().attribution : null
-      )
-      setAttributionName(layers[0] ? layers[0].getProperties().name : null)
-    }
-  }, [layers])
+  if (map) {
+    map.on("postrender", setAttribution)
+  }
 
   if (!map) return null
   return (

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useContext } from "react"
-import { FaLayerGroup, FaEye, FaEyeSlash } from "react-icons/fa"
+import { FaLayerGroup } from "react-icons/fa"
 import MapContext from "@/components/map/mapContext"
 import styled from "styled-components"
+import TileLayer from "ol/layer/Tile"
+import { XYZ } from "ol/source"
 
 const LayerSwitcherContainer = styled.div`
   position: absolute;
@@ -19,13 +21,10 @@ const LayerSwitcherContainer = styled.div`
   height: 50px;
 `
 
-
 function LayerSwitcher({ sidebarVisible }) {
   const [layers, setLayers] = useState()
 
   const { map } = useContext(MapContext)
-
-  useEffect(() => {}, [])
 
   useEffect(() => {
     if (map) {
@@ -33,26 +32,39 @@ function LayerSwitcher({ sidebarVisible }) {
     }
   }, [map])
 
-
-  const toggleLayer = (layers) => {
-    if (layers[0].getVisible() === true) {
-      layers[0].setVisible(false)
-      layers[1].setVisible(true)
-    } else {
-      layers[0].setVisible(true)
-      layers[1].setVisible(false)
+  const addGoogleLayer = () => {
+    if (!map) return
+    const googleHybridLayer = new TileLayer({
+      source: new XYZ({
+        url: "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+      }),
+      properties: {
+        name: "Google Hybrid",
+        attribution: `&copy; Google`,
+      },
+    })
+    map.addLayer(googleHybridLayer)
+    return () => {
+      if (map) {
+        map.removeLayer(googleHybridLayer)
+      }
     }
   }
 
+  const toggleLayer = (layers) => {
+    layers[0].getVisible() === false
+      ? layers[0].setVisible(true)
+      : layers[0].setVisible(false)
+  }
 
   return (
-      <LayerSwitcherContainer
-        onClick={() => toggleLayer(layers)}
-        title="Show layers"
-        sidebarVisible={sidebarVisible}
-      >
-        <FaLayerGroup />
-      </LayerSwitcherContainer>
+    <LayerSwitcherContainer
+      onClick={() => toggleLayer(layers)}
+      title="Show layers"
+      sidebarVisible={sidebarVisible}
+    >
+      <FaLayerGroup />
+    </LayerSwitcherContainer>
   )
 }
 
