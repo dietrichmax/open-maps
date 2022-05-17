@@ -21,7 +21,8 @@ import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
 import { fetchGET } from "@/components/utils/fetcher"
 import { fetchPOST } from "@/components/utils/fetcher"
-import useSWR from "swr"
+
+
 
 const DetailsWrapper = styled.div`
   position: absolute;
@@ -241,7 +242,7 @@ const InformationContainer = styled.div`
 const InformationIconWrapper = styled(Button)`
   padding-left: 0;
   color: var(--secondary-color);
-  font-size: 100%;
+  font-size: 18px;
   cursor: auto;
 `
 
@@ -272,17 +273,18 @@ const InformationWebsiteLink = styled.a`
   }
 `
 
+
+
 function Details({ result, name }) {
   const [osmId, setOsmId] = useState()
   const [visible, setVisible] = useState(false)
   const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
   const [wikipediaData, setWikipediaData] = useState(false)
-  const [rating, setRating] = useState()
-  const [currentUpvotes, setCurrentUpvotes] = useState(0)
-  const [currentDownvotes, setCurrentDownvotes] = useState(0)
-  const [newUpvotes, setNewUpvotes] = useState(1)
-  const [newDownvotes, setNewDownvotes] = useState(1)
+  const [upvotes, setUpvotes] = useState(1)
+  const [downvotes, setDownvotes] = useState(1)
+  const [votesChanged, setVotesChanged] = useState(false)
   const [wikipediaLang, setWikipediaLang] = useState("en")
+  const [percent, setPercent] = useState(100)
 
   useEffect(() => {
     getWikimediaImageUrl(result)
@@ -292,42 +294,44 @@ function Details({ result, name }) {
 
   useEffect(() => {
     if (osmId) {
-      getRating()
+      getRating(osmId)
     }
   }, [osmId])
 
-  async function getRating() {
-    const data = await fetchGET(`/api/poi_details/${osmId}`)
-    if (!data) {
-      setCurrentUpvotes(1)
-      setCurrentDownvotes(1)
-    } else {
-      setCurrentUpvotes(data.currentUpvotes > 0 ? data.currentUpvotes : 1)
-      setCurrentDownvotes(data.currentDownvotes > 0 ? data.currentDownvotes : 1)
-    }
+  async function getRating(osmId) {
+    const data = await fetchGET(`/api/poi_details/${parseInt(osmId)}`)
+    setUpvotes(!data ? 0 : data.upvotes)
+    setDownvotes(!data ? 0 : data.downvotes)
   }
 
-  async function sendRating(osmId, newUpvotes, newDownvotes) {
-    const body = { osmId, newUpvotes, newDownvotes }
+  useEffect(() => {
+    votesChanged ? sendRating(osmId, upvotes, downvotes) : null
+  }, [votesChanged, downvotes, upvotes])
+
+  useEffect(() => {
+    const ratio = upvotes / downvotes
+    setPercent(ratio * 100 > 100 || isNaN(ratio) ? 100 : parseInt(ratio * 100))
+  }, [ downvotes, upvotes])
+  
+  const handleRating = (string) => {
+    if (string === "upvote") {
+      setUpvotes(prevUpvotes => prevUpvotes + 1)
+    } else if (string === "downvote") {
+      setDownvotes(prevDownvotes => prevDownvotes + 1)
+    }
+    setVotesChanged(true)
+  }
+
+  async function sendRating(osmId, upvotes, downvotes) {
+    const body = { osmId, upvotes, downvotes }
     const data = await fetchPOST(`/api/poi_details`, body)
     if (!data) {
       console.log("error")
     }
+    setVotesChanged(false)
   }
 
-  const handleRating = (string) => {
-    if (string === "upvote") {
-      setCurrentUpvotes(currentUpvotes + 1)
-    } else if (string === "downvote") {
-      setCurrentDownvotes(currentDownvotes + 1)
-    }
-    sendRating(osmId, currentUpvotes, currentDownvotes)
-  }
 
-  useEffect(() => {
-    //console.log(newUpvotes, newDownvotes)
-    //sendRating(osmId, newUpvotes, newDownvotes)
-  }, [newUpvotes, newDownvotes])
 
   const renderImage = () => {
     if (!wikimediaImageUrl) {
@@ -416,7 +420,7 @@ function Details({ result, name }) {
     const data = await fetchGET(
       `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipedia}&origin=*`
     )
-    if (!data.query.pages[0].extract) return
+    if (!data.query.pages[0] || !data.query.pages[0].extract) return
     setWikipediaData(data.query.pages[0].extract.toString())
   }
 
@@ -466,11 +470,9 @@ function Details({ result, name }) {
                 <FaThumbsDown style={{ color: "var(--failure-color)" }} />
               </FeedbackWrapper>
               <FeedbackResult
-                value={parseInt((currentUpvotes / currentDownvotes) * 100)}
+                value={percent}
               >
-                {parseInt((currentUpvotes / currentDownvotes) * 100) > 100
-                  ? 100
-                  : parseInt((currentUpvotes / currentDownvotes) * 100)}
+                {percent}
                 % liked this place
               </FeedbackResult>
             </ActionsResponsiveContainer>

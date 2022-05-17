@@ -7,8 +7,7 @@ const AttributionContainer = styled.div`
   bottom: 0;
   right: 0;
   z-index: 1;
-  background-color: #fff;
-  opacity: 0.7;
+  background: rgba(255,255,255,.6);
   font-size: 11px;
   padding-left: 5px;
   padding-right: 5px;

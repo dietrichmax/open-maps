@@ -11,14 +11,6 @@ function OSMLayer() {
     attribution: `
     <a target="_blank" href="https://www.openstreetmap.org/">
       © OpenStreetMap contributors
-    </a>
-    <span> | </span>
-    <a
-        rel="license"
-        target="_blank"
-        href="https://opendatacommons.org/licenses/odbl/"
-    >
-        Open Database License (ODbL)
     </a>`,
   }
 

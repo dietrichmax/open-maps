@@ -5,10 +5,14 @@ import { fromLonLat } from "ol/proj"
 import { Layers } from "components/layers"
 import { OSMLayer } from "components/layers"
 import Attribution from "@/components/attribution/attribution"
-
+import { useRouter } from 'next/router'  
+/*const router = useRouter();
+router.query.NEWPARAMS = "VALUE"
+router.push(router)*/
 function Index() {
   const [center, setCenter] = useState([14, 46])
   const [zoom, setZoom] = useState(5)
+
 
   /*function getLocation() {
     if (navigator.geolocation) {
