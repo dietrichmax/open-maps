@@ -13,9 +13,15 @@ const MapWrapper = ({ children, zoom, center }) => {
 
   const getHash = () => {
     if (window.location.hash.length === 0) return
-    setLat(window.location.hash.substring(1, 8))
-    setLon(window.location.hash.substring(9, 16))
-    setAZoom(window.location.hash.substring(17, 20))
+    const parameters = window.location.hash.replace("#","").split(",")
+    console.log(parameters)
+    //const first = a.slice(0, n).join(',')
+    //console.log(first)
+    //var second =  a.slice(n).join(',');
+    //console.log(second)
+    setLat(parameters[0])
+    setLon(parameters[1])
+    setAZoom(parameters[2])
     // use regex
   }
 

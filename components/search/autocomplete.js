@@ -207,7 +207,7 @@ function Autocomplete() {
         lonLat[1].toFixed(4) +
         "," +
         zoom +
-        "/place/" +
+        "," +
         geocodingResult.osm_id
     } else {
       //console.log("asd1")
