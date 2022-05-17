@@ -15,7 +15,7 @@ function Index() {
   const [zoom, setZoom] = useState(5)
 
   const OSMBrightSource = new XYZ({
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    url: "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
     tilePixelRatio: 2, // THIS IS IMPORTANT
   })
 
