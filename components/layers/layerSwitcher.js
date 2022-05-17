@@ -31,7 +31,7 @@ const LayerSwitcherContainer = styled.div`
 const LayerGroupContainer = styled.div`
   position: absolute;
   bottom: calc(50px + var(--space));
-  left: var(--space-sm);
+  left: ${(props) => props.sidebarVisible ? "432px" : "var(--space-sm)"};
   z-index: 1;
   font-size: 20px;
   cursor: pointer;
@@ -104,7 +104,7 @@ function LayerSwitcher({sidebarVisible}) {
 
       {visible ? (
         <LayerGroupContainer visible={visible}>
-          <LayerGroupWrapper>
+          <LayerGroupWrapper visible={visible}>
             {layers
               ? layers.map((layer) => {
                   return (

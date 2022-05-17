@@ -345,7 +345,9 @@ function Autocomplete() {
       addMarker(geocodingResult)
     }
     setShowSuggestions(false)
-    updateUrlHash()
+    if(map) {
+      updateUrlHash()
+    }
   }, [geocodingResult])
 
   const addMarker = (geocodingResult) => {
