@@ -190,7 +190,7 @@ function Autocomplete() {
         zoom +
         "/place/" +
         geocodingResult.osm_id
-    } else {
+    }  else {
       window.location.hash =
         lonLat[0].toFixed(4) + "," + lonLat[1].toFixed(4) + "," + zoom
     }
@@ -345,6 +345,7 @@ function Autocomplete() {
       addMarker(geocodingResult)
     }
     setShowSuggestions(false)
+    updateUrlHash()
   }, [geocodingResult])
 
   const addMarker = (geocodingResult) => {
