@@ -13,9 +13,10 @@ const MapWrapper = ({ children, zoom, center }) => {
 
   const getHash = () => {
     if (window.location.hash.length === 0) return
-    setLon(window.location.hash.substring(1, 8))
-    setLat(window.location.hash.substring(9, 16))
+    setLat(window.location.hash.substring(1, 8))
+    setLon(window.location.hash.substring(9, 16))
     setAZoom(window.location.hash.substring(17, 20))
+    // use regex
   }
 
   useEffect(() => {

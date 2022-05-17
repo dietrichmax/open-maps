@@ -212,7 +212,7 @@ function Autocomplete() {
     } else {
       //console.log("asd1")
       window.location.hash =
-        lonLat[0].toFixed(4) + "," + lonLat[1].toFixed(4) + "," + zoom
+      lonLat[1].toFixed(4) + "," + lonLat[0].toFixed(4) + "," +zoom
     }
   }
 
