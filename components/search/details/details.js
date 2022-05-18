@@ -2,14 +2,7 @@ import styled from "styled-components"
 import { useState, useEffect, useContext } from "react"
 import { useRouter } from "next/router"
 import { config } from "config"
-import {
-  FaRoute,
-  FaMapMarkerAlt,
-  FaHome,
-  FaPhone,
-  FaEnvelope,
-  FaBookmark,
-} from "react-icons/fa"
+import { FaRoute, FaMapMarkerAlt, FaHome, FaPhone, FaEnvelope, FaBookmark } from "react-icons/fa"
 import { BsShareFill } from "react-icons/bs"
 const md5 = require("md5")
 import Image from "next/image"
@@ -124,8 +117,7 @@ const FeedbackResult = styled.div`
   display: flex;
   align-items: center;
   font-size: 0.85rem;
-  color: ${(props) =>
-    props.value > 85 ? "var(--success-color)" : "var(--failure-color)"};
+  color: ${(props) => (props.value > 85 ? "var(--success-color)" : "var(--failure-color)")};
 `
 
 const Actions = styled.div`
@@ -287,25 +279,13 @@ function Details({ result, name }) {
       <ImageWrapper>
         <a href={wikimediaImageUrl}>
           <Image
-            src={
-              wikimediaImageUrl
-                ? wikimediaImageUrl
-                : `https://source.unsplash.com/random/300×450/?${result.display_name}`
-            }
+            src={wikimediaImageUrl ? wikimediaImageUrl : `https://source.unsplash.com/random/300×450/?${result.display_name}`}
             height="250"
             width="400"
             target="_blank"
             rel="nofollow noopener noreferrer"
-            alt={
-              wikimediaImageUrl
-                ? `Image of ${result.display_name} from Wikimeda`
-                : "Random image from Unsplash"
-            }
-            title={
-              wikimediaImageUrl
-                ? `Image of '${result.display_name}' from Wikimedia`
-                : "Random image from Unsplash"
-            }
+            alt={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimeda` : "Random image from Unsplash"}
+            title={wikimediaImageUrl ? `Image of '${result.display_name}' from Wikimedia` : "Random image from Unsplash"}
           />
         </a>
       </ImageWrapper>
@@ -334,15 +314,10 @@ function Details({ result, name }) {
       setwikimediaImageUrl()
       return null
     }
-    const data = await fetchGET(
-      `https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`
-    )
+    const data = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`)
     let imageUrl
     if (data.claims && data.claims.P18) {
-      const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(
-        " ",
-        "_"
-      )
+      const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
       const hash = md5(imageName)
       imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
     }
@@ -356,12 +331,7 @@ function Details({ result, name }) {
       return null
     }
 
-    setWikipediaLang(
-      result.extratags.wikipedia.substr(
-        0,
-        result.extratags.wikipedia.indexOf(":")
-      )
-    )
+    setWikipediaLang(result.extratags.wikipedia.substr(0, result.extratags.wikipedia.indexOf(":")))
     const wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
     const data = await fetchGET(
       `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipedia}&origin=*`
@@ -380,13 +350,7 @@ function Details({ result, name }) {
         {address.street ? address.street : address.road ? address.road : null}
         {address.house_number ? ` ${address.house_number}, ` : null}
         {address.postcode ? ` ${address.postcode} ` : null}
-        {address.city
-          ? ` ${address.city}, `
-          : address.village
-          ? ` ${address.village}, `
-          : address.town
-          ? ` ${address.town}, `
-          : null}
+        {address.city ? ` ${address.city}, ` : address.village ? ` ${address.village}, ` : address.town ? ` ${address.town}, ` : null}
         {address.country ? `${address.country}` : null}
       </div>
     )
@@ -401,15 +365,11 @@ function Details({ result, name }) {
         <Header>
           {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
-          {result.type ? (
-            <Type>{capitalizeFirstLetter(result.type)}</Type>
-          ) : null}
+          {result.type ? <Type>{capitalizeFirstLetter(result.type)}</Type> : null}
         </Header>
         <Actions>
           <a
-            href={`https://www.google.com/maps/dir/?api=1&origin=&destination=${encodeURI(
-              result.display_name
-            )}&travelmode=driving`} //&dir_action=navigate
+            href={`https://www.google.com/maps/dir/?api=1&origin=&destination=${encodeURI(result.display_name)}&travelmode=driving`} //&dir_action=navigate
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -447,9 +407,7 @@ function Details({ result, name }) {
               </InformationIconWrapper>
               <InformationDetails>
                 <InformationDetailsTitle>Address</InformationDetailsTitle>
-                <InformationDetailsValue>
-                  {renderAdress(result)}
-                </InformationDetailsValue>
+                <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
               </InformationDetails>
             </InformationItem>
           ) : null}
@@ -460,11 +418,7 @@ function Details({ result, name }) {
               </InformationIconWrapper>
               <InformationDetails>
                 <InformationDetailsTitle>Website</InformationDetailsTitle>
-                <InformationWebsiteLink
-                  href={result.extratags.website}
-                  title={result.extratags.website}
-                  alt={`Link to website of ${result.display_name}`}
-                >
+                <InformationWebsiteLink href={result.extratags.website} title={result.extratags.website} alt={`Link to website of ${result.display_name}`}>
                   {result.extratags.website}
                 </InformationWebsiteLink>
               </InformationDetails>
@@ -477,10 +431,7 @@ function Details({ result, name }) {
               </InformationIconWrapper>
               <InformationDetails>
                 <InformationDetailsTitle>Phone</InformationDetailsTitle>
-                <InformationWebsiteLink
-                  title={result.extratags.phone}
-                  alt={`Phone number of ${result.name}`}
-                >
+                <InformationWebsiteLink title={result.extratags.phone} alt={`Phone number of ${result.name}`}>
                   {result.extratags.phone}
                 </InformationWebsiteLink>
               </InformationDetails>
@@ -493,11 +444,7 @@ function Details({ result, name }) {
               </InformationIconWrapper>
               <InformationDetails>
                 <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
-                <InformationWebsiteLink
-                  title={result.extratags.email}
-                  alt={`Email address of ${result.name}`}
-                  href={`mailto:${result.extratags.email}`}
-                >
+                <InformationWebsiteLink title={result.extratags.email} alt={`Email address of ${result.name}`} href={`mailto:${result.extratags.email}`}>
                   {result.extratags.email}
                 </InformationWebsiteLink>
               </InformationDetails>

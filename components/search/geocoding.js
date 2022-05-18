@@ -54,13 +54,10 @@ function AutoComplete() {
   }, [])
 
   async function getGeocodingResults(searchString, limit) {
-    const response = await fetch(
-      `https://photon.komoot.io/api/?q=${searchString}&limit=${limit}&lang=${userLang}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    )
+    const response = await fetch(`https://photon.komoot.io/api/?q=${searchString}&limit=${limit}&lang=${userLang}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
     const data = await response.json()
     setGeocodingResults(data.features)
     //console.log(geocodingResults.length)

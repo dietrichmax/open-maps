@@ -13,7 +13,7 @@ const MapWrapper = ({ children, zoom, center }) => {
 
   const getHash = () => {
     if (window.location.hash.length === 0) return
-    const parameters = window.location.hash.replace("#","").split(",")
+    const parameters = window.location.hash.replace("#", "").split(",")
     //console.log(parameters)
     //const first = a.slice(0, n).join(',')
     //console.log(first)
@@ -82,11 +82,7 @@ const MapWrapper = ({ children, zoom, center }) => {
 
   return (
     <MapContext.Provider value={{ map }}>
-      <div
-        ref={mapRef}
-        className="ol-map"
-        style={{ height: "100vh", width: "100%", position: "relative" }}
-      >
+      <div ref={mapRef} className="ol-map" style={{ height: "100vh", width: "100%", position: "relative" }}>
         {children}
       </div>
     </MapContext.Provider>

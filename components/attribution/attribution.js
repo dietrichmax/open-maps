@@ -34,12 +34,6 @@ function Attribution() {
   }
 
   if (!map) return null
-  return (
-    <AttributionContainer
-      id="copyright"
-      dangerouslySetInnerHTML={{ __html: attributionText }}
-      title={attributionName}
-    />
-  )
+  return <AttributionContainer id="copyright" dangerouslySetInnerHTML={{ __html: attributionText }} title={attributionName} />
 }
 export default Attribution

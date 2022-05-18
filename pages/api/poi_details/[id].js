@@ -6,9 +6,7 @@ export default async function handle(req, res) {
   if (req.method === "GET") {
     handleGET(osm_id, res)
   } else {
-    throw new Error(
-      `The HTTP ${req.method} method is not supported at this route.`
-    )
+    throw new Error(`The HTTP ${req.method} method is not supported at this route.`)
   }
 }
 

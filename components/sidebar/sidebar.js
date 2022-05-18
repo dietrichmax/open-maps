@@ -94,7 +94,7 @@ function Sidebar({ visible }) {
   }
 
   const draw = new DrawShapes(map)
- 
+
   return (
     <>
       {showSidebar ? (
@@ -124,10 +124,7 @@ function Sidebar({ visible }) {
               <InfoLinks title="Privacy" href="https://mxd.codes/privacy">
                 Privacy
               </InfoLinks>
-              <InfoLinks
-                title="Site Notice"
-                href="https://mxd.codes/site-notice"
-              >
+              <InfoLinks title="Site Notice" href="https://mxd.codes/site-notice">
                 Site-Notice
               </InfoLinks>
             </InfoSection>

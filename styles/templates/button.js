@@ -12,12 +12,10 @@ const Button = styled.button`
   width: 20%;
   border-radius: var(--border-radius);
   color: ${(props) => (props.color ? `${props.color}` : "var(--text-color)")};
-  background: ${(props) =>
-    props.backgroundColor ? `${props.backgroundColor}` : "none"};
+  background: ${(props) => (props.backgroundColor ? `${props.backgroundColor}` : "none")};
   cursor: pointer;
   :hover {
-    background-color: ${(props) =>
-      props.backgroundColor ? `${props.backgroundColor}` : "none"};
+    background-color: ${(props) => (props.backgroundColor ? `${props.backgroundColor}` : "none")};
   }
   :disabled {
     cursor: not-allowed;

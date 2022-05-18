@@ -32,8 +32,7 @@ const FeedbackResult = styled.div`
   display: flex;
   align-items: center;
   font-size: 0.85rem;
-  color: ${(props) =>
-    props.value > 85 ? "var(--success-color)" : "var(--failure-color)"};
+  color: ${(props) => (props.value > 85 ? "var(--success-color)" : "var(--failure-color)")};
 `
 
 const ActionsResponsiveContainer = styled.div`
@@ -97,21 +96,13 @@ function Rating({ result }) {
     return (
       <FeedbackContainer>
         <ActionsResponsiveContainer>
-          <FeedbackWrapper
-            onClick={() => handleRating("upvote")}
-            title="Upvote this place"
-          >
+          <FeedbackWrapper onClick={() => handleRating("upvote")} title="Upvote this place">
             <FaThumbsUp style={{ color: "var(--success-color)" }} />
           </FeedbackWrapper>
-          <FeedbackWrapper
-            onClick={() => handleRating("downvote")}
-            title="Downvote this place"
-          >
+          <FeedbackWrapper onClick={() => handleRating("downvote")} title="Downvote this place">
             <FaThumbsDown style={{ color: "var(--failure-color)" }} />
           </FeedbackWrapper>
-          <FeedbackResult value={percent}>
-            {percent}% liked this place
-          </FeedbackResult>
+          <FeedbackResult value={percent}>{percent}% liked this place</FeedbackResult>
         </ActionsResponsiveContainer>
       </FeedbackContainer>
     )

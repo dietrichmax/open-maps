@@ -18,11 +18,11 @@ class DrawShapes {
   addInteraction(type) {
     let value = type
 
-  const source = new VectorSource({ wrapX: false })
+    const source = new VectorSource({ wrapX: false })
 
-  const vector = new VectorLayer({
-    source: source,
-  })
+    const vector = new VectorLayer({
+      source: source,
+    })
     if (value !== "None") {
       let geometryFunction
       if (value === "Square") {
@@ -41,10 +41,9 @@ class DrawShapes {
     }
   }
 
- removeInteraction() {
-   console.log("sd")
-  this.map.removeInteraction(this.draw)
-
+  removeInteraction() {
+    console.log("sd")
+    this.map.removeInteraction(this.draw)
   }
 }
 

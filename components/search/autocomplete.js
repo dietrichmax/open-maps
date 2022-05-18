@@ -180,7 +180,6 @@ function Autocomplete() {
 
   const { map } = useContext(MapContext)
 
-
   useEffect(() => {
     if (osm_id && osm_type) {
       setInput(placeName)
@@ -193,30 +192,22 @@ function Autocomplete() {
 
   const updateHash = () => {
     const zoom = map.getView().getZoom().toFixed(2)
-    const lonLat = transform(
-      map.getView().getCenter(),
-      "EPSG:3857",
-      "EPSG:4326"
-    )
-  
+    const lonLat = transform(map.getView().getCenter(), "EPSG:3857", "EPSG:4326")
+
     const urlTemp = window.location.hash
-    const urlParams = urlTemp.replace("#","").split(",")
-    //console.log(geocodingResult.length === 0 && urlParams.length < 4)
-    if (!geocodingResult || geocodingResult.length === 0 && urlParams.length < 4) {
+    const urlParams = urlTemp.replace("#", "").split(",")
+    if (!geocodingResult || (geocodingResult.length === 0 && urlParams.length < 4)) {
       window.location.hash = lonLat[1].toFixed(4) + "," + lonLat[0].toFixed(4) + "," + zoom
-    } else if (geocodingResult && geocodingResult.osm_id || urlParams.length > 3) {
-
-
-      const osmId = geocodingResult.osm_id  ? geocodingResult.osm_id  : urlParams[3]
+    } else if ((geocodingResult && geocodingResult.osm_id) || urlParams.length > 3) {
+      const osmId = geocodingResult.osm_id ? geocodingResult.osm_id : urlParams[3]
       const osmType = geocodingResult.osm_type ? geocodingResult.osm_type[0].toUpperCase() : urlParams[4]
-      const placeName = name ? name.replaceAll(" ","+") : urlParams[5]
+      const placeName = name ? name.replaceAll(" ", "+") : urlParams[5]
       if (urlParams.length > 3) {
-        setOsm_id(osmId) 
+        setOsm_id(osmId)
         setOsm_type(osmType)
-        setPlaceName(placeName.replaceAll("+"," ")) 
+        setPlaceName(placeName.replaceAll("+", " "))
       }
       window.location.hash = `${lonLat[1].toFixed(4)},${lonLat[0].toFixed(4)},${zoom},${osmId},${osmType},${placeName}`
-        
     }
   }
 
@@ -232,18 +223,8 @@ function Autocomplete() {
 
   const getOptions = () => {
     if (map) {
-      const center = transform(
-        map.getView().getCenter(),
-        "EPSG:3857",
-        "EPSG:4326"
-      )
-      setExtent(
-        transformExtent(
-          map.getView().calculateExtent(map.getSize()),
-          "EPSG:3857",
-          "EPSG:4326"
-        )
-      )
+      const center = transform(map.getView().getCenter(), "EPSG:3857", "EPSG:4326")
+      setExtent(transformExtent(map.getView().calculateExtent(map.getSize()), "EPSG:3857", "EPSG:4326"))
       setLon(parseInt(center[0]))
       setLat(parseInt(center[1]))
       setZoom(parseInt(map.getView().getZoom() + 2))
@@ -257,18 +238,11 @@ function Autocomplete() {
   const handleChange = (e) => {
     setGotFirstData(false)
     setInput(e.target.value)
-    setSearchQuery(
-      e.target.value
-        .replaceAll(",", "+")
-        .replaceAll(" ", "+")
-        .replaceAll("++", "+")
-    )
+    setSearchQuery(e.target.value.replaceAll(",", "+").replaceAll(" ", "+").replaceAll("++", "+"))
   }
 
   useEffect(() => {
-    !gotFirstData
-      ? getFirstSuggestionResultsDelayed(lat, lon, searchQuery, suggestionLimit)
-      : null
+    !gotFirstData ? getFirstSuggestionResultsDelayed(lat, lon, searchQuery, suggestionLimit) : null
   }, [extent])
 
   const filterData = (data) => {
@@ -282,10 +256,7 @@ function Autocomplete() {
           hit.properties.osm_value === "municipality"
         ) {
           return false
-        } else if (
-          hit.properties.type === "county" ||
-          hit.properties.type === "country"
-        ) {
+        } else if (hit.properties.type === "county" || hit.properties.type === "country") {
           return false
         } else if (hit.properties.osm_key === "boundary") {
           return false
@@ -337,11 +308,7 @@ function Autocomplete() {
       )
     return (
       <DeleteSearchButtonWrapper>
-        <CloseButton
-          style={{ color: "var(--gray)", fontSize: "11px" }}
-          title="Delete search"
-          onClick={deleteSearch}
-        />
+        <CloseButton style={{ color: "var(--gray)", fontSize: "11px" }} title="Delete search" onClick={deleteSearch} />
       </DeleteSearchButtonWrapper>
     )
   }
@@ -352,12 +319,7 @@ function Autocomplete() {
     if (geocodingResult && geocodingResult.boundingbox) {
       removeMarker()
       const transformedBbox = transformExtent(
-        [
-          geocodingResult.boundingbox[2],
-          geocodingResult.boundingbox[0],
-          geocodingResult.boundingbox[3],
-          geocodingResult.boundingbox[1],
-        ],
+        [geocodingResult.boundingbox[2], geocodingResult.boundingbox[0], geocodingResult.boundingbox[3], geocodingResult.boundingbox[1]],
         "EPSG:4326",
         "EPSG:3857"
       )
@@ -382,9 +344,7 @@ function Autocomplete() {
     })
 
     const marker = new Feature({
-      geometry: new Point(
-        fromLonLat([geocodingResult.lon, geocodingResult.lat])
-      ),
+      geometry: new Point(fromLonLat([geocodingResult.lon, geocodingResult.lat])),
       name: "Marker",
     })
 
@@ -430,18 +390,13 @@ function Autocomplete() {
   async function getFirstSuggestionResults(lat, lon, input, limit) {
     if (!input || input.length < 1) return
     const encodedInput = encodeURI(input)
-    const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${
-        zoom - 4
-      }&location_bias_scale=0.6`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": config.email,
-        },
-      }
-    )
+    const response = await fetch(`https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${zoom - 4}&location_bias_scale=0.6`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": config.email,
+      },
+    })
     const data = await response.json()
     setGotFirstData(true)
     const filteredData = filterData(data)
@@ -490,11 +445,7 @@ function Autocomplete() {
                   : suggestion.properties.housenumber
                   ? suggestion.properties.housenumber
                   : null
-              }${
-                suggestion.properties.city
-                  ? ", " + suggestion.properties.city
-                  : ""
-              }`
+              }${suggestion.properties.city ? ", " + suggestion.properties.city : ""}`
               const name = suggestion.properties.name
               const osmId = suggestion.properties.osm_id
               const osmType = suggestion.properties.osm_type
@@ -504,33 +455,14 @@ function Autocomplete() {
               )
               const firstPart = input*/
               return (
-                <ListItem
-                  key={index}
-                  onClick={() => selectResult(searchTerm, osmId, osmType, name)}
-                >
-                  <ButtonWrapper>
-                    {getSymbol(suggestion.properties.osm_value)}
-                  </ButtonWrapper>
-                  {suggestion.properties.name ? (
-                    <Place>{`${suggestion.properties.name}`}</Place>
-                  ) : null}
-                  {suggestion.properties.street ? (
-                    <AdressDetail>{`${suggestion.properties.street} `}</AdressDetail>
-                  ) : null}
-                  {suggestion.properties.housenumber ? (
-                    <AdressDetail>{`${suggestion.properties.housenumber}`}</AdressDetail>
-                  ) : null}
-                  {suggestion.properties.city ? (
-                    <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail>
-                  ) : null}
-                  {suggestion.properties.country ? (
-                    <AdressDetail>{`${suggestion.properties.country}`}</AdressDetail>
-                  ) : null}
-                  {suggestion.properties.AdressDetail ? (
-                    <AdressDetail>
-                      {suggestion.properties.AdressDetail}
-                    </AdressDetail>
-                  ) : null}
+                <ListItem key={index} onClick={() => selectResult(searchTerm, osmId, osmType, name)}>
+                  <ButtonWrapper>{getSymbol(suggestion.properties.osm_value)}</ButtonWrapper>
+                  {suggestion.properties.name ? <Place>{`${suggestion.properties.name}`}</Place> : null}
+                  {suggestion.properties.street ? <AdressDetail>{`${suggestion.properties.street} `}</AdressDetail> : null}
+                  {suggestion.properties.housenumber ? <AdressDetail>{`${suggestion.properties.housenumber}`}</AdressDetail> : null}
+                  {suggestion.properties.city ? <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail> : null}
+                  {suggestion.properties.country ? <AdressDetail>{`${suggestion.properties.country}`}</AdressDetail> : null}
+                  {suggestion.properties.AdressDetail ? <AdressDetail>{suggestion.properties.AdressDetail}</AdressDetail> : null}
                 </ListItem>
               )
             })}
@@ -551,12 +483,7 @@ function Autocomplete() {
           <SearchContainer>
             <AutoCompleteContainer>
               <AutoCompleteInputContainer>
-                <AutoCompleteInput
-                  type="text"
-                  onChange={handleChange}
-                  value={input}
-                  placeholder="Search in mxd.codes Maps"
-                />
+                <AutoCompleteInput type="text" onChange={handleChange} value={input} placeholder="Search in mxd.codes Maps" />
               </AutoCompleteInputContainer>
               {showSuggestions ? <SuggestionsListComponent /> : null}
             </AutoCompleteContainer>
@@ -565,9 +492,7 @@ function Autocomplete() {
             <HandleSearch />
           </SearchAction>
         </Container>
-        {geocodingResult ? (
-          <Details result={geocodingResult} name={name} />
-        ) : null}
+        {geocodingResult ? <Details result={geocodingResult} name={name} /> : null}
         <LayerSwitcher sidebarVisible={showResult} />
       </>
     </>

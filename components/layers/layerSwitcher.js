@@ -4,11 +4,11 @@ import MapContext from "@/components/map/mapContext"
 import styled from "styled-components"
 import TileLayer from "ol/layer/Tile"
 import { XYZ } from "ol/source"
-import VectorTileLayer from 'ol/layer/VectorTile';
-import VectorTileSource from 'ol/source/VectorTile';
-import MVT from 'ol/format/MVT';
-import {Fill, Icon, Stroke, Style, Text} from 'ol/style';
-import apply from 'ol-mapbox-style';
+import VectorTileLayer from "ol/layer/VectorTile"
+import VectorTileSource from "ol/source/VectorTile"
+import MVT from "ol/format/MVT"
+import { Fill, Icon, Stroke, Style, Text } from "ol/style"
+import apply from "ol-mapbox-style"
 
 const LayerSwitcherContainer = styled.div`
   position: absolute;
@@ -44,29 +44,23 @@ function LayerSwitcher({ sidebarVisible }) {
     const vectorLayer = new VectorTileLayer({
       source: new VectorTileSource({
         format: new MVT(),
-        url: 'https://api.maptiler.com/tiles/v3-lite/{z}/{x}/{y}.pbf?key=KgUIFOAvg8EQYAVIO2oy',
-      })
+        url: "https://api.maptiler.com/tiles/v3-lite/{z}/{x}/{y}.pbf?key=KgUIFOAvg8EQYAVIO2oy",
+      }),
     })
     apply(map, styleJson)
     return () => {
       if (map) {
-        map.removeLayer(vectorLayer )
+        map.removeLayer(vectorLayer)
       }
     }
   }
 
   const toggleLayer = (layers) => {
-    layers[0].getVisible() === false
-      ? layers[0].setVisible(true)
-      : layers[0].setVisible(false)
+    layers[0].getVisible() === false ? layers[0].setVisible(true) : layers[0].setVisible(false)
   }
 
   return (
-    <LayerSwitcherContainer
-      onClick={() => toggleLayer(layers)}
-      title="Show layers"
-      sidebarVisible={sidebarVisible}
-    >
+    <LayerSwitcherContainer onClick={() => toggleLayer(layers)} title="Show layers" sidebarVisible={sidebarVisible}>
       <FaLayerGroup />
     </LayerSwitcherContainer>
   )
