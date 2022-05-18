@@ -52,10 +52,11 @@ const DetailsWrapper = styled.div`
 `
 
 const ImageWrapper = styled.div`
+  position: relative;
   display: block;
   width: var(--sidebar-width);
   height: 250px;
-  object-fit: cover;
+  width: 400px;
   ${media.lessThan("432px")`
   width: 100%
 
@@ -260,6 +261,13 @@ const InformationWebsiteLink = styled.a`
   }
 `
 
+const PlaceholderImage = styled.div`
+position: relative
+  height: 250px;
+  width: 400px;
+`
+
+
 function Details({ result, name }) {
   const [visible, setVisible] = useState(false)
   const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
@@ -272,22 +280,18 @@ function Details({ result, name }) {
   }, [result])
 
   const renderImage = () => {
-    if (!wikimediaImageUrl) {
-      return null
-    }
     return (
-      <ImageWrapper>
-        <a href={wikimediaImageUrl}>
+      <ImageWrapper href={wikimediaImageUrl}>
           <Image
             src={wikimediaImageUrl ? wikimediaImageUrl : `https://source.unsplash.com/random/300×450/?${result.display_name}`}
-            height="250"
-            width="400"
+            layout="fill"
             target="_blank"
             rel="nofollow noopener noreferrer"
+            objectFit='cover'
+            objectPosition='top'
             alt={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimeda` : "Random image from Unsplash"}
-            title={wikimediaImageUrl ? `Image of '${result.display_name}' from Wikimedia` : "Random image from Unsplash"}
+            title={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimedia` : "Random image from Unsplash"}
           />
-        </a>
       </ImageWrapper>
     )
   }

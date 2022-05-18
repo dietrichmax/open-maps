@@ -1,5 +1,5 @@
 export const config = {
-  siteTitle: "maps.mxd.codes",
+  siteTitle: "mxd.codes | Maps",
   siteTitleShort: "maps.mxd.codes",
   domain: "maps.mxd.codes",
   siteUrl: "https://maps.mxd.codes",
