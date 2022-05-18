@@ -4,6 +4,11 @@ import MapContext from "@/components/map/mapContext"
 import styled from "styled-components"
 import TileLayer from "ol/layer/Tile"
 import { XYZ } from "ol/source"
+import VectorTileLayer from 'ol/layer/VectorTile';
+import VectorTileSource from 'ol/source/VectorTile';
+import MVT from 'ol/format/MVT';
+import {Fill, Icon, Stroke, Style, Text} from 'ol/style';
+import apply from 'ol-mapbox-style';
 
 const LayerSwitcherContainer = styled.div`
   position: absolute;
@@ -29,24 +34,23 @@ function LayerSwitcher({ sidebarVisible }) {
   useEffect(() => {
     if (map) {
       setLayers(map.getLayers().getArray())
+      addVectorLayer()
     }
   }, [map])
 
-  const addGoogleLayer = () => {
+  const addVectorLayer = () => {
     if (!map) return
-    const googleHybridLayer = new TileLayer({
-      source: new XYZ({
-        url: "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-      }),
-      properties: {
-        name: "Google Hybrid",
-        attribution: `&copy; Google`,
-      },
+    const styleJson = "https://api.maptiler.com/maps/openstreetmap/style.json?key=KgUIFOAvg8EQYAVIO2oy"
+    const vectorLayer = new VectorTileLayer({
+      source: new VectorTileSource({
+        format: new MVT(),
+        url: 'https://api.maptiler.com/tiles/v3-lite/{z}/{x}/{y}.pbf?key=KgUIFOAvg8EQYAVIO2oy',
+      })
     })
-    map.addLayer(googleHybridLayer)
+    apply(map, styleJson)
     return () => {
       if (map) {
-        map.removeLayer(googleHybridLayer)
+        map.removeLayer(vectorLayer )
       }
     }
   }
