@@ -399,7 +399,7 @@ function Details({ result, name }) {
       <DetailsWrapper>
         {renderImage()}
         <Header>
-          {result.display_name ? <Title>{name}</Title> : null}
+          {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
           {result.type ? (
             <Type>{capitalizeFirstLetter(result.type)}</Type>

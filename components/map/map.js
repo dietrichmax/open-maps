@@ -14,7 +14,7 @@ const MapWrapper = ({ children, zoom, center }) => {
   const getHash = () => {
     if (window.location.hash.length === 0) return
     const parameters = window.location.hash.replace("#","").split(",")
-    console.log(parameters)
+    //console.log(parameters)
     //const first = a.slice(0, n).join(',')
     //console.log(first)
     //var second =  a.slice(n).join(',');
@@ -30,7 +30,7 @@ const MapWrapper = ({ children, zoom, center }) => {
       map.getView().setCenter(transform([lon, lat], "EPSG:4326", "EPSG:3857"))
       map.getView().setZoom(aZoom)
     }
-  }, [lat, lon, zoom])
+  }, [lat, lon, aZoom])
 
   // on component mount
   useEffect(() => {

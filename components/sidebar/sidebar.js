@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState, useContext } from "react"
 import styled from "styled-components"
 import Logo from "@/components/logo/logo"
-import { DrawShapes } from "@/components/draw"
+import { addInteraction } from "@/components/draw/shapes"
 import media from "styled-media-query"
 import MapContext from "../map/mapContext"
 import { ImCross } from "react-icons/im"
+import { DrawShapes } from "@/components/draw"
 
 const SidebarContainer = styled.div`
   position: absolute;
@@ -92,6 +93,8 @@ function Sidebar({ visible }) {
     showSidebar ? setShowSidebar(false) : setShowSidebar(true)
   }
 
+  const draw = new DrawShapes(map)
+ 
   return (
     <>
       {showSidebar ? (
@@ -105,11 +108,8 @@ function Sidebar({ visible }) {
             </Header>
             <Section>
               <SectionHeader>Draw Options</SectionHeader>
-              <SectionItem onClick={DrawShapes("Square")}>
-                Rectangles{" "}
-              </SectionItem>
-              <SectionItem>Point</SectionItem>
-              <SectionItem onClick={DrawShapes("Box")}>Polygon</SectionItem>
+              <SectionItem onClick={draw.addInteraction("Polygon")}>Polygon</SectionItem>
+              <SectionItem onClick={draw.removeInteraction()}>Clear</SectionItem>
             </Section>
             <Section>
               <SectionItem>Share Map</SectionItem>

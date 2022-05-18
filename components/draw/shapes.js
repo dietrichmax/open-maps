@@ -6,22 +6,23 @@ import Polygon from "ol/geom/Polygon"
 import { OSM, Vector as VectorSource } from "ol/source"
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer"
 
-const DrawShapes = (type) => {
-  const { map } = useContext(MapContext)
+class DrawShapes {
+  constructor(map) {
+    this.map = map
+    this.draw
+  }
 
-  const raster = new TileLayer({
-    source: new OSM(),
-  })
+  /*
+
+  let draw // global so we can remove it later*/
+  addInteraction(type) {
+    let value = type
 
   const source = new VectorSource({ wrapX: false })
 
   const vector = new VectorLayer({
     source: source,
   })
-
-  let draw // global so we can remove it later
-  function addInteraction() {
-    let value = type
     if (value !== "None") {
       let geometryFunction
       if (value === "Square") {
@@ -31,16 +32,20 @@ const DrawShapes = (type) => {
         value = "Circle"
         geometryFunction = createBox()
       }
-      draw = new Draw({
+      this.draw = new Draw({
         source: source,
         type: value,
-        geometryFunction: geometryFunction,
       })
-      map.addInteraction(draw)
+      this.map.addLayer(vector)
+      this.map.addInteraction(this.draw)
     }
   }
 
-  addInteraction()
+ removeInteraction() {
+   console.log("sd")
+  this.map.removeInteraction(this.draw)
+
+  }
 }
 
 export default DrawShapes

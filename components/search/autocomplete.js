@@ -173,24 +173,23 @@ function Autocomplete() {
   const [input, setInput] = useState("")
   const [markerLayer, setMarkerLayer] = useState()
   const [osm_id, setOsm_id] = useState()
+  const [osm_type, setOsm_type] = useState()
+  const [placeName, setPlaceName] = useState()
   const [gotFirstData, setGotFirstData] = useState(false)
   const [searchQuery, setSearchQuery] = useState(false)
 
   const { map } = useContext(MapContext)
 
-  const getHash = () => {
-    console.log("1")
-    if (window.location.hash.includes("place")) {
-      const osmId = window.location.hash.split("place/").pop()
-      setOsm_id(osmId)
-    }
-  }
 
   useEffect(() => {
-    if (osm_id) {
-      console.log(osm_id)
+    if (osm_id && osm_type) {
+      setInput(placeName)
+      setName(placeName)
+      getGeocodingResults(osm_id, osm_type)
+      setShowSuggestions(false)
+      setShowResult(true)
     }
-  }, [osm_id])
+  }, [osm_id, osm_type, placeName])
 
   const updateHash = () => {
     const zoom = map.getView().getZoom().toFixed(2)
@@ -199,26 +198,30 @@ function Autocomplete() {
       "EPSG:3857",
       "EPSG:4326"
     )
-    if (geocodingResult && geocodingResult.osm_id) {
-      //console.log("asd")
-      window.location.hash =
-        lonLat[0].toFixed(4) +
-        "," +
-        lonLat[1].toFixed(4) +
-        "," +
-        zoom +
-        "," +
-        geocodingResult.osm_id
-    } else {
-      //console.log("asd1")
-      window.location.hash =
-      lonLat[1].toFixed(4) + "," + lonLat[0].toFixed(4) + "," +zoom
+  
+    const urlTemp = window.location.hash
+    const urlParams = urlTemp.replace("#","").split(",")
+    //console.log(geocodingResult.length === 0 && urlParams.length < 4)
+    if (!geocodingResult || geocodingResult.length === 0 && urlParams.length < 4) {
+      window.location.hash = lonLat[1].toFixed(4) + "," + lonLat[0].toFixed(4) + "," + zoom
+    } else if (geocodingResult && geocodingResult.osm_id || urlParams.length > 3) {
+
+
+      const osmId = geocodingResult.osm_id  ? geocodingResult.osm_id  : urlParams[3]
+      const osmType = geocodingResult.osm_type ? geocodingResult.osm_type[0].toUpperCase() : urlParams[4]
+      const placeName = name ? name.replaceAll(" ","+") : urlParams[5]
+      if (urlParams.length > 3) {
+        setOsm_id(osmId) 
+        setOsm_type(osmType)
+        setPlaceName(placeName.replaceAll("+"," ")) 
+      }
+      window.location.hash = `${lonLat[1].toFixed(4)},${lonLat[0].toFixed(4)},${zoom},${osmId},${osmType},${placeName}`
+        
     }
   }
 
   if (map) {
     map.on("moveend", updateHash)
-    //map.on("moveend", getHash)
   }
 
   const suggestionLimit = 30
@@ -449,7 +452,7 @@ function Autocomplete() {
   async function getGeocodingResults(osmId, osmType) {
     push(["trackEvent", "search", true])
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1`,
+      `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`,
       {
         method: "GET",
         headers: {
