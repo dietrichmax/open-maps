@@ -34,13 +34,13 @@ function LayerSwitcher({ sidebarVisible }) {
   useEffect(() => {
     if (map) {
       setLayers(map.getLayers().getArray())
-      addVectorLayer()
+      //addVectorLayer()
     }
   }, [map])
 
   const addVectorLayer = () => {
     if (!map) return
-    const styleJson = "https://api.maptiler.com/maps/openstreetmap/style.json?key=KgUIFOAvg8EQYAVIO2oy"
+    const styleJson = "/assets/osm_liberty.json"
     const vectorLayer = new VectorTileLayer({
       source: new VectorTileSource({
         format: new MVT(),

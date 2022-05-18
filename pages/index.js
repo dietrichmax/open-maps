@@ -18,7 +18,7 @@ function Index() {
     <Map center={fromLonLat(center)} zoom={zoom}>
       <Autocomplete />
       <Layers>
-        {/*<OSMLayer />*/}
+        <OSMLayer />
       </Layers>
       <Attribution />
     </Map>
