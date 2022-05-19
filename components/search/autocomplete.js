@@ -4,29 +4,22 @@ import Logo from "@/components/logo/logo"
 import BurgerIcon from "@/components/sidebar/burgerIcon"
 import { DrawShapes } from "@/components/draw"
 import media from "styled-media-query"
+import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import { Input } from "@/styles/templates/input"
-import { Button } from "@/styles/templates/button"
-import { fromLonLat } from "ol/proj"
 import { transform } from "ol/proj"
-import { Point } from "ol/geom"
 import debounce from "lodash/debounce"
 import { transformExtent } from "ol/proj"
-import { Feature } from "ol"
 import VectorSource from "ol/source/Vector"
 import VectorLayer from "ol/layer/Vector"
-import { FaSearch } from "react-icons/fa"
+import GeoJSON from 'ol/format/GeoJSON';
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import { ImCross } from "react-icons/im"
 import Details from "@/components/search/details/details"
-import { config } from "config"
-import { Icon, Style } from "ol/style"
 import { push } from "@socialgouv/matomo-next"
 import { Sidebar } from "@/components/sidebar"
-import { set } from "lodash"
+import { result, set } from "lodash"
 import MapContext from "@/components/map/mapContext"
-import LayerSwitcher from "@/components/layers/layerSwitcher"
-import { fetchGETCache } from "@/components/utils/fetcher"
-import { fetchGET } from "@/components/utils/fetcher"
+import { fetchPOST } from "@/components/utils/fetcher"
 
 const Container = styled.div`
   position: absolute;
@@ -248,7 +241,6 @@ function Autocomplete() {
   }, [extent])
 
   const filterData = (data) => {
-    console.log(data)
     let set = []
     if (data.features) {
       set = data.features.filter((hit) => {
@@ -295,7 +287,7 @@ function Autocomplete() {
     setInput("")
     setGeocodingResult()
     setShowResult(false)
-    removeMarker()
+    removeGeojson()
   }
 
   const HandleSearch = () => {
@@ -316,11 +308,38 @@ function Autocomplete() {
     )
   }
 
-  // Marker
+  const image = new CircleStyle({
+    radius: 5,
+    fill: null,
+    stroke: new Stroke({color: 'red', width: 10}),
+  });
+
+  const styles = {
+    'Point': new Style({
+      image: image,
+    }),
+    'MultiPolygon': new Style({
+      stroke: new Stroke({
+        color: '#3f72af',
+        width: 3,
+      }),
+    }),
+    'Polygon': new Style({
+      stroke: new Stroke({
+        color: '#3f72af',
+        width: 3,
+      }),
+    }),
+  };
+
+  const styleFunction = function (feature) {
+    return styles[feature.getGeometry().getType()];
+  };
+
   useEffect(() => {
     setShowSuggestions(false)
     if (geocodingResult && geocodingResult.boundingbox) {
-      removeMarker()
+      removeGeojson()
       const transformedBbox = transformExtent(
         [geocodingResult.boundingbox[2], geocodingResult.boundingbox[0], geocodingResult.boundingbox[3], geocodingResult.boundingbox[1]],
         "EPSG:4326",
@@ -330,7 +349,7 @@ function Autocomplete() {
         duration: 1000,
         padding: [100, 100, 100, 100],
       })
-      addMarker(geocodingResult)
+      addGeojson(geocodingResult)
     }
     setShowSuggestions(false)
     if (map) {
@@ -338,46 +357,27 @@ function Autocomplete() {
     }
   }, [geocodingResult])
 
-  const addMarker = (geocodingResult) => {
-    let markerLayer
-    map.getLayers().forEach((layer) => {
-      if (layer.get("name") === "Marker Layer") {
-        markerLayer = layer.getSource()
-      }
-    })
-
-    const marker = new Feature({
-      geometry: new Point(fromLonLat([geocodingResult.lon, geocodingResult.lat])),
-      name: "Marker",
-    })
-
-    if (markerLayer) {
-      markerLayer.addFeature(marker)
-    } else {
-      const vectorSource = new VectorSource({
-        features: [marker],
-      })
+  const addGeojson = (geocodingResult) => {
+    console.log(geocodingResult.geojson)
+    const vectorSource = new VectorSource({
+      features: new GeoJSON().readFeatures(geocodingResult.geojson,{ featureProjection: 'EPSG:3857' }),
+    });
 
       const vectorLayer = new VectorLayer({
         source: vectorSource,
-        zIndex: 2,
-        style: new Style({
-          image: new Icon({
-            // src: "marker.png",
-            src: "/assets/map-marker-icon.png",
-          }),
-        }),
+        zIndex: 3,
+        style: styleFunction,
         properties: {
-          name: "Marker Layer",
+          name: "Geojson Layer",
         },
       })
       map.addLayer(vectorLayer)
-    }
+    
   }
 
-  const removeMarker = () => {
+  const removeGeojson = () => {
     map.getLayers().forEach((layer) => {
-      if (layer.get("name") === "Marker Layer") {
+      if (layer.get("name") === "Geojson Layer") {
         layer.getSource().clear()
       }
     })
@@ -392,35 +392,28 @@ function Autocomplete() {
 
   async function getFirstSuggestionResults(lat, lon, input, limit) {
     if (!input || input.length < 1) return
-    const encodedInput = encodeURI(input)
-    const response = await fetch(`https://photon.komoot.io/api/?q=${encodedInput}&limit=${limit}&lang=en&lon=${lon}&lat=${lat}&zoom=${zoom - 4}&location_bias_scale=0.6`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": config.email,
-      },
-    })
-    const data = await response.json()
+    const data = await fetchPOST('/api/autocomplete', {lat, lon, input, limit, zoom})
+    if (!data) {
+      console.log("error")
+    } else {
     setGotFirstData(true)
     const filteredData = filterData(data)
-    console.log(filteredData)
     setSuggestions(filteredData)
     setShowSuggestions(true)
+      
+  }
   }
 
   async function getGeocodingResults(osmId, osmType) {
     push(["trackEvent", "search", true])
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": config.email
-        },
-      })
-    const data = await response.json()
-    setGeocodingResult(data[0])
+    const data = await fetchPOST(`/api/details`, {osmId, osmType})
+    if (!data) {
+      console.log("error")
+    } else {
+      
+    setGeocodingResult(data)
     setShowSuggestions(false)
+    }
   }
 
   const getSymbol = (value) => {

@@ -1,15 +1,11 @@
 import styled from "styled-components"
 import { useState, useEffect, useContext } from "react"
-import { useRouter } from "next/router"
-import { config } from "config"
-import { FaRoute, FaMapMarkerAlt, FaHome, FaPhone, FaEnvelope, FaBookmark } from "react-icons/fa"
+import { FaRoute, FaMapMarkerAlt, FaHome, FaPhone, FaEnvelope, FaBookmark, FaClock, FaAccessibleIcon, FaHamburger, FaBicycle, FaUmbrellaBeach, FaWifi } from "react-icons/fa"
 import { BsShareFill } from "react-icons/bs"
-const md5 = require("md5")
 import Image from "next/image"
 import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
-import { fetchGET } from "@/components/utils/fetcher"
 import Rating from "@/components/search/details/rating/rating"
 
 const DetailsWrapper = styled.div`
@@ -81,7 +77,7 @@ const Title = styled.h1`
 
 const SubTitle = styled.h2`
   margin-top: 1rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   font-weight: 600;
 `
 
@@ -252,10 +248,11 @@ const InformationDetailsTitle = styled.h4`
 `
 
 const InformationDetailsValue = styled.a`
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 `
 
 const InformationWebsiteLink = styled.a`
+  font-size: 0.85rem;
   color: var(--secondary-color);
   :hover {
     border-bottom: 1px solid var(--secondary-color);
@@ -276,41 +273,13 @@ function Details({ result, name }) {
   const [wikipediaData, setWikipediaData] = useState(false)
   const [wikipediaLang, setWikipediaLang] = useState("en")
 
-  useEffect(() => {
-    getWikimediaImageUrl(result)
-    getWikipediaData(result)
-  }, [result])
-
-  const renderImage = () => {
-    return (
-      wikimediaImageUrl ? (
-      <ImageWrapper href={wikimediaImageUrl}>
-          <Image
-            src={wikimediaImageUrl}
-            layout="fill"
-            target="_blank"
-            rel="nofollow noopener noreferrer"
-            objectFit='cover'
-            objectPosition='top'
-            alt={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimeda` : "Random image from Unsplash"}
-            title={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimedia` : "Random image from Unsplash"}
-          />
-      </ImageWrapper>
-      ) : (
-        <ImageWrapper>
-          <PlaceholderImage/>
-      </ImageWrapper>
-      )
-    )
-  }
-
-  const renderWikidata = () => {
-    if (!wikipediaData || wikipediaData.length === 2) {
+  const renderWikidata = (result) => {
+    if (!result.summary ||result.summary === 2) {
       return null
     }
-    let text = `${wikipediaData.substr(0, wikipediaData.indexOf(". "))}.`
+    let text = `${result.summary.substr(0, result.summary.indexOf(". "))}.`
     if (text.length < 3) {
-      text = wikipediaData
+      text = result.summary
     }
     return (
       <WikipediaData>
@@ -320,46 +289,6 @@ function Details({ result, name }) {
     )
   }
 
-  //getWikimediaImageUrl(result)
-  async function getWikimediaImageUrl(result) {
-    if (!result || !result.extratags) {
-      setwikimediaImageUrl()
-      return null
-    }
-    const data = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": config.email,
-      },
-    }
-  )
-    let imageUrl
-    if (data.claims && data.claims.P18) {
-      const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
-      const hash = md5(imageName)
-      imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
-    }
-
-    setwikimediaImageUrl(imageUrl)
-  }
-
-  async function getWikipediaData(result) {
-    if (!result || !result.extratags || !result.extratags.wikipedia) {
-      setWikipediaData()
-      return null
-    }
-
-    setWikipediaLang(result.extratags.wikipedia.substr(0, result.extratags.wikipedia.indexOf(":")))
-    const wikipedia = result.extratags.wikipedia.replace(/^.+:/, "")
-    const data = await fetchGET(
-      `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipedia}&origin=*`
-    )
-    if (!data.query.pages[0] || !data.query.pages[0].extract) return
-    setWikipediaData(data.query.pages[0].extract.toString())
-  }
-
   const renderAdress = (result) => {
     if (!result.address) {
       return null
@@ -367,7 +296,7 @@ function Details({ result, name }) {
     const address = result.address
     return (
       <div>
-        {address.street ? address.street : address.road ? address.road : null}
+        {address.street ? `${address.street}, ` : address.road ? `${address.road}, ` : null}
         {address.house_number ? ` ${address.house_number}, ` : null}
         {address.postcode ? ` ${address.postcode} ` : null}
         {address.city ? ` ${address.city}, ` : address.village ? ` ${address.village}, ` : address.town ? ` ${address.town}, ` : null}
@@ -381,7 +310,18 @@ function Details({ result, name }) {
   } else {
     return (
       <DetailsWrapper>
-        {renderImage()}
+      <ImageWrapper href={result.image}>
+          <Image
+            src={result.image}
+            layout="fill"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            objectFit='cover'
+            objectPosition='top'
+            alt={`Image of ${result.display_name} from Wikimeda`}
+            title={`Image of ${result.display_name} from Wikimedia`}
+          />
+      </ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
@@ -407,14 +347,14 @@ function Details({ result, name }) {
             </ActionsWrapper>
           </ActionsResponsiveContainer>
         </Actions>
-        {renderWikidata()}
-        {result.extratags.wikipedia ? (
+        {renderWikidata(result)}
+        {result.wikipediaLink ? (
           <WikipediaCredit>
             <WikipediaLink
-              title={`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
-              href={`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+              title={`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
+              href={`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
             >
-              {`https://${wikipediaLang}.wikipedia.org/wiki/${result.extratags.wikipedia}`}
+              {`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
             </WikipediaLink>{" "}
           </WikipediaCredit>
         ) : null}
@@ -431,46 +371,118 @@ function Details({ result, name }) {
               </InformationDetails>
             </InformationItem>
           ) : null}
-          {result.extratags.website ? (
+          {result.information.opening_hours ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaClock title="Opening hours" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Opening hours</InformationDetailsTitle>
+                <InformationDetailsValue>{result.information.opening_hours}</InformationDetailsValue>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
+          {result.information.website ? (
             <InformationItem>
               <InformationIconWrapper>
                 <FaHome title="Website Link" />
               </InformationIconWrapper>
               <InformationDetails>
                 <InformationDetailsTitle>Website</InformationDetailsTitle>
-                <InformationWebsiteLink href={result.extratags.website} title={result.extratags.website} alt={`Link to website of ${result.display_name}`}>
-                  {result.extratags.website}
+                <InformationWebsiteLink href={result.information.website} title={result.information.website} alt={`Link to website of ${result.display_name}`}>
+                  {result.information.website}
                 </InformationWebsiteLink>
               </InformationDetails>
             </InformationItem>
           ) : null}
-          {result.extratags.phone ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaPhone title="Phone number" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Phone</InformationDetailsTitle>
-                <InformationWebsiteLink title={result.extratags.phone} alt={`Phone number of ${result.name}`}>
-                  {result.extratags.phone}
-                </InformationWebsiteLink>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-          {result.extratags.email ? (
+          {result.information.email ? (
             <InformationItem>
               <InformationIconWrapper>
                 <FaEnvelope />
               </InformationIconWrapper>
               <InformationDetails>
                 <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
-                <InformationWebsiteLink title={result.extratags.email} alt={`Email address of ${result.name}`} href={`mailto:${result.extratags.email}`}>
-                  {result.extratags.email}
+                <InformationWebsiteLink title={result.information.email} alt={`Email address of ${result.name}`} href={`mailto:${result.information.email}`}>
+                  {result.information.email}
+                </InformationWebsiteLink>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
+          {result.information.phone ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaPhone title="Phone number" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Phone</InformationDetailsTitle>
+                <InformationWebsiteLink title={result.information.phone} alt={`Phone number of ${result.name}`}>
+                  {result.information.phone}
                 </InformationWebsiteLink>
               </InformationDetails>
             </InformationItem>
           ) : null}
         </InformationContainer>
+          {Object.keys(result.details).length > 0 ? (
+        <InformationContainer>
+          <SubTitle>Details</SubTitle>
+          {result.details.wheelchair ? (
+          <InformationItem>
+              <InformationIconWrapper>
+                <FaAccessibleIcon />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Wheelchair accessible</InformationDetailsTitle>
+                
+                <InformationDetailsValue>{result.details.wheelchair}</InformationDetailsValue>
+              </InformationDetails>
+            </InformationItem>
+          ) : null }
+          {result.details.takeaway ? (
+          <InformationItem>
+              <InformationIconWrapper>
+                <FaBicycle />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsValue>Takeaway</InformationDetailsValue>
+                  <InformationDetailsValue>{result.details.takeaway}</InformationDetailsValue>
+              </InformationDetails>
+            </InformationItem>
+          ) : null }
+          {result.details.cuisine ? (
+            <InformationItem>
+                <InformationIconWrapper>
+                  <FaHamburger />
+                </InformationIconWrapper>
+                <InformationDetails>
+                <InformationDetailsTitle>Cuisine</InformationDetailsTitle>
+                  <InformationDetailsValue>{result.details.cuisine.replaceAll("_"," ")}</InformationDetailsValue>
+                </InformationDetails>
+              </InformationItem>
+            ) : null }
+            {result.details.outdoor_seating ? (
+              <InformationItem>
+                  <InformationIconWrapper>
+                    <FaUmbrellaBeach />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                <InformationDetailsTitle>Outdoor seating</InformationDetailsTitle>
+                    <InformationDetailsValue>{result.details.outdoor_seating}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null }
+              {result.details.internet_access ? (
+                <InformationItem>
+                    <InformationIconWrapper>
+                      <FaWifi />
+                    </InformationIconWrapper>
+                    <InformationDetails>
+                <InformationDetailsTitle>Internet access</InformationDetailsTitle>
+                      <InformationDetailsValue>{result.details.internet_access}</InformationDetailsValue>
+                    </InformationDetails>
+                  </InformationItem>
+                ) : null }
+        </InformationContainer>
+        ) : null }
       </DetailsWrapper>
     )
   }
