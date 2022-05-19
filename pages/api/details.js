@@ -4,7 +4,6 @@ const md5 = require("md5")
 
 export default async function handler(req, res) {
   const { osmId, osmType } = req.body
-  console.log(req.body)
   const geocodingResponse = await fetch(
     `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`,
     {
@@ -15,7 +14,10 @@ export default async function handler(req, res) {
         "Cache-Control": "max-age=86400",
       },
     }
-  )
+  ).catch(function (error) {
+    console.log(error)
+  })
+
   const geocodingData = await geocodingResponse.json()
   console.log(geocodingData)
 
@@ -29,6 +31,8 @@ export default async function handler(req, res) {
       "User-Agent": config.email,
       "Cache-Control": "max-age=86400",
     },
+  }).catch(function (error) {
+    console.log(error)
   })
   let wikiImageUrl
   const wikiData = await wikiResponse.json()
@@ -59,7 +63,9 @@ export default async function handler(req, res) {
           "Cache-Control": "max-age=86400",
         },
       }
-    )
+    ).catch(function (error) {
+      console.log(error)
+    })
     wikipediaData = await wikipediaRes.json()
 
     if (!wikipediaData.query || !wikipediaData.query.pages) {
