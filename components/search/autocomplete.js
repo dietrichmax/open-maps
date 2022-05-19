@@ -25,6 +25,8 @@ import { Sidebar } from "@/components/sidebar"
 import { set } from "lodash"
 import MapContext from "@/components/map/mapContext"
 import LayerSwitcher from "@/components/layers/layerSwitcher"
+import { fetchGETCache } from "@/components/utils/fetcher"
+import { fetchGET } from "@/components/utils/fetcher"
 
 const Container = styled.div`
   position: absolute;
@@ -246,6 +248,7 @@ function Autocomplete() {
   }, [extent])
 
   const filterData = (data) => {
+    console.log(data)
     let set = []
     if (data.features) {
       set = data.features.filter((hit) => {
@@ -400,6 +403,7 @@ function Autocomplete() {
     const data = await response.json()
     setGotFirstData(true)
     const filteredData = filterData(data)
+    console.log(filteredData)
     setSuggestions(filteredData)
     setShowSuggestions(true)
   }
@@ -407,15 +411,13 @@ function Autocomplete() {
   async function getGeocodingResults(osmId, osmType) {
     push(["trackEvent", "search", true])
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`,
-      {
+      `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "User-Agent": config.email,
+          "User-Agent": config.email
         },
-      }
-    )
+      })
     const data = await response.json()
     setGeocodingResult(data[0])
     setShowSuggestions(false)
@@ -493,7 +495,7 @@ function Autocomplete() {
           </SearchAction>
         </Container>
         {geocodingResult ? <Details result={geocodingResult} name={name} /> : null}
-        <LayerSwitcher sidebarVisible={showResult} />
+        {/*<LayerSwitcher sidebarVisible={showResult} />*/}
       </>
     </>
   )

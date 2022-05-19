@@ -42,12 +42,13 @@ const DetailsWrapper = styled.div`
   ::-webkit-scrollbar-thumb:hover {
     background: var(--gray);
   }
-  ${media.lessThan("432px")`
-    top: 48px;
-    left: 0px;
-    width: 100%;
-    height: calc(100vh - 48px);
+  ${media.lessThan("432px")`  
+    position: absolute;
     border-radius: 0;
+    top: 50px;
+    left: 0; 
+    max-height: 100%;
+    overflow: hidden;
   `}
 `
 
@@ -267,6 +268,7 @@ position: relative
   width: 400px;
 `
 
+const SwipeContainer = styled.div``
 
 function Details({ result, name }) {
   const [visible, setVisible] = useState(false)
@@ -281,9 +283,10 @@ function Details({ result, name }) {
 
   const renderImage = () => {
     return (
+      wikimediaImageUrl ? (
       <ImageWrapper href={wikimediaImageUrl}>
           <Image
-            src={wikimediaImageUrl ? wikimediaImageUrl : `https://source.unsplash.com/random/300×450/?${result.display_name}`}
+            src={wikimediaImageUrl}
             layout="fill"
             target="_blank"
             rel="nofollow noopener noreferrer"
@@ -293,6 +296,11 @@ function Details({ result, name }) {
             title={wikimediaImageUrl ? `Image of ${result.display_name} from Wikimedia` : "Random image from Unsplash"}
           />
       </ImageWrapper>
+      ) : (
+        <ImageWrapper>
+          <PlaceholderImage/>
+      </ImageWrapper>
+      )
     )
   }
 
@@ -318,7 +326,15 @@ function Details({ result, name }) {
       setwikimediaImageUrl()
       return null
     }
-    const data = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`)
+    const data = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${result.extratags.wikidata}&origin=*&format=json`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": config.email,
+      },
+    }
+  )
     let imageUrl
     if (data.claims && data.claims.P18) {
       const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
