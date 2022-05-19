@@ -17,11 +17,10 @@ export default async function handler(req, res) {
   ).catch(function (error) {
     console.log(error)
   })
-
   const geocodingData = await geocodingResponse.json()
-  console.log(geocodingData)
 
   // wikimdata
+  console.log(geocodingData)
   const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
   let wikiImageUrl
   const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
@@ -101,7 +100,7 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    //image: wikiImageUrl,
+    image: wikiImageUrl,
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
