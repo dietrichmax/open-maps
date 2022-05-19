@@ -274,7 +274,7 @@ function Details({ result, name }) {
   const [wikipediaLang, setWikipediaLang] = useState("en")
 
   const renderWikidata = (result) => {
-    if (!result.summary ||result.summary === 2) {
+    if (!result.summary || result.summary === 2) {
       return null
     }
     let text = `${result.summary.substr(0, result.summary.indexOf(". "))}.`
@@ -310,18 +310,18 @@ function Details({ result, name }) {
   } else {
     return (
       <DetailsWrapper>
-      <ImageWrapper href={result.image}>
+        <ImageWrapper href={result.image}>
           <Image
             src={result.image}
             layout="fill"
             target="_blank"
             rel="nofollow noopener noreferrer"
-            objectFit='cover'
-            objectPosition='top'
+            objectFit="cover"
+            objectPosition="top"
             alt={`Image of ${result.display_name}`}
             title={`Image of ${result.display_name}`}
           />
-      </ImageWrapper>
+        </ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
@@ -422,67 +422,67 @@ function Details({ result, name }) {
             </InformationItem>
           ) : null}
         </InformationContainer>
-          {Object.keys(result.details).length > 0 ? (
-        <InformationContainer>
-          <SubTitle>Details</SubTitle>
-          {result.details.wheelchair ? (
-          <InformationItem>
-              <InformationIconWrapper>
-                <FaAccessibleIcon />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Wheelchair accessible</InformationDetailsTitle>
-                
-                <InformationDetailsValue>{result.details.wheelchair}</InformationDetailsValue>
-              </InformationDetails>
-            </InformationItem>
-          ) : null }
-          {result.details.takeaway ? (
-          <InformationItem>
-              <InformationIconWrapper>
-                <FaBicycle />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsValue>Takeaway</InformationDetailsValue>
+        {Object.keys(result.details).length > 0 ? (
+          <InformationContainer>
+            <SubTitle>Details</SubTitle>
+            {result.details.wheelchair ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaAccessibleIcon />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>Wheelchair accessible</InformationDetailsTitle>
+
+                  <InformationDetailsValue>{result.details.wheelchair}</InformationDetailsValue>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+            {result.details.takeaway ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaBicycle />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsValue>Takeaway</InformationDetailsValue>
                   <InformationDetailsValue>{result.details.takeaway}</InformationDetailsValue>
-              </InformationDetails>
-            </InformationItem>
-          ) : null }
-          {result.details.cuisine ? (
-            <InformationItem>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+            {result.details.cuisine ? (
+              <InformationItem>
                 <InformationIconWrapper>
                   <FaHamburger />
                 </InformationIconWrapper>
                 <InformationDetails>
-                <InformationDetailsTitle>Cuisine</InformationDetailsTitle>
-                  <InformationDetailsValue>{result.details.cuisine.replaceAll("_"," ")}</InformationDetailsValue>
+                  <InformationDetailsTitle>Cuisine</InformationDetailsTitle>
+                  <InformationDetailsValue>{result.details.cuisine.replaceAll("_", " ")}</InformationDetailsValue>
                 </InformationDetails>
               </InformationItem>
-            ) : null }
+            ) : null}
             {result.details.outdoor_seating ? (
               <InformationItem>
-                  <InformationIconWrapper>
-                    <FaUmbrellaBeach />
-                  </InformationIconWrapper>
-                  <InformationDetails>
-                <InformationDetailsTitle>Outdoor seating</InformationDetailsTitle>
-                    <InformationDetailsValue>{result.details.outdoor_seating}</InformationDetailsValue>
-                  </InformationDetails>
-                </InformationItem>
-              ) : null }
-              {result.details.internet_access ? (
-                <InformationItem>
-                    <InformationIconWrapper>
-                      <FaWifi />
-                    </InformationIconWrapper>
-                    <InformationDetails>
-                <InformationDetailsTitle>Internet access</InformationDetailsTitle>
-                      <InformationDetailsValue>{result.details.internet_access}</InformationDetailsValue>
-                    </InformationDetails>
-                  </InformationItem>
-                ) : null }
-        </InformationContainer>
-        ) : null }
+                <InformationIconWrapper>
+                  <FaUmbrellaBeach />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>Outdoor seating</InformationDetailsTitle>
+                  <InformationDetailsValue>{result.details.outdoor_seating}</InformationDetailsValue>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+            {result.details.internet_access ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaWifi />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>Internet access</InformationDetailsTitle>
+                  <InformationDetailsValue>{result.details.internet_access}</InformationDetailsValue>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+          </InformationContainer>
+        ) : null}
       </DetailsWrapper>
     )
   }

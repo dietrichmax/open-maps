@@ -4,14 +4,14 @@ import Logo from "@/components/logo/logo"
 import BurgerIcon from "@/components/sidebar/burgerIcon"
 import { DrawShapes } from "@/components/draw"
 import media from "styled-media-query"
-import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
+import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style"
 import { Input } from "@/styles/templates/input"
 import { transform } from "ol/proj"
 import debounce from "lodash/debounce"
 import { transformExtent } from "ol/proj"
 import VectorSource from "ol/source/Vector"
 import VectorLayer from "ol/layer/Vector"
-import GeoJSON from 'ol/format/GeoJSON';
+import GeoJSON from "ol/format/GeoJSON"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import { ImCross } from "react-icons/im"
 import Details from "@/components/search/details/details"
@@ -311,30 +311,30 @@ function Autocomplete() {
   const image = new CircleStyle({
     radius: 5,
     fill: null,
-    stroke: new Stroke({color: '#3f72af', width: 10}),
-  });
+    stroke: new Stroke({ color: "#3f72af", width: 10 }),
+  })
 
   const styles = {
-    'Point': new Style({
+    Point: new Style({
       image: image,
     }),
-    'MultiPolygon': new Style({
+    MultiPolygon: new Style({
       stroke: new Stroke({
-        color: '#3f72af',
+        color: "#3f72af",
         width: 3,
       }),
     }),
-    'Polygon': new Style({
+    Polygon: new Style({
       stroke: new Stroke({
-        color: '#3f72af',
+        color: "#3f72af",
         width: 3,
       }),
     }),
-  };
+  }
 
   const styleFunction = function (feature) {
-    return styles[feature.getGeometry().getType()];
-  };
+    return styles[feature.getGeometry().getType()]
+  }
 
   useEffect(() => {
     setShowSuggestions(false)
@@ -360,19 +360,18 @@ function Autocomplete() {
   const addGeojson = (geocodingResult) => {
     console.log(geocodingResult.geojson)
     const vectorSource = new VectorSource({
-      features: new GeoJSON().readFeatures(geocodingResult.geojson,{ featureProjection: 'EPSG:3857' }),
-    });
+      features: new GeoJSON().readFeatures(geocodingResult.geojson, { featureProjection: "EPSG:3857" }),
+    })
 
-      const vectorLayer = new VectorLayer({
-        source: vectorSource,
-        zIndex: 3,
-        style: styleFunction,
-        properties: {
-          name: "Geojson Layer",
-        },
-      })
-      map.addLayer(vectorLayer)
-    
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+      zIndex: 3,
+      style: styleFunction,
+      properties: {
+        name: "Geojson Layer",
+      },
+    })
+    map.addLayer(vectorLayer)
   }
 
   const removeGeojson = () => {
@@ -392,27 +391,25 @@ function Autocomplete() {
 
   async function getFirstSuggestionResults(lat, lon, input, limit) {
     if (!input || input.length < 1) return
-    const data = await fetchPOST('/api/autocomplete', {lat, lon, input, limit, zoom})
+    const data = await fetchPOST("/api/autocomplete", { lat, lon, input, limit, zoom })
     if (!data) {
       console.log("error")
     } else {
-    setGotFirstData(true)
-    const filteredData = filterData(data)
-    setSuggestions(filteredData)
-    setShowSuggestions(true)
-      
-  }
+      setGotFirstData(true)
+      const filteredData = filterData(data)
+      setSuggestions(filteredData)
+      setShowSuggestions(true)
+    }
   }
 
   async function getGeocodingResults(osmId, osmType) {
     push(["trackEvent", "search", true])
-    const data = await fetchPOST(`/api/details`, {osmId, osmType})
+    const data = await fetchPOST(`/api/details`, { osmId, osmType })
     if (!data) {
       console.log("error")
     } else {
-      
-    setGeocodingResult(data)
-    setShowSuggestions(false)
+      setGeocodingResult(data)
+      setShowSuggestions(false)
     }
   }
 

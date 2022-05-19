@@ -22,7 +22,6 @@ class MyApp extends App {
     return (
       <>
         <Head>
-          
           <title>{config.siteTitle}</title>
           <meta name="application-name" content={config.siteTitle} />
           <meta name="apple-mobile-web-app-capable" content="yes" />
