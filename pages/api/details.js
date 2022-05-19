@@ -1,5 +1,4 @@
 import { config } from "config"
-
 const md5 = require("md5")
 
 export default async function handler(req, res) {
@@ -21,21 +20,25 @@ export default async function handler(req, res) {
 
   // wikimdata
   
-  const wikidata = geocodingData[0].extratags.wikidata
-  let imageUrl
-  const wikiResponse = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&origin=*&format=json`)
+  const wikidata = geocodingData[0].extratags.wikidata //? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
+  let wikiImageUrl
+  const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": config.email
+    },
+  }).catch(function (error) {
+    console.log(error)
+  })
   const wikiData = await wikiResponse.json()
-  if (wikiData.claims && wikiData.claims.P18) {
-      const imageName = wikiData.claims.P18[0].mainsnak.datavalue.value.replaceAll(
-        " ",
-        "_"
-      )
-      const hash = md5(imageName)
-      imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
-    } else {
-    imageUrl = "/assets/placeholder_image.jpg"
-    }
-
+  if (!wikiData && !wikiData.claims) {
+    wikiImageUrl = "/assets/placeholder_image.jpg"
+  } else {
+    const imageName = wikiData.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
+    const hash = md5(imageName)
+    wikiImageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+  }
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipedia = geocodingData[0].extratags.wikipedia
@@ -95,7 +98,7 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    image: imageUrl,
+    image: wikiImageUrl,
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
