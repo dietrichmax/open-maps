@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     wikiImageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
   } else {
     wikiImageUrl = "/assets/placeholder_image.jpg"
-  }
+  }*/
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipedia = geocodingData[0].extratags.wikipedia
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     } else {
       summary = wikipediaData.query.pages[0].extract.toString()
     }
-  }*/
+  }
 
   res.status(200).json({
     display_name: geocodingData[0].display_name,
@@ -103,8 +103,8 @@ export default async function handler(req, res) {
       internet_access: geocodingData[0].extratags.internet_access,
     },
     //image: wikiImageUrl,
-    //summary: summary,
-    //wikipediaLang: wikiLang,
-    //wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
+    summary: summary,
+    wikipediaLang: wikiLang,
+    wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
   })
 }
