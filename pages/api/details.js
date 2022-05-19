@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const geocodingData = await geocodingResponse.json()
 
   // wikimdata
-  console.log(geocodingData)
+  /*console.log(geocodingData)
   const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
   let wikiImageUrl
   const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
@@ -40,9 +40,9 @@ export default async function handler(req, res) {
     const imageName = wikiData.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
     const hash = md5(imageName)
     wikiImageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
-  }
+  }*/
 
-  /*const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
+  const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipedia = geocodingData[0].extratags.wikipedia
     ? geocodingData[0].extratags.wikipedia.replace(/^.+:/, "")
     : geocodingData[0].extratags["brand:wikipedia"]
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
     } else {
       summary = wikipediaData.query.pages[0].extract.toString()
     }
-  }*/
+  }
 
   res.status(200).json({
     display_name: geocodingData[0].display_name,
