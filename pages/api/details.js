@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     // wikimdata
     const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
 
-    const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata }&origin=*&format=json`, {
+    const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -311,7 +311,7 @@ function Autocomplete() {
   const image = new CircleStyle({
     radius: 5,
     fill: null,
-    stroke: new Stroke({color: 'red', width: 10}),
+    stroke: new Stroke({color: '#3f72af', width: 10}),
   });
 
   const styles = {
