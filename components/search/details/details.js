@@ -320,6 +320,7 @@ function Details({ result, name }) {
             objectPosition="top"
             alt={`Image of ${result.display_name}`}
             title={`Image of ${result.display_name}`}
+            priority={true}
           />
         </ImageWrapper>
         <Header>

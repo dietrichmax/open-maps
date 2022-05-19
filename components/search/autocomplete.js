@@ -358,7 +358,7 @@ function Autocomplete() {
   }, [geocodingResult])
 
   const addGeojson = (geocodingResult) => {
-    console.log(geocodingResult.geojson)
+    //console.log(geocodingResult.geojson)
     const vectorSource = new VectorSource({
       features: new GeoJSON().readFeatures(geocodingResult.geojson, { featureProjection: "EPSG:3857" }),
     })
@@ -405,6 +405,7 @@ function Autocomplete() {
   async function getGeocodingResults(osmId, osmType) {
     push(["trackEvent", "search", true])
     const data = await fetchPOST(`/api/details`, { osmId, osmType })
+    console.log(data)
     if (!data) {
       console.log("error")
     } else {
