@@ -444,7 +444,7 @@ function Details({ result, name }) {
                   <FaBicycle />
                 </InformationIconWrapper>
                 <InformationDetails>
-                  <InformationDetailsValue>Takeaway</InformationDetailsValue>
+                  <InformationDetailsTitle>Takeaway</InformationDetailsTitle>
                   <InformationDetailsValue>{result.details.takeaway}</InformationDetailsValue>
                 </InformationDetails>
               </InformationItem>
