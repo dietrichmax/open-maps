@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   console.log(geocodingData)
 
   // wikimdata
-  const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
+  /*const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
 
   const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
     method: "GET",
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     wikiImageUrl = "/assets/placeholder_image.jpg"
   }
 
-  /*const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
+  const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipedia = geocodingData[0].extratags.wikipedia
     ? geocodingData[0].extratags.wikipedia.replace(/^.+:/, "")
     : geocodingData[0].extratags["brand:wikipedia"]
@@ -102,7 +102,7 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    image: wikiImageUrl,
+    //image: wikiImageUrl,
     //summary: summary,
     //wikipediaLang: wikiLang,
     //wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
