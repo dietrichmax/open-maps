@@ -23,15 +23,7 @@ export default async function handler(req, res) {
   
   const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
   let imageUrl
-  const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&origin=*&format=json`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "User-Agent": config.email
-    },
-  }).catch(function (error) {
-    console.log(error)
-  })
+  const wikiResponse = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&origin=*&format=json`)
   const wikiData = await wikiResponse.json()
   if (wikiData.claims && wikiData.claims.P18) {
       const imageName = wikiData.claims.P18[0].mainsnak.datavalue.value.replaceAll(
