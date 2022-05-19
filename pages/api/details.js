@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const geocodingData = await geocodingResponse.json()
 
   // wikimdata
-  
+
   /*const wikidata = geocodingData[0].extratags.wikidata //? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
   let wikiImageUrl
   const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
