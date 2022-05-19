@@ -33,8 +33,8 @@ export default async function handler(req, res) {
     console.log(error)
   })
   const wikiData = await wikiResponse.json()
-  if (data.claims && data.claims.P18) {
-      const imageName = data.claims.P18[0].mainsnak.datavalue.value.replaceAll(
+  if (wikiData.claims && wikiData.claims.P18) {
+      const imageName = wikiData.claims.P18[0].mainsnak.datavalue.value.replaceAll(
         " ",
         "_"
       )
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    image: "/assets/placeholder_image.jpg",
+    image: imageUrl,
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
