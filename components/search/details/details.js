@@ -318,8 +318,8 @@ function Details({ result, name }) {
             rel="nofollow noopener noreferrer"
             objectFit='cover'
             objectPosition='top'
-            alt={`Image of ${result.display_name} from Wikimeda`}
-            title={`Image of ${result.display_name} from Wikimedia`}
+            alt={`Image of ${result.display_name}`}
+            title={`Image of ${result.display_name}`}
           />
       </ImageWrapper>
         <Header>

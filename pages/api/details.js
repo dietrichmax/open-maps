@@ -5,7 +5,6 @@ const md5 = require("md5")
 
 export default async function handler(req, res) {
   const {osmId, osmType} = req.body
-
   const geocodingResponse = await fetch(`https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`, {
       method: "GET",
       headers: {
@@ -14,6 +13,7 @@ export default async function handler(req, res) {
         "Cache-Control": "max-age=86400",
       },
     })
+    console.log(geocodingResponse)
     const geocodingData = await geocodingResponse.json()
     console.log(geocodingData)
 
