@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
   const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
   let imageUrl
-  if (wikidata) {
+  /*if (wikidata) {
     const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
       method: "GET",
       headers: {
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     }
   } else {
     imageUrl = "/assets/placeholder_image.jpg"
-  }
+  }*/
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipediaTitle = geocodingData[0].extratags.wikipedia
@@ -104,7 +104,7 @@ export default async function handler(req, res) {
     },
     image:  "/assets/placeholder_image.jpg",
     summary: "summary",
-    wikipediaLang: wikiLang,
+    wikipediaLang: "wikiLang",
     wikipediaLink: "wikipediaLink",
   })
 }
