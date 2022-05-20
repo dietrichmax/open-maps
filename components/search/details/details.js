@@ -298,7 +298,7 @@ function Details({ result, name }) {
     }
   }
 
-  /*const renderImage = () => {
+  const renderImage = () => {
     if (image) {
       return (
         <ImageWrapper href={image}>
@@ -316,7 +316,7 @@ function Details({ result, name }) {
         </ImageWrapper>
       )
     }
-  }*/
+  }
 
   const renderWikidata = (result) => {
     if (!result.summary || result.summary === 2) {
@@ -355,19 +355,7 @@ function Details({ result, name }) {
   } else {
     return (
       <DetailsWrapper>
-        <ImageWrapper href={image}>
-          <Image
-            src={image}
-            layout="fill"
-            target="_blank"
-            rel="nofollow noopener noreferrer"
-            objectFit="cover"
-            objectPosition="top"
-            alt={`Image of ${result.display_name}`}
-            title={`Image of ${result.display_name}`}
-            priority={true}
-          />
-        </ImageWrapper>
+        {renderImage()}
         <Header>
           {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
