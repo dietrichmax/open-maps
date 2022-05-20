@@ -18,17 +18,16 @@ export default async function handler(req, res) {
   })
   const geocodingData = await geocodingResponse.json()
 
-  // wikimdata
+  // wikimdataPasingmunic
 
   const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
   let imageUrl
-  /*if (wikidata) {
+  if (wikidata) {
     const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": config.email,
-        "Cache-Control": "max-age=86400",
+        "User-Agent": config.email
       },
     }).catch(function (error) {
       console.log(error)
@@ -43,7 +42,7 @@ export default async function handler(req, res) {
     }
   } else {
     imageUrl = "/assets/placeholder_image.jpg"
-  }*/
+  }
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipediaTitle = geocodingData[0].extratags.wikipedia
@@ -102,7 +101,7 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    image:  "/assets/placeholder_image.jpg",
+    image:  imageUrl,
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipediaLink,
