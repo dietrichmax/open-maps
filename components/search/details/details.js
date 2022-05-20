@@ -46,7 +46,7 @@ const DetailsWrapper = styled.div`
     border-radius: 0;
     top: 50px;
     left: 0; 
-    max-height: 100%;
+    height: calc(100vh - 50px);
     overflow: hidden;
     width: 100%;
   `}
