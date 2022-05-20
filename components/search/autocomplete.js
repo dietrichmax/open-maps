@@ -33,8 +33,8 @@ const Container = styled.div`
   width: 400px;
   box-shadow: var(--box-shadow);
   ${media.lessThan("432px")`
-  top: 0px;
-  left: 0px;
+    top: 0px;
+    left: 0px;
     margin: 0;
     width: 100%;
     border-radius: 0;
@@ -96,7 +96,7 @@ const ListContainer = styled.ol`
   box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   border-radius: var(--border-radius);
   overflow: hidden;
-  ${media.lessThan("432px")`
+  ${media.lessThan("400px")`
   border-radius: 0;
   `}
 `

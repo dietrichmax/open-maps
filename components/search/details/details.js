@@ -45,6 +45,7 @@ const DetailsWrapper = styled.div`
     left: 0; 
     max-height: 100%;
     overflow: hidden;
+    width: 100%;
   `}
 `
 
