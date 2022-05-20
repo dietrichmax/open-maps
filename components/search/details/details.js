@@ -274,7 +274,7 @@ const SwipeContainer = styled.div``
 function Details({ result, name }) {
   const [image, setImage] = useState()
 
-  /*useEffect(() => {
+  useEffect(() => {
     getImage(result)
   }, [result])
 
@@ -298,7 +298,7 @@ function Details({ result, name }) {
     }
   }
 
-  const renderImage = () => {
+  /*const renderImage = () => {
     if (image) {
       return (
         <ImageWrapper href={image}>
@@ -355,9 +355,9 @@ function Details({ result, name }) {
   } else {
     return (
       <DetailsWrapper>
-        <ImageWrapper href={result.image}>
+        <ImageWrapper href={image}>
           <Image
-            src={result.image}
+            src={image}
             layout="fill"
             target="_blank"
             rel="nofollow noopener noreferrer"
