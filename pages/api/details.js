@@ -70,9 +70,7 @@ export default async function handler(req, res) {
     })
     wikipediaData = await wikipediaRes.json()
 
-    if (!wikipediaData.query || !wikipediaData.query.pages) {
-      summary = null
-    } else {
+    if (wikipediaData.query || wikipediaData.query.pages) {
       summary = wikipediaData.query.pages[0].extract.toString()
     }
   }
@@ -106,8 +104,8 @@ export default async function handler(req, res) {
       internet_access: geocodingData[0].extratags.internet_access,
     },
     image: imageUrl,
-    //summary: summary,
+    summary: summary,
     wikipediaLang: wikiLang,
-    wikipediaLink: wikipedia ? `${wikiLang}:${wikipedia}` : null,
+    wikipediaLink: wikipedia ? `${wikiLang}:${wikipedia}` : "",
   })
 }
