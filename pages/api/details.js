@@ -4,33 +4,30 @@ const md5 = require("md5")
 export default async function handler(req, res) {
   const { osmId, osmType } = req.body
 
-  let geocodingData  
+  let geocodingData
   let imageUrl
   let summary
 
-  await fetch(
-    `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": config.email,
-        "Cache-Control": "max-age=86400",
-      },
-    }
-  ).then((response) => {
-        if (response.ok) {
-          return response.json()
-        }
-        return Promise.reject(response)
-      })
-      .then((result) => {
-        geocodingData = result
-      })
-      .catch((error) => {
-        console.log("Something went wrong.", error)
-      })
-  
+  await fetch(`https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": config.email,
+      "Cache-Control": "max-age=86400",
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      }
+      return Promise.reject(response)
+    })
+    .then((result) => {
+      geocodingData = result
+    })
+    .catch((error) => {
+      console.log("Something went wrong.", error)
+    })
 
   // wikimdataPasingmunic
 
@@ -46,17 +43,20 @@ export default async function handler(req, res) {
       },
     })
       .then((response) => {
+        console.log(response)
         if (response.ok) {
           return response.json()
         }
         return Promise.reject(response)
       })
       .then((result) => {
+        console.log(result)
         const imageName = result.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
         const hash = md5(imageName)
         imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
       })
       .catch((error) => {
+        console.log(error)
         imageUrl = "/assets/placeholder_image.jpg"
         console.log("Something went wrong.", error)
       })
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     ? geocodingData[0].extratags["brand:wikipedia"]
     : null
   const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
-  
+
   if (wikipediaTitle) {
     fetch(
       `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`,
@@ -81,20 +81,21 @@ export default async function handler(req, res) {
           "Cache-Control": "max-age=86400",
         },
       }
-    ).then((response) => {
-      if (response.ok) {
-        return response.json()
-      }
-      return Promise.reject(response)
-    })
-    .then((result) => {
-      if (result.query ||result.query.pages) {
-        summary = result.query.pages[0].extract
-      }
-    })
-    .catch((error) => {
-      console.log("Something went wrong.", error)
-    })
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json()
+        }
+        return Promise.reject(response)
+      })
+      .then((result) => {
+        if (result.query || result.query.pages) {
+          summary = result.query.pages[0].extract
+        }
+      })
+      .catch((error) => {
+        console.log("Something went wrong.", error)
+      })
   }
   console.log(summary)
 
