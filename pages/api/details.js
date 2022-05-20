@@ -103,8 +103,8 @@ export default async function handler(req, res) {
       internet_access: geocodingData[0].extratags.internet_access,
     },
     image:  "/assets/placeholder_image.jpg",
-    summary: "summary",
-    wikipediaLang: "wikiLang",
-    wikipediaLink: "wikipediaLink",
+    summary: summary,
+    wikipediaLang: wikiLang,
+    wikipediaLink: wikipediaLink,
   })
 }
