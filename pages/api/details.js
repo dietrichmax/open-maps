@@ -23,25 +23,29 @@ export default async function handler(req, res) {
   const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
   let imageUrl
   if (wikidata) {
-    const wikiResponse = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
+    await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": config.email
+        "User-Agent": config.email,
       },
-    }).catch(function (error) {
-      console.log(error)
     })
-    const wikiData = await wikiResponse.json()
-    if (!wikiData && !wikiData.claims && wikiData.claims.P18[0]) {
-      imageUrl = "/assets/placeholder_image.jpg"
-    } else {
-      const imageName = wikiData.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
-      const hash = md5(imageName)
-      imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
-    }
-  } else {
-    imageUrl = "/assets/placeholder_image.jpg"
+      .then((response) => {
+        if (response.ok) {
+          imageUrl = "/assets/placeholder_image.jpg"
+          return response.json()
+        }
+        return Promise.reject(response)
+      })
+      .then((result) => {
+        const imageName = result.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
+        const hash = md5(imageName)
+        imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+      })
+      .catch((error) => {
+        imageUrl = "/assets/placeholder_image.jpg"
+        console.log("Something went wrong.", error)
+      })
   }
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
@@ -53,7 +57,7 @@ export default async function handler(req, res) {
   const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
   let wikipediaData
   let summary
-  if ( wikipediaTitle) {
+  if (wikipediaTitle) {
     const wikipediaRes = await fetch(
       `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`,
       {
@@ -68,7 +72,7 @@ export default async function handler(req, res) {
       console.log(error)
     })
     wikipediaData = await wikipediaRes.json()
-    
+
     if (wikipediaData.query || wikipediaData.query.pages) {
       summary = wikipediaData.query.pages[0].extract.toString()
     }
@@ -101,7 +105,7 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    image:  imageUrl,
+    image: imageUrl,
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipediaLink,

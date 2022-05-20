@@ -47,7 +47,6 @@ function Rating({ result }) {
   const [votesChanged, setVotesChanged] = useState(false)
   const [percent, setPercent] = useState(100)
 
-  console.log(result.osm_id)
   useEffect(() => {
     setOsmId(result.osm_id)
   }, [result])
