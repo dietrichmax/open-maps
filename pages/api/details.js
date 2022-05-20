@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     if (wikidata) {
       const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
       const hash = md5(imageName)
-      image = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+      image = "/assets/placeholder_image.jpg" //`https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
     } else {
       image = "/assets/placeholder_image.jpg"
     }
