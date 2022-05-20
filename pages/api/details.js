@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     : geocodingData[0].extratags["brand:wikipedia"]
     ? geocodingData[0].extratags["brand:wikipedia"]
     : null
-  const wikipediaLink = wikipedia ? `${wikiLang}:${wikipedia}` : null
+  const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
   let wikipediaData
   let summary
   if ( wikipediaTitle) {
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
       console.log(error)
     })
     wikipediaData = await wikipediaRes.json()
-    console.log(wikipediaData)
+    
     if (wikipediaData.query || wikipediaData.query.pages) {
       summary = wikipediaData.query.pages[0].extract.toString()
     }
