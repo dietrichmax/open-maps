@@ -142,7 +142,7 @@ const ActionsResponsiveContainer = styled.div`
 `
 
 const ActionsWrapper = styled(Button)`
-  background-color: var(--border-color);
+  border: 1px solid var(--border-color);
   display: flex;
   border-radius: 50%;
   cursor: pointer;
@@ -301,19 +301,18 @@ function Details({ result, name }) {
   const renderImage = () => {
     if (image) {
       return (
-        <a href={image}>
           <Image
             src={image}
             layout="fill"
             target="_blank"
             rel="nofollow noopener noreferrer"
+            href={image}
             objectFit="cover"
             objectPosition="top"
             alt={`Image of ${result.display_name}`}
             title={`Image of ${result.display_name}`}
             priority={true}
           />
-        </a>
       )
     }
   }

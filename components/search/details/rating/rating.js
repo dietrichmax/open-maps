@@ -15,8 +15,8 @@ const FeedbackContainer = styled.div`
 `
 
 const FeedbackWrapper = styled.button`
-  background-color: var(--border-color);
-  border: none;
+  border: 1px solid var(--border-color);
+  background: var(--body-bg);
   display: flex;
   border-radius: 50%;
   cursor: pointer;
@@ -24,7 +24,8 @@ const FeedbackWrapper = styled.button`
   padding: 0.75rem;
   transition: 0.2s;
   :hover {
-    background: var(--body-bg);
+    background: var(--border-coor);
+    opacity: 0.8;
   }
 `
 

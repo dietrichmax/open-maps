@@ -16,18 +16,22 @@ const AttributionContainer = styled.div`
 function Attribution() {
   const [attributionText, setAttributionText] = useState()
   const [attributionName, setAttributionName] = useState()
+  const [gotAttribution, setGotAttribution] = useState(false)
 
   const { map } = useContext(MapContext)
 
   const setAttribution = () => {
+    if (gotAttribution) return
     const layers = map.getLayers().getArray()
     layers.map((layer) => {
-      if (layer.getVisible() === true) {
+      if (layer.getProperties().name === "OpenStreetMap") {
         setAttributionText(layer.getProperties().attribution)
         setAttributionName(layer.getProperties().name)
       }
     })
+    setGotAttribution(true)
   }
+  
 
   if (map) {
     map.on("postrender", setAttribution)
