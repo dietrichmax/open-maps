@@ -405,7 +405,6 @@ function Autocomplete() {
   async function getGeocodingResults(osmId, osmType) {
     push(["trackEvent", "search", true])
     const data = await fetchPOST(`/api/details`, { osmId, osmType })
-    console.log(data)
     if (!data) {
       console.log("error")
     } else {

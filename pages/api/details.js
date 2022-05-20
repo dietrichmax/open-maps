@@ -77,7 +77,7 @@ export default async function handler(req, res) {
     }
   }
 
-  console.log(geocodingData)
+  //console.log(geocodingData)
   res.status(200).json({
     display_name: geocodingData[0].display_name,
     osm_id: geocodingData[0].osm_id,

@@ -52,19 +52,17 @@ function Rating({ result }) {
   }, [result])
 
   useEffect(() => {
-    if (osmId) {
-      getRating(osmId)
-    }
-  }, [osmId])
+    getRating(result.osm_id)
+  }, [])
 
-  async function getRating(osmId) {
-    const data = await fetchGET(`/api/poi_details/${parseInt(osmId)}`)
+  async function getRating(osm_id) {
+    const data = await fetchGET(`/api/poi_details/${parseInt(osm_id)}`)
     setUpvotes(!data ? 0 : data.upvotes)
     setDownvotes(!data ? 0 : data.downvotes)
   }
 
   useEffect(() => {
-    votesChanged ? sendRating(osmId, upvotes, downvotes) : null
+    votesChanged ? sendRating(result.osm_id, upvotes, downvotes) : null
   }, [votesChanged, downvotes, upvotes])
 
   useEffect(() => {
@@ -81,12 +79,13 @@ function Rating({ result }) {
     setVotesChanged(true)
   }
 
-  async function sendRating(osmId, upvotes, downvotes) {
-    const body = { osmId, upvotes, downvotes }
+  async function sendRating(osm_id, upvotes, downvotes) {
+
+    const body = { osm_id, upvotes, downvotes }
     const data = await fetchPOST(`/api/poi_details`, body)
     if (!data) {
       console.log("error")
-    }
+    }    
     setVotesChanged(false)
   }
 
