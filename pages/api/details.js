@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   const { osmId, osmType } = req.body
 
   let summary
-  let image = ""
+  let image = "/assets/placeholder_image.jpg"
 
   const geocodingData = await fetchGET(
     `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`
