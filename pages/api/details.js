@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   const geocodingData = await fetchGET(
     `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`)
   
-      const wikidataEntity = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : null //geocodingData.extratags["brand:wikipedia"] ? geocodingData.extratags["brand:wikipedia"] : null
+     /* const wikidataEntity = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : null //geocodingData.extratags["brand:wikipedia"] ? geocodingData.extratags["brand:wikipedia"] : null
       
       if (wikidataEntity) {
       const wikidata = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`)
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         const hash = md5(imageName)
         imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
       }
-    }
+    }*/
 
     
 
@@ -71,6 +71,6 @@ export default async function handler(req, res) {
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipediaLink,
-    wikidata: wikidataEntity
+    wikidata: geocodingData[0].extratags.wikidata
   })
 }
