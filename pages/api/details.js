@@ -1,31 +1,29 @@
 import { config } from "config"
 const md5 = require("md5")
 import { fetchGET } from "@/components/utils/fetcher"
+import { useState } from "react"
+
+
+
 
 export default async function handler(req, res) {
   const { osmId, osmType } = req.body
 
-  let imageUrl = "/assets/placeholder_image.jpg"
   let summary
+  let image = ""
 
   const geocodingData = await fetchGET(
     `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`)
-  
-    if (Object.keys(geocodingData[0].extratags).length > 0 && geocodingData[0].wikidata) {
-      const wikidataEntity = geocodingData[0].extratags.replace(/^.+:/, "") 
-    const res = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    const wikidata = await res.json()
+    if (geocodingData && geocodingData[0].extratags && geocodingData[0].extratags.wikidata) {
+      
+      const wikidataEntity = geocodingData[0].extratags.wikidata.replace(/^.+:/, "") 
+    const wikidata = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`)
     if (wikidata) {
       const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
       const hash = md5(imageName)
-      imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+      image = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
     } else {
-      imageUrl = "/assets/placeholder_image.jpg"
+      image = "/assets/placeholder_image.jpg"
     }}
 
     
@@ -73,7 +71,7 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    image: imageUrl,
+    image: image,
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipediaLink,

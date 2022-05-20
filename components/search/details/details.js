@@ -358,7 +358,19 @@ const renderImage = ()  => {
   } else {
     return (
       <DetailsWrapper>
-        {renderImage()}
+         <ImageWrapper href={result.image}>
+    <Image
+      src={result.image}
+      layout="fill"
+      target="_blank"
+      rel="nofollow noopener noreferrer"
+      objectFit="cover"
+      objectPosition="top"
+      alt={`Image of ${result.display_name}`}
+      title={`Image of ${result.display_name}`}
+      priority={true}
+    />
+  </ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
