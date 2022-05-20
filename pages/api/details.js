@@ -105,9 +105,9 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    image: imageUrl,
-    summary: summary,
-    wikipediaLang: wikiLang,
-    wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
+    //image: imageUrl,
+    //summary: summary,
+    //wikipediaLang: wikiLang,
+    //wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
   })
 }
