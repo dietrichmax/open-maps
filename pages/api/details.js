@@ -3,7 +3,12 @@ const md5 = require("md5")
 
 export default async function handler(req, res) {
   const { osmId, osmType } = req.body
-  const geocodingResponse = await fetch(
+
+  let geocodingData  
+  let imageUrl
+  let summary
+
+  await fetch(
     `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`,
     {
       method: "GET",
@@ -13,26 +18,35 @@ export default async function handler(req, res) {
         "Cache-Control": "max-age=86400",
       },
     }
-  ).catch(function (error) {
-    console.log(error)
-  })
-  const geocodingData = await geocodingResponse.json()
+  ).then((response) => {
+        if (response.ok) {
+          return response.json()
+        }
+        return Promise.reject(response)
+      })
+      .then((result) => {
+        geocodingData = result
+      })
+      .catch((error) => {
+        console.log("Something went wrong.", error)
+      })
+  
 
   // wikimdataPasingmunic
 
   const wikidata = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
-  let imageUrl
+
   if (wikidata) {
     await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidata}&format=json&origin=*`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         "User-Agent": config.email,
+        "Cache-Control": "max-age=86400",
       },
     })
       .then((response) => {
         if (response.ok) {
-          imageUrl = "/assets/placeholder_image.jpg"
           return response.json()
         }
         return Promise.reject(response)
@@ -55,10 +69,9 @@ export default async function handler(req, res) {
     ? geocodingData[0].extratags["brand:wikipedia"]
     : null
   const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
-  let wikipediaData
-  let summary
+  
   if (wikipediaTitle) {
-    const wikipediaRes = await fetch(
+    fetch(
       `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`,
       {
         method: "GET",
@@ -68,15 +81,22 @@ export default async function handler(req, res) {
           "Cache-Control": "max-age=86400",
         },
       }
-    ).catch(function (error) {
-      console.log(error)
+    ).then((response) => {
+      if (response.ok) {
+        return response.json()
+      }
+      return Promise.reject(response)
     })
-    wikipediaData = await wikipediaRes.json()
-
-    if (wikipediaData.query || wikipediaData.query.pages) {
-      summary = wikipediaData.query.pages[0].extract.toString()
-    }
+    .then((result) => {
+      if (result.query ||result.query.pages) {
+        summary = result.query.pages[0].extract
+      }
+    })
+    .catch((error) => {
+      console.log("Something went wrong.", error)
+    })
   }
+  console.log(summary)
 
   res.status(200).json({
     display_name: geocodingData[0].display_name,
