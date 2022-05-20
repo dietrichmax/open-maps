@@ -1,5 +1,6 @@
 import { config } from "config"
 const md5 = require("md5")
+import { fetchGET } from "@/components/utils/fetcher"
 
 export default async function handler(req, res) {
   const { osmId, osmType } = req.body
@@ -7,18 +8,8 @@ export default async function handler(req, res) {
   let imageUrl = "/assets/placeholder_image.jpg"
   let summary
 
-  const geocodingRes = await fetch(
-    `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": config.email,
-        "Cache-Control": "max-age=86400",
-      },
-    }
-  )
-  const geocodingData = await geocodingRes.json()
+  const geocodingData = await fetchGET(
+    `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`)
   
 
   // wikimdataPasingmunic
@@ -26,15 +17,7 @@ export default async function handler(req, res) {
   const wikidataEntity = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
 
   if (wikidataEntity) {
-    const wikidataRes = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": config.email,
-        "Cache-Control": "max-age=86400",
-      },
-    })
-    const wikidata = await wikidataRes.json()
+    const wikidata = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`)
     if (wikidata) {
       const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
       const hash = md5(imageName)
@@ -51,18 +34,9 @@ export default async function handler(req, res) {
   const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
     
   if (wikipediaTitle) {
-    const wikipediaRes = await fetch(
-      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": config.email
-        },
-      }
-    )
-    if (wikipediaRes) {
-      const wikipediaData = await wikipediaRes.json()
+    const wikipediaData = await fetchGET(
+      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`)
+    if (wikipediaData) {
       summary = wikipediaData.query.pages[0].extract
     }
   }
