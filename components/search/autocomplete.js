@@ -303,7 +303,7 @@ function Autocomplete() {
       )
     return (
       <DeleteSearchButtonWrapper>
-        <CloseButton style={{ color: "var(--gray)", fontSize: "11px" }} title="Delete search" onClick={deleteSearch} />
+        <CloseButton style={{ color: "var(--border-color)", fontSize: "11px" }} title="Delete search" onClick={deleteSearch} />
       </DeleteSearchButtonWrapper>
     )
   }

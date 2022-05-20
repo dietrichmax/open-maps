@@ -31,7 +31,6 @@ function Attribution() {
     })
     setGotAttribution(true)
   }
-  
 
   if (map) {
     map.on("postrender", setAttribution)

@@ -3,6 +3,17 @@ import MapContext from "./mapContext"
 import View from "ol/View"
 import Map from "ol/Map"
 import { transform } from "ol/proj"
+import styled from "styled-components"
+import media from "styled-media-query"
+
+const MapContainer = styled.div`
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  ${media.lessThan("432px")`  
+  overflow: hidden;
+  `}
+`
 
 const MapWrapper = ({ children, zoom, center }) => {
   const mapRef = useRef()
@@ -82,9 +93,9 @@ const MapWrapper = ({ children, zoom, center }) => {
 
   return (
     <MapContext.Provider value={{ map }}>
-      <div ref={mapRef} className="ol-map" style={{ height: "100vh", width: "100%", position: "relative" }}>
+      <MapContainer ref={mapRef} className="ol-map">
         {children}
-      </div>
+      </MapContainer>
     </MapContext.Provider>
   )
 }

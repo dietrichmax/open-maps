@@ -1,5 +1,7 @@
+import ReactDOM from "react-dom"
+import { useRef } from "react"
 import styled from "styled-components"
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import { FaRoute, FaMapMarkerAlt, FaHome, FaPhone, FaEnvelope, FaBookmark, FaClock, FaAccessibleIcon, FaHamburger, FaBicycle, FaUmbrellaBeach, FaWifi } from "react-icons/fa"
 import { BsShareFill } from "react-icons/bs"
 import Image from "next/image"
@@ -7,7 +9,6 @@ import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
 import Rating from "@/components/search/details/rating/rating"
-import { fetchGET } from "@/components/utils/fetcher"
 
 const md5 = require("md5")
 
@@ -17,7 +18,7 @@ const DetailsWrapper = styled.div`
   left: 16px;
   bottom: 16px;
   z-index: 2;
-  max-height: calc(100vh - 96px);
+  max-height: calc(100vh - 50px);
   overflow: auto;
   background-color: #fff;
   width: var(--sidebar-width);
@@ -49,6 +50,8 @@ const DetailsWrapper = styled.div`
     height: calc(100vh - 50px);
     overflow: hidden;
     width: 100%;
+    transform: translate(0px, 725px);
+    transition: ${(props) => (!props.isControlled ? `transform 0.5s` : `none`)};
   `}
 `
 
@@ -59,6 +62,7 @@ const ImageWrapper = styled.div`
   height: 250px;
   width: 400px;
   ${media.lessThan("432px")`
+  height: 200px;
   width: 100%
 
 `}
@@ -90,36 +94,6 @@ const Type = styled.p`
   color: var(--gray);
   font-size: 0.95rem;
   letter-spacing: 0.05rem;
-`
-
-const FeedbackContainer = styled.div`
-  display: flex;
-  margin-bottom: 0.75rem;
-
-  ${media.lessThan("432px")`
-  display: block;
-  `}
-`
-
-const FeedbackWrapper = styled.button`
-  background-color: var(--border-color);
-  border: none;
-  display: flex;
-  border-radius: 50%;
-  cursor: pointer;
-  margin-right: 1rem;
-  padding: 0.75rem;
-  transition: 0.2s;
-  :hover {
-    background: var(--body-bg);
-  }
-`
-
-const FeedbackResult = styled.div`
-  display: flex;
-  align-items: center;
-  font-size: 0.85rem;
-  color: ${(props) => (props.value > 85 ? "var(--success-color)" : "var(--failure-color)")};
 `
 
 const Actions = styled.div`
@@ -196,32 +170,6 @@ const WikipediaLink = styled.a`
   }
 `
 
-const CloseDetailsContainer = styled.div`
-  display: none;
-
-  ${media.lessThan("416px")`
-  position: absolute;
-  bottom: -1.75rem;
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
-  padding: 1rem;
-  border: 1px solid var(--border-color);
-  background: #fff;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  justify-content: center;
-  :hover {
-    border: 1px solid var(--secondary-color);
-  }
-`}
-`
-
 const InformationContainer = styled.div`
   margin: 1rem 2rem;
   align-items: center;
@@ -263,16 +211,76 @@ const InformationWebsiteLink = styled.a`
   }
 `
 
-const PlaceholderImage = styled.div`
-position: relative
-  height: 250px;
-  width: 400px;
+const PanelDrawer = styled.div`
+  min-height: 20px;
+  height: 20px;
+  cursor: grab;
+  width: 100%;
+  border-radius: var(--border-radius);
+  padding-top: 2px;
 `
 
-const SwipeContainer = styled.div``
+const PanelHandler = styled.div`
+  width: 40px;
+  height: 5px;
+  margin: 4px auto;
+  border-radius: 2.5px;
+  background-color: var(--border-color);
+`
 
 function Details({ result, name }) {
   const [image, setImage] = useState()
+  const [isMobile, setIsMobile] = useState(false)
+  const [isControlled, setIsControlled] = useState(true)
+
+  const elemRef = useRef(null)
+  const dragProps = useRef()
+
+  const initialiseDrag = (event) => {
+    const { target, clientY } = event
+    const { offsetTop } = target
+    const { top } = elemRef.current.getBoundingClientRect()
+
+    dragProps.current = {
+      dragStartTop: top - offsetTop,
+      dragStartY: clientY,
+    }
+    window.addEventListener("mousemove", startDragging, false)
+    window.addEventListener("mouseup", stopDragging, false)
+  }
+
+  const startDragging = ({ clientY }) => {
+    setIsControlled(true)
+    elemRef.current.style.transform = `translate(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
+  }
+
+  const stopDragging = ({ clientY }) => {
+    setIsControlled(false)
+    if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
+      elemRef.current.style.transform = `translate(0px, 725px)`
+    } else {
+      elemRef.current.style.transform = `translate(0px, 0px)`
+    }
+    window.removeEventListener("mousemove", startDragging, false)
+    window.removeEventListener("mouseup", stopDragging, false)
+  }
+
+  const resize = () => {
+    if (window.innerWidth <= 432) {
+      setIsMobile(true)
+    } else {
+      setIsMobile(false)
+    }
+  }
+
+  useEffect(() => {
+    if (window.innerWidth <= 432) {
+      setIsMobile(true)
+    }
+    window.addEventListener("resize", resize)
+  }, [])
+
+  useEffect(() => {}, [isMobile])
 
   useEffect(() => {
     getImage(result)
@@ -301,18 +309,18 @@ function Details({ result, name }) {
   const renderImage = () => {
     if (image) {
       return (
-          <Image
-            src={image}
-            layout="fill"
-            target="_blank"
-            rel="nofollow noopener noreferrer"
-            href={image}
-            objectFit="cover"
-            objectPosition="top"
-            alt={`Image of ${result.display_name}`}
-            title={`Image of ${result.display_name}`}
-            priority={true}
-          />
+        <Image
+          src={image}
+          layout="fill"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          href={image}
+          objectFit="cover"
+          objectPosition="top"
+          alt={`Image of ${result.display_name}`}
+          title={`Image of ${result.display_name}`}
+          priority={true}
+        />
       )
     }
   }
@@ -353,7 +361,12 @@ function Details({ result, name }) {
     return null
   } else {
     return (
-      <DetailsWrapper>
+      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled}>
+        {isMobile ? (
+          <PanelDrawer>
+            <PanelHandler />
+          </PanelDrawer>
+        ) : null}
         <ImageWrapper>{renderImage()}</ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
