@@ -7,6 +7,9 @@ import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
 import Rating from "@/components/search/details/rating/rating"
+import { fetchGET } from "@/components/utils/fetcher"
+
+const md5 = require("md5")
 
 const DetailsWrapper = styled.div`
   position: absolute;
@@ -269,11 +272,7 @@ position: relative
 const SwipeContainer = styled.div``
 
 function Details({ result, name }) {
-  const [visible, setVisible] = useState(false)
-  const [wikimediaImageUrl, setwikimediaImageUrl] = useState()
-  const [wikipediaData, setWikipediaData] = useState(false)
-  const [wikipediaLang, setWikipediaLang] = useState("en")
-
+  
   const renderWikidata = (result) => {
     if (!result.summary || result.summary === 2) {
       return null

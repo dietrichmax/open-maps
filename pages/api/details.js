@@ -11,19 +11,18 @@ export default async function handler(req, res) {
   const geocodingData = await fetchGET(
     `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`)
   
-
-  // wikimdataPasingmunic
-
-  const wikidataEntity = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : geocodingData[0].extratags["brand:wikipedia"]
-
-  /*if (wikidataEntity) {
-    const wikidata = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`)
-    if (wikidata) {
-      const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
-      const hash = md5(imageName)
-      imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+      const wikidataEntity = geocodingData[0].extratags.wikidata ? geocodingData[0].extratags.wikidata.replace(/^.+:/, "") : null //geocodingData.extratags["brand:wikipedia"] ? geocodingData.extratags["brand:wikipedia"] : null
+      
+      if (wikidataEntity) {
+      const wikidata = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`)
+      if (wikidata) {
+        const imageName = await wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
+        const hash = md5(imageName)
+        imageUrl = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
+      }
     }
-  }*/
+
+    
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipediaTitle = geocodingData[0].extratags.wikipedia
@@ -72,5 +71,6 @@ export default async function handler(req, res) {
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipediaLink,
+    wikidata: wikidataEntity
   })
 }

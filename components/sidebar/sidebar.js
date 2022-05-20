@@ -83,6 +83,7 @@ function Sidebar({ visible }) {
   useEffect(() => {
     setShowSidebar(visible)
   }, [visible])
+  
   useEffect(() => {
     if (map) {
       setLayers(map.getLayers().getArray())
