@@ -47,7 +47,7 @@ export default async function handler(req, res) {
   }
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
-  const wikipedia = geocodingData[0].extratags.wikipedia
+  const wikipediaTitle = geocodingData[0].extratags.wikipedia
     ? geocodingData[0].extratags.wikipedia.replace(/^.+:/, "")
     : geocodingData[0].extratags["brand:wikipedia"]
     ? geocodingData[0].extratags["brand:wikipedia"]
@@ -55,9 +55,9 @@ export default async function handler(req, res) {
   const wikipediaLink = wikipedia ? `${wikiLang}:${wikipedia}` : null
   let wikipediaData
   let summary
-  if (wikipedia) {
+  if ( wikipediaTitle) {
     const wikipediaRes = await fetch(
-      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipedia}&origin=*`,
+      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`,
       {
         method: "GET",
         headers: {
@@ -104,9 +104,9 @@ export default async function handler(req, res) {
       opening_hours: geocodingData[0].extratags.opening_hours,
       internet_access: geocodingData[0].extratags.internet_access,
     },
-    //image: imageUrl,
-    summary,
-    wikipediaLang: wikiLang,
-    wikipediaLink: wikipediaLink,
+    image: imageUrl,
+    //summary,
+    //wikipediaLang: wikiLang,
+    //wikipediaLink: wikipediaLink,
   })
 }
