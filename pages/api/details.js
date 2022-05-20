@@ -3,9 +3,6 @@ const md5 = require("md5")
 import { fetchGET } from "@/components/utils/fetcher"
 import { useState } from "react"
 
-
-
-
 export default async function handler(req, res) {
   const { osmId, osmType } = req.body
 
@@ -13,10 +10,10 @@ export default async function handler(req, res) {
   let image = ""
 
   const geocodingData = await fetchGET(
-    `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`)
-    if (geocodingData && geocodingData[0].extratags && geocodingData[0].extratags.wikidata) {
-      
-      const wikidataEntity = geocodingData[0].extratags.wikidata.replace(/^.+:/, "") 
+    `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`
+  )
+  if (geocodingData && geocodingData[0].extratags && geocodingData[0].extratags.wikidata) {
+    const wikidataEntity = geocodingData[0].extratags.wikidata.replace(/^.+:/, "")
     const wikidata = await fetchGET(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`)
     if (wikidata) {
       const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
@@ -24,9 +21,8 @@ export default async function handler(req, res) {
       image = `https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`
     } else {
       image = "/assets/placeholder_image.jpg"
-    }}
-
-    
+    }
+  }
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipediaTitle = geocodingData[0].extratags.wikipedia
@@ -35,10 +31,11 @@ export default async function handler(req, res) {
     ? geocodingData[0].extratags["brand:wikipedia"]
     : null
   const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
-    
+
   if (wikipediaTitle) {
     const wikipediaData = await fetchGET(
-      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`)
+      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`
+    )
     if (wikipediaData) {
       summary = wikipediaData.query.pages[0].extract
     }
@@ -75,6 +72,6 @@ export default async function handler(req, res) {
     summary: summary,
     wikipediaLang: wikiLang,
     wikipediaLink: wikipediaLink,
-    wikidata: geocodingData[0].extratags.wikidata
+    wikidata: geocodingData[0].extratags.wikidata,
   })
 }

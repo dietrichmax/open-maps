@@ -272,56 +272,53 @@ position: relative
 const SwipeContainer = styled.div``
 
 function Details({ result, name }) {
-  const [image, setImage ] = useState()
+  const [image, setImage] = useState()
 
-
-  useEffect(() => {
+  /*useEffect(() => {
     getImage(result)
   }, [result])
 
-
-  async function getImage (result) {
+  async function getImage(result) {
     if (Object.keys(result).length > 0 && result.wikidata) {
-      const wikidataEntity = result.wikidata.replace(/^.+:/, "") 
-    const res = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    const wikidata = await res.json()
-    if (wikidata) {
-      const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
-      const hash = md5(imageName)
-      setImage(`https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`)
-    } else {
-      setImage("/assets/placeholder_image.jpg")
+      const wikidataEntity = result.wikidata.replace(/^.+:/, "")
+      const res = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetclaims&property=P18&entity=${wikidataEntity}&format=json&origin=*`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const wikidata = await res.json()
+      if (wikidata) {
+        const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
+        const hash = md5(imageName)
+        setImage(`https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`)
+      } else {
+        setImage("/assets/placeholder_image.jpg")
+      }
     }
   }
-  
-}
 
-const renderImage = ()  => {
-  if (image) {
-  return (
-  <ImageWrapper href={image}>
-    <Image
-      src={image}
-      layout="fill"
-      target="_blank"
-      rel="nofollow noopener noreferrer"
-      objectFit="cover"
-      objectPosition="top"
-      alt={`Image of ${result.display_name}`}
-      title={`Image of ${result.display_name}`}
-      priority={true}
-    />
-  </ImageWrapper>)}
-
+  const renderImage = () => {
+    if (image) {
+      return (
+        <ImageWrapper href={image}>
+          <Image
+            src={image}
+            layout="fill"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            objectFit="cover"
+            objectPosition="top"
+            alt={`Image of ${result.display_name}`}
+            title={`Image of ${result.display_name}`}
+            priority={true}
+          />
+        </ImageWrapper>
+      )
     }
+  }*/
+
   const renderWikidata = (result) => {
-
-
     if (!result.summary || result.summary === 2) {
       return null
     }
@@ -358,19 +355,19 @@ const renderImage = ()  => {
   } else {
     return (
       <DetailsWrapper>
-         <ImageWrapper href={result.image}>
-    <Image
-      src={result.image}
-      layout="fill"
-      target="_blank"
-      rel="nofollow noopener noreferrer"
-      objectFit="cover"
-      objectPosition="top"
-      alt={`Image of ${result.display_name}`}
-      title={`Image of ${result.display_name}`}
-      priority={true}
-    />
-  </ImageWrapper>
+        <ImageWrapper href={result.image}>
+          <Image
+            src={result.image}
+            layout="fill"
+            target="_blank"
+            rel="nofollow noopener noreferrer"
+            objectFit="cover"
+            objectPosition="top"
+            alt={`Image of ${result.display_name}`}
+            title={`Image of ${result.display_name}`}
+            priority={true}
+          />
+        </ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
