@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   let summary
   let image = "/assets/placeholder_image.jpg"
 
-  /*const geocodingData = await fetchGET(
+  const geocodingData = await fetchGET(
     `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`
   )
   if (geocodingData && geocodingData[0].extratags && geocodingData[0].extratags.wikidata) {
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     } else {
       image = "/assets/placeholder_image.jpg"
     }
-  }*/
+  }
 
   const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipediaTitle = geocodingData[0].extratags.wikipedia
