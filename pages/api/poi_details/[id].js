@@ -15,7 +15,8 @@ async function handleGET(osm_id, res) {
   if (!osm_id) return
   const poi_details = await prisma.poi_details.findUnique({
     where: { osm_id: parseInt(osm_id) },
-    //include: { author: true },
+  }).catch(function (error) {
+    console.log(error)
   })
   res.json(poi_details)
 }

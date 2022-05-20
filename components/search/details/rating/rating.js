@@ -47,22 +47,25 @@ function Rating({ result }) {
   const [votesChanged, setVotesChanged] = useState(false)
   const [percent, setPercent] = useState(100)
 
+  console.log(result.osm_id)
   useEffect(() => {
     setOsmId(result.osm_id)
   }, [result])
 
   useEffect(() => {
-    getRating(result.osm_id)
-  }, [])
+    if (osmId) {
+      getRating(osmId)
+    }
+  }, [osmId])
 
-  async function getRating(osm_id) {
-    const data = await fetchGET(`/api/poi_details/${parseInt(osm_id)}`)
+  async function getRating(osmId) {
+    const data = await fetchGET(`/api/poi_details/${parseInt(osmId)}`)
     setUpvotes(!data ? 0 : data.upvotes)
     setDownvotes(!data ? 0 : data.downvotes)
   }
 
   useEffect(() => {
-    votesChanged ? sendRating(result.osm_id, upvotes, downvotes) : null
+    votesChanged ? sendRating(osmId, upvotes, downvotes) : null
   }, [votesChanged, downvotes, upvotes])
 
   useEffect(() => {
@@ -79,13 +82,12 @@ function Rating({ result }) {
     setVotesChanged(true)
   }
 
-  async function sendRating(osm_id, upvotes, downvotes) {
-
-    const body = { osm_id, upvotes, downvotes }
+  async function sendRating(osmId, upvotes, downvotes) {
+    const body = { osmId, upvotes, downvotes }
     const data = await fetchPOST(`/api/poi_details`, body)
     if (!data) {
       console.log("error")
-    }    
+    }
     setVotesChanged(false)
   }
 

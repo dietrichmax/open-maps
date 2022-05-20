@@ -107,7 +107,7 @@ export default async function handler(req, res) {
     },
     image: imageUrl,
     //summary: summary,
-    //wikipediaLang: wikiLang,
-    //wikipediaLink: wikipedia ? wikiLang + ":" + wikipedia : null,
+    wikipediaLang: wikiLang,
+    //wikipediaLink: wikipedia ? `${wikiLang}:${wikipedia}` : null,
   })
 }
