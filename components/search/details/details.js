@@ -9,6 +9,8 @@ import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
 import Rating from "@/components/search/details/rating/rating"
+import Attribution from "@/components/attribution/attribution"
+
 
 const md5 = require("md5")
 
@@ -50,7 +52,7 @@ const DetailsWrapper = styled.div`
     height: calc(100vh - 50px);
     overflow: hidden;
     width: 100%;
-    transform: translate(0px, 725px);
+    transform:  ${(props) => (props.y ? `translate(0px, ${props.y}px)` : `translate(0px, 0px)`)};
     transition: ${(props) => (!props.isControlled ? `transform 0.5s` : `none`)};
   `}
 `
@@ -232,6 +234,7 @@ function Details({ result, name }) {
   const [image, setImage] = useState()
   const [isMobile, setIsMobile] = useState(false)
   const [isControlled, setIsControlled] = useState(true)
+  const [innerHeight, setInnerHeight] = useState()
 
   const elemRef = useRef(null)
   const dragProps = useRef()
@@ -240,6 +243,7 @@ function Details({ result, name }) {
     const { target, clientY } = event
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
+    console.log(clientY)
 
     dragProps.current = {
       dragStartTop: top - offsetTop,
@@ -257,7 +261,7 @@ function Details({ result, name }) {
   const stopDragging = ({ clientY }) => {
     setIsControlled(false)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
-      elemRef.current.style.transform = `translate(0px, 725px)`
+      elemRef.current.style.transform = `translate(0px, ${window.innerHeight * 0.8}px)`
     } else {
       elemRef.current.style.transform = `translate(0px, 0px)`
     }
@@ -274,6 +278,8 @@ function Details({ result, name }) {
   }
 
   useEffect(() => {
+    console.log(window.innerHeight)
+    setInnerHeight(window.innerHeight)
     if (window.innerWidth <= 432) {
       setIsMobile(true)
     }
@@ -361,7 +367,9 @@ function Details({ result, name }) {
     return null
   } else {
     return (
-      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled}>
+      <>
+    <Attribution y={(window.innerHeight * 0.2) + 16}/>
+      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} y={window.innerHeight * 0.8}>
         {isMobile ? (
           <PanelDrawer>
             <PanelHandler />
@@ -530,6 +538,7 @@ function Details({ result, name }) {
           </InformationContainer>
         ) : null}
       </DetailsWrapper>
+      </>
     )
   }
 }

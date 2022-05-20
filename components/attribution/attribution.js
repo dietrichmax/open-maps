@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react"
 import MapContext from "@/components/map/mapContext"
 import styled from "styled-components"
+import media from "styled-media-query"
 
 const AttributionContainer = styled.div`
   position: absolute;
@@ -12,8 +13,11 @@ const AttributionContainer = styled.div`
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
   padding: 3px 5px;
+  ${media.lessThan("432px")`
+  bottom: ${(props) => (props.y ? `${props.y}px` : `0`)}
+  `}
 `
-function Attribution() {
+function Attribution({y}) {
   const [attributionText, setAttributionText] = useState()
   const [attributionName, setAttributionName] = useState()
   const [gotAttribution, setGotAttribution] = useState(false)
@@ -37,6 +41,6 @@ function Attribution() {
   }
 
   if (!map) return null
-  return <AttributionContainer id="copyright" dangerouslySetInnerHTML={{ __html: attributionText }} title={attributionName} />
+  return <AttributionContainer y={y} id="copyright" dangerouslySetInnerHTML={{ __html: attributionText }} title={attributionName} />
 }
 export default Attribution
