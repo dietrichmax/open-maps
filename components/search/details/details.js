@@ -301,7 +301,7 @@ function Details({ result, name }) {
   const renderImage = () => {
     if (image) {
       return (
-        <ImageWrapper href={image}>
+        <a href={image}>
           <Image
             src={image}
             layout="fill"
@@ -313,7 +313,7 @@ function Details({ result, name }) {
             title={`Image of ${result.display_name}`}
             priority={true}
           />
-        </ImageWrapper>
+        </a>
       )
     }
   }
@@ -355,7 +355,7 @@ function Details({ result, name }) {
   } else {
     return (
       <DetailsWrapper>
-        {renderImage()}
+        <ImageWrapper>{renderImage()}</ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
           <Rating result={result} />
