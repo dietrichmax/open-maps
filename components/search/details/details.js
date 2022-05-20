@@ -49,10 +49,10 @@ const DetailsWrapper = styled.div`
     border-radius: 0;
     top: 50px;
     left: 0; 
-    height: calc(100vh - 50px);
-    overflow: hidden;
+    overflow: scroll;
     width: 100%;
-    transform:  ${(props) => (props.y ? `translate(0px, ${props.y}px)` : `translate(0px, 0px)`)};
+    height: 100%;
+    transform:  ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
     transition: ${(props) => (!props.isControlled ? `transform 0.5s` : `none`)};
   `}
 `
@@ -270,6 +270,7 @@ function Details({ result, name }) {
   }
 
   const resize = () => {
+    setInnerHeight(window.innerHeight)
     if (window.innerWidth <= 432) {
       setIsMobile(true)
     } else {
@@ -368,8 +369,8 @@ function Details({ result, name }) {
   } else {
     return (
       <>
-    <Attribution y={(window.innerHeight * 0.2) + 16}/>
-      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} y={window.innerHeight * 0.8}>
+    <Attribution y={window.innerHeight}/>
+      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={innerHeight - 225}>
         {isMobile ? (
           <PanelDrawer>
             <PanelHandler />
