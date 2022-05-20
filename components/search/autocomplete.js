@@ -280,7 +280,7 @@ function Autocomplete() {
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
     setShowResult(true)
-    push(["trackEvent", "search", searchTerm])
+    //push(["trackEvent", "search", searchTerm])
   }
 
   const deleteSearch = () => {
@@ -403,7 +403,7 @@ function Autocomplete() {
   }
 
   async function getGeocodingResults(osmId, osmType) {
-    push(["trackEvent", "search", true])
+    //push(["trackEvent", "search", true])
     const data = await fetchPOST(`/api/details`, { osmId, osmType })
     if (!data) {
       console.log("error")
