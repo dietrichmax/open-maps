@@ -54,7 +54,7 @@ function Rating({ result }) {
 
   useEffect(() => {
     if (osmId) {
-      getRating(osmId)
+      //getRating(osmId)
     }
   }, [osmId])
 
