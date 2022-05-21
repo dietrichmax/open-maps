@@ -7,6 +7,7 @@ import { OSMLayer } from "components/layers"
 import MapContext from "@/components/map/mapContext"
 import { XYZ } from "ol/source"
 import { TileLayer } from "components/layers"
+import Attribution from "@components/attribution/attribution"
 
 function Index() {
   const [center, setCenter] = useState([14, 46])
@@ -19,6 +20,7 @@ function Index() {
       <Layers>
         <OSMLayer />
       </Layers>
+      <Attribution />
     </Map>
   )
 }

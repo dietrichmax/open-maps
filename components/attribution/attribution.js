@@ -17,7 +17,7 @@ const AttributionContainer = styled.div`
   bottom: ${(props) => (props.y ? `${props.y}px` : `0`)}
   `}
 `
-function Attribution({y}) {
+function Attribution({ y }) {
   const [attributionText, setAttributionText] = useState()
   const [attributionName, setAttributionName] = useState()
   const [gotAttribution, setGotAttribution] = useState(false)
@@ -31,9 +31,9 @@ function Attribution({y}) {
       if (layer.getProperties().name === "OpenStreetMap") {
         setAttributionText(layer.getProperties().attribution)
         setAttributionName(layer.getProperties().name)
+        setGotAttribution(true)
       }
     })
-    setGotAttribution(true)
   }
 
   if (map) {

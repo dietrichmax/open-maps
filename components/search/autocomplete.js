@@ -66,11 +66,18 @@ const AutoCompleteContainer = styled.div`
 const AutoCompleteInputContainer = styled.div`
   display: flex;
   align-items: center;
+  background-color: var(--border-color);
+  margin-right: var(--space-sm);
+  border-radius: var(--border-radius);
+  :focus {
+    background-color: #fff;
+  }
 `
 
 const AutoCompleteInput = styled(Input)`
   width: 100%;
   max-width: 350px;
+  background-color: var(--border-color);
 `
 
 const SuggestionsContainer = styled.div`
@@ -298,7 +305,7 @@ function Autocomplete() {
       )
     return (
       <DeleteSearchButtonWrapper>
-        <CloseButton style={{ color: "var(--border-color)", fontSize: "11px" }} title="Delete search" onClick={deleteSearch} />
+        <CloseButton style={{ color: "var(--gray)", fontSize: "11px" }} title="Delete search" onClick={deleteSearch} />
       </DeleteSearchButtonWrapper>
     )
   }
@@ -471,13 +478,13 @@ function Autocomplete() {
             <AutoCompleteContainer>
               <AutoCompleteInputContainer>
                 <AutoCompleteInput type="text" onChange={handleChange} value={input} placeholder="Search in mxd.codes Maps" />
+                <SearchAction>
+                  <HandleSearch />
+                </SearchAction>
               </AutoCompleteInputContainer>
               {showSuggestions ? <SuggestionsListComponent /> : null}
             </AutoCompleteContainer>
           </SearchContainer>
-          <SearchAction>
-            <HandleSearch />
-          </SearchAction>
         </Container>
         {geocodingResult ? <Details result={geocodingResult} name={name} /> : null}
         {/*<LayerSwitcher sidebarVisible={showResult} />*/}

@@ -9,18 +9,15 @@ import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
 import Rating from "@/components/search/details/rating/rating"
-import Attribution from "@/components/attribution/attribution"
-
 
 const md5 = require("md5")
 
-const DetailsContainer = styled.div`
-
-`
+const DetailsContainer = styled.div``
 
 const DetailsWrapper = styled.div`
+  display: inline-block;
   position: absolute;
-  top: 80px;
+  top: 96px;
   left: 16px;
   bottom: 16px;
   z-index: 2;
@@ -32,6 +29,7 @@ const DetailsWrapper = styled.div`
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
   padding-bottom: 1rem;
+  overflow-x: hidden;
   ::-webkit-scrollbar {
     width: 10px;
   }
@@ -77,7 +75,7 @@ const ImageWrapper = styled.div`
 `
 
 const Header = styled.div`
-  padding: 1rem 2rem;
+  margin: var(--space-sm) var(--space);
   display: block;
   ${media.lessThan("432px")`
   `}
@@ -88,7 +86,7 @@ const Title = styled.h1`
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 `
 
 const SubTitle = styled.h2`
@@ -106,12 +104,13 @@ const Type = styled.p`
 
 const Actions = styled.div`
   display: flex;
-  border-top: 1px solid var(--border-color);
   padding-top: 1rem;
   margin-bottom: 1rem;
   margin-left: 2rem;
   margin-right: 2rem;
+  justify-content: space-between;
   ${media.lessThan("432px")`
+  margin-top: var(--space-sm);
   display: block;
   padding-top: 0;
   padding-bottom: 0;
@@ -129,7 +128,6 @@ const ActionsWrapper = styled(Button)`
   border-radius: 50%;
   cursor: pointer;
   margin-left: var(--space-sm);
-  margin-right: 0.5rem;
   padding: 0.75rem;
   align-items: center;
   :hover {
@@ -179,7 +177,8 @@ const WikipediaLink = styled.a`
 `
 
 const InformationContainer = styled.div`
-  margin: 1rem 2rem;
+  padding: 0 2rem;
+  margin-top: var(--space-sm);
   align-items: center;
   border-top: 1px solid var(--border-color);
 `
@@ -246,6 +245,7 @@ function Details({ result, name }) {
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
+    if (!isMobile) return
     const { target, clientY } = event
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
@@ -310,7 +310,7 @@ function Details({ result, name }) {
       })
       const wikidata = await res.json()
       if (wikidata) {
-        const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
+        const imageName = wikidata.claims.P18 ? wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_") : setImage("/assets/placeholder_image.jpg")
         const hash = md5(imageName)
         setImage(`https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`)
       } else {
@@ -370,12 +370,11 @@ function Details({ result, name }) {
     )
   }
 
-
   if (result.length === 0) {
     return null
   } else {
     return (
-    /*<Attribution y={window.innerHeight}/>*/
+      /*<Attribution y={window.innerHeight}/>*/
       <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={innerHeight - 225}>
         {isMobile ? (
           <PanelDrawer>
@@ -385,9 +384,9 @@ function Details({ result, name }) {
         <ImageWrapper>{renderImage()}</ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
-          <Rating result={result} />
           {result.type ? <Type>{capitalizeFirstLetter(result.type)}</Type> : null}
         </Header>
+        <Rating result={result} />
         <Actions>
           <a
             href={`https://www.google.com/maps/dir/?api=1&origin=&destination=${encodeURI(result.display_name)}&travelmode=driving`} //&dir_action=navigate

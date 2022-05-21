@@ -6,12 +6,19 @@ import { fetchGET } from "@/components/utils/fetcher"
 import { fetchPOST } from "@/components/utils/fetcher"
 
 const FeedbackContainer = styled.div`
-  display: flex;
-  margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.5rem var(--space);
 
   ${media.lessThan("432px")`
   display: block;
   `}
+`
+
+const FeedbackWrapperContainer = styled.div`
+  display: flex;
 `
 
 const FeedbackWrapper = styled.button`
@@ -20,7 +27,7 @@ const FeedbackWrapper = styled.button`
   display: flex;
   border-radius: 50%;
   cursor: pointer;
-  margin-right: 1rem;
+  margin-left: 1rem;
   padding: 0.75rem;
   transition: 0.2s;
   :hover {
@@ -30,7 +37,6 @@ const FeedbackWrapper = styled.button`
 `
 
 const FeedbackResult = styled.div`
-  display: flex;
   align-items: center;
   font-size: 0.85rem;
   color: ${(props) => (props.value > 85 ? "var(--success-color)" : "var(--failure-color)")};
@@ -39,6 +45,7 @@ const FeedbackResult = styled.div`
 const ActionsResponsiveContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `
 
 function Rating({ result }) {
@@ -97,13 +104,15 @@ function Rating({ result }) {
     return (
       <FeedbackContainer>
         <ActionsResponsiveContainer>
-          <FeedbackWrapper onClick={() => handleRating("upvote")} title="Upvote this place">
-            <FaThumbsUp style={{ color: "var(--success-color)" }} />
-          </FeedbackWrapper>
-          <FeedbackWrapper onClick={() => handleRating("downvote")} title="Downvote this place">
-            <FaThumbsDown style={{ color: "var(--failure-color)" }} />
-          </FeedbackWrapper>
           <FeedbackResult value={percent}>{percent}% liked this place</FeedbackResult>
+          <FeedbackWrapperContainer>
+            <FeedbackWrapper onClick={() => handleRating("upvote")} title="Upvote this place">
+              <FaThumbsUp style={{ color: "var(--success-color)" }} />
+            </FeedbackWrapper>
+            <FeedbackWrapper onClick={() => handleRating("downvote")} title="Downvote this place">
+              <FaThumbsDown style={{ color: "var(--failure-color)" }} />
+            </FeedbackWrapper>
+          </FeedbackWrapperContainer>
         </ActionsResponsiveContainer>
       </FeedbackContainer>
     )
