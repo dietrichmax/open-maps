@@ -21,8 +21,7 @@ const DetailsWrapper = styled.div`
   left: 16px;
   bottom: 16px;
   z-index: 2;
-  max-height: calc(100vh - 50px);
-  overflow: auto;
+  max-height: calc(100vh - 64px);
   background-color: #fff;
   width: var(--sidebar-width);
   border: 0;
@@ -46,6 +45,8 @@ const DetailsWrapper = styled.div`
     background: var(--gray);
   }
   ${media.lessThan("432px")`  
+  display: flex;
+  flex-direction: column;
     position: absolute;
     border-radius: 0;
     top: 64px;
@@ -54,10 +55,8 @@ const DetailsWrapper = styled.div`
     width: 100%;
     height: 100%;
     overflow: unset;
-    -ms-transform: ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
-    -webkit-transform: ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
-    transform:  ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
-    transition: ${(props) => (!props.isControlled ? `transform 0.5s` : `none`)};
+    transform: ${(props) => (!props.height ? `translate(0px, ${props.height - 100}px);` : `translate(0px, ${props.height}px);`)};
+    transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};
   `}
 `
 
@@ -69,7 +68,8 @@ const ImageWrapper = styled.div`
   width: 400px;
   ${media.lessThan("432px")`
   height: 200px;
-  width: 100%
+  width: 100%;
+  order: 1;
 
 `}
 `
@@ -110,10 +110,13 @@ const Actions = styled.div`
   margin-right: 2rem;
   justify-content: space-between;
   ${media.lessThan("432px")`
+  
+  order: 2;
   margin-top: var(--space-sm);
   display: block;
   padding-top: 0;
   padding-bottom: 0;
+  margin-bottom: 0;
   `}
 `
 
@@ -160,6 +163,7 @@ const DirectionsButton = styled(Button)`
 
 const WikipediaData = styled.div`
   padding: 0 2rem 0 2rem;
+  order: 3;
 `
 
 const WikipediaDataContainer = styled.div``
@@ -168,6 +172,7 @@ const WikipediaCredit = styled.div`
   margin-left: 2rem;
   margin-right: 2rem;
   margin-top: 1rem;
+  order: 4;
 `
 const WikipediaLink = styled.a`
   border-bottom: 1px solid var(--secondary-color);
@@ -181,6 +186,7 @@ const InformationContainer = styled.div`
   margin-top: var(--space-sm);
   align-items: center;
   border-top: 1px solid var(--border-color);
+  order: 5;
 `
 
 const InformationIconWrapper = styled(Button)`
@@ -375,7 +381,7 @@ function Details({ result, name }) {
   } else {
     return (
       /*<Attribution y={window.innerHeight}/>*/
-      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={innerHeight - 225}>
+      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={innerHeight - 170}>
         {isMobile ? (
           <PanelDrawer>
             <PanelHandler />

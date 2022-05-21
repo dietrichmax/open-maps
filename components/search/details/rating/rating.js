@@ -13,7 +13,10 @@ const FeedbackContainer = styled.div`
   padding: 0.5rem var(--space);
 
   ${media.lessThan("432px")`
+  margin-top: 0;
+  border-top: none;
   display: block;
+  order: 2;
   `}
 `
 
