@@ -14,6 +14,10 @@ import Attribution from "@/components/attribution/attribution"
 
 const md5 = require("md5")
 
+const DetailsContainer = styled.div`
+
+`
+
 const DetailsWrapper = styled.div`
   position: absolute;
   top: 80px;
@@ -52,6 +56,8 @@ const DetailsWrapper = styled.div`
     overflow: scroll;
     width: 100%;
     height: 100%;
+    -ms-transform: ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
+    -webkit-transform: ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
     transform:  ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
     transition: ${(props) => (!props.isControlled ? `transform 0.5s` : `none`)};
   `}
@@ -364,12 +370,12 @@ function Details({ result, name }) {
     )
   }
 
+
   if (result.length === 0) {
     return null
   } else {
     return (
-      <>
-    <Attribution y={window.innerHeight}/>
+    /*<Attribution y={window.innerHeight}/>*/
       <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={innerHeight - 225}>
         {isMobile ? (
           <PanelDrawer>
@@ -539,7 +545,6 @@ function Details({ result, name }) {
           </InformationContainer>
         ) : null}
       </DetailsWrapper>
-      </>
     )
   }
 }
