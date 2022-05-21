@@ -103,7 +103,7 @@ const Type = styled.p`
 
 const Actions = styled.div`
   display: flex;
-  margin: 1rem 2rem;
+  margin: 1rem 2 rem;
   justify-content: space-between;
   ${media.lessThan("432px")`
   
@@ -263,21 +263,21 @@ function Details({ result, name }) {
 
   const startDragging = ({ clientY }) => {
     setIsControlled(true)
-    elemRef.current.style.transform = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
-    elemRef.current.style["-ms-transform"] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
-    elemRef.current.style["-webkit-transform"] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
+    elemRef.current.style.transform = `translate(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
+    elemRef.current.style["-ms-transform"] = `translate(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
+    elemRef.current.style["-webkit-transform"] = `translate(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
   }
 
   const stopDragging = ({ clientY }) => {
     setIsControlled(false)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
-      elemRef.current.style.transform = `translate3d(0px, ${window.innerHeight * 0.825}px)`
-      elemRef.current.style["-ms-transform"] = `-ms-transform: translate3d(0px, ${window.innerHeight * 0.825}px)`
-      elemRef.current.style["-webkit-transform"] = `-webkit-transform:: translate3d(0px, ${window.innerHeight * 0.825}px)`
+      elemRef.current.style.transform = `translate(0px, ${window.innerHeight * 0.8}px)`
+      elemRef.current.style["-ms-transform"] = `translate(0px, ${window.innerHeight * 0.8}px)`
+      elemRef.current.style["-webkit-transform"] = `translate(0px, ${window.innerHeight * 0.8}px)`
     } else {
-      elemRef.current.style.transform = `translate3d(0px, 0px)`
-      elemRef.current.style["-ms-transform"] = `-ms-transform: translate3d(0px, 0px)`
-      elemRef.current.style["-webkit-transform"] = `-webkit-transform:: translate3d(0px, 0px)`
+      elemRef.current.style.transform = `translate(0px, 0px)`
+      elemRef.current.style["-ms-transform"] = `translate(0px, 0px)`
+      elemRef.current.style["-webkit-transform"] = `translate(0px, 0px)`
     }
     window.removeEventListener("mousemove", startDragging, false)
     window.removeEventListener("mouseup", stopDragging, false)
