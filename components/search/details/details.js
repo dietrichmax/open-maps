@@ -103,7 +103,7 @@ const Type = styled.p`
 
 const Actions = styled.div`
   display: flex;
-  margin: 1rem 2 rem;
+  margin: 1rem 2rem;
   justify-content: space-between;
   ${media.lessThan("432px")`
   
