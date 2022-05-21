@@ -10,7 +10,7 @@ const FeedbackContainer = styled.div`
   justify-content: space-between;
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
-  padding: 0.5rem var(--space);
+  padding: 1rem var(--space);
 
   ${media.lessThan("432px")`
   margin-top: 0;

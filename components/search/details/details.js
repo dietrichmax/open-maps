@@ -55,7 +55,6 @@ const DetailsWrapper = styled.div`
     width: 100%;
     height: 100%;
     overflow: unset;
-    transform: ${(props) => (!props.height ? `translate(0px, ${props.height - 100}px);` : `translate(0px, ${props.height}px);`)};
     transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};
   `}
 `
@@ -86,7 +85,7 @@ const Title = styled.h1`
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.75rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 `
 
 const SubTitle = styled.h2`
@@ -104,10 +103,7 @@ const Type = styled.p`
 
 const Actions = styled.div`
   display: flex;
-  padding-top: 1rem;
-  margin-bottom: 1rem;
-  margin-left: 2rem;
-  margin-right: 2rem;
+  margin: 1rem 2 rem;
   justify-content: space-between;
   ${media.lessThan("432px")`
   
