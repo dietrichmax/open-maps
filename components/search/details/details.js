@@ -269,7 +269,7 @@ function Details({ result, name }) {
   const stopDragging = ({ clientY }) => {
     setIsControlled(false)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
-      elemRef.current.style.transform = `translate(0px, ${window.innerHeight * 0.8}px)`
+      elemRef.current.style.transform = `translate(0px, ${window.innerHeight * 0.825}px)`
     } else {
       elemRef.current.style.transform = `translate(0px, 0px)`
     }
