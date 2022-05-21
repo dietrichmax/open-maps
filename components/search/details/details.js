@@ -32,7 +32,6 @@ const DetailsWrapper = styled.div`
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
   padding-bottom: 1rem;
-  overflow-x: hidden;
   ::-webkit-scrollbar {
     width: 10px;
   }
@@ -51,11 +50,12 @@ const DetailsWrapper = styled.div`
   ${media.lessThan("432px")`  
     position: absolute;
     border-radius: 0;
-    top: 50px;
+    top: 64px;
     left: 0; 
     overflow: scroll;
     width: 100%;
     height: 100%;
+    overflow: unset;
     -ms-transform: ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
     -webkit-transform: ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};
     transform:  ${(props) => (props.height ? `translate(0px, ${props.height}px)` : `translate(0px, 0px)`)};

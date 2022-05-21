@@ -31,6 +31,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   width: 400px;
+  height: 64px;
   box-shadow: var(--box-shadow);
   ${media.lessThan("432px")`
     top: 0px;
@@ -69,13 +70,7 @@ const AutoCompleteInputContainer = styled.div`
 
 const AutoCompleteInput = styled(Input)`
   width: 100%;
-  font-size: 15px;
-  padding-left: 1rem;
   max-width: 350px;
-  padding: 0;
-  ::placeholder {
-    color: var(--gray);
-  }
 `
 
 const SuggestionsContainer = styled.div`
@@ -85,7 +80,7 @@ const SuggestionsContainer = styled.div`
   top: 64px;
 
   ${media.lessThan("432px")`
-  top: 48px;
+  top: 64px;
   `}
 `
 
@@ -130,7 +125,7 @@ const AdressDetail = styled.p`
 const SearchButtonWrapper = styled.div`
   display: flex;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   align-items: center;
   padding: 0;
   border: none;
@@ -142,7 +137,7 @@ const SearchButtonWrapper = styled.div`
 
 const ButtonWrapper = styled.div`
   display: inline-block;
-  width: 48px;
+  width: 68px;
   text-align: center;
 `
 
