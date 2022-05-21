@@ -264,20 +264,20 @@ function Details({ result, name }) {
   const startDragging = ({ clientY }) => {
     setIsControlled(true)
     elemRef.current.style.transform = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
-    elemRef.current.style.transform = `-ms-transform: translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
-    elemRef.current.style.transform = `-webkit-transform:: translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
+    elemRef.current.style["-ms-transform"] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
+    elemRef.current.style["-webkit-transform"] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px)`
   }
 
   const stopDragging = ({ clientY }) => {
     setIsControlled(false)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
       elemRef.current.style.transform = `translate3d(0px, ${window.innerHeight * 0.825}px)`
-      elemRef.current.style.transform = `-ms-transform: translate3d(0px, ${window.innerHeight * 0.825}px)`
-      elemRef.current.style.transform = `-webkit-transform:: translate3d(0px, ${window.innerHeight * 0.825}px)`
+      elemRef.current.style["-ms-transform"] = `-ms-transform: translate3d(0px, ${window.innerHeight * 0.825}px)`
+      elemRef.current.style["-webkit-transform"] = `-webkit-transform:: translate3d(0px, ${window.innerHeight * 0.825}px)`
     } else {
       elemRef.current.style.transform = `translate3d(0px, 0px)`
-      elemRef.current.style.transform = `-ms-transform: translate3d(0px, 0px)`
-      elemRef.current.style.transform = `-webkit-transform:: translate3d(0px, 0px)`
+      elemRef.current.style["-ms-transform"] = `-ms-transform: translate3d(0px, 0px)`
+      elemRef.current.style["-webkit-transform"] = `-webkit-transform:: translate3d(0px, 0px)`
     }
     window.removeEventListener("mousemove", startDragging, false)
     window.removeEventListener("mouseup", stopDragging, false)
