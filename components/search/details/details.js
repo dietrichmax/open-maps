@@ -51,7 +51,7 @@ const DetailsWrapper = styled.div`
     border-radius: 0;
     top: 64px;
     left: 0; 
-    overflow: scroll;
+    overflow: unset;
     width: 100%;
     height: 100%;
     overflow: unset;
