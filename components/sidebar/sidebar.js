@@ -11,8 +11,11 @@ const SidebarContainer = styled.div`
   position: absolute;
   z-index: 4;
   background-color: var(--body-bg);
-  width: calc(var(--sidebar-width) + 16px);
+  width: 448px;
   height: 100vh;
+  ${media.lessThan("432px")`
+  width: 100%;
+  `}
 `
 
 const PageWrap = styled.div`

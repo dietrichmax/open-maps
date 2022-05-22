@@ -5,6 +5,8 @@ import { config } from "config"
 import Head from "next/head"
 import { init } from "@socialgouv/matomo-next"
 import App from "next/app"
+import SEO from "@components/seo/seo"
+
 
 class MyApp extends App {
   componentDidMount() {
@@ -46,7 +48,8 @@ class MyApp extends App {
           <meta property="og:site_name" content={config.siteTitle} />
           <meta property="og:url" content={config.siteUrl} />
           <meta property="og:image" content="/assets/map-marker-icon.png" />
-        </Head>
+        </Head> 
+        <SEO />
         <Component {...pageProps} />
       </>
     )

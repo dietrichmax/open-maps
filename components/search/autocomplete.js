@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState, useContext } from "react"
 import styled from "styled-components"
-import Logo from "@/components/logo/logo"
 import BurgerIcon from "@/components/sidebar/burgerIcon"
 import { DrawShapes } from "@/components/draw"
 import media from "styled-media-query"
@@ -15,9 +14,7 @@ import GeoJSON from "ol/format/GeoJSON"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import { ImCross } from "react-icons/im"
 import Details from "@/components/search/details/details"
-import { push } from "@socialgouv/matomo-next"
 import { Sidebar } from "@/components/sidebar"
-import { result, set } from "lodash"
 import MapContext from "@/components/map/mapContext"
 import { fetchPOST } from "@/components/utils/fetcher"
 
@@ -27,16 +24,14 @@ const Container = styled.div`
   left: var(--space-sm);
   z-index: 3;
   border-radius: var(--border-radius);
+  border-bottom-left-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
+  border-bottom-right-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
   background-color: var(--body-bg);
   display: flex;
   align-items: center;
   width: 400px;
   height: 55px;
   box-shadow: var(--box-shadow);
-  :focus {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
   ${media.lessThan("432px")`
     top: 0px;
     left: 0px;
@@ -103,6 +98,8 @@ const ListContainer = styled.ol`
   background-color: var(--body-bg);
   box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   border-radius: var(--border-radius);
+  border-top-left-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
+  border-top-right-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
   overflow: hidden;
   ${media.lessThan("400px")`
   border-radius: 0;
@@ -110,7 +107,8 @@ const ListContainer = styled.ol`
 `
 
 const ListItem = styled.li`
-  align-items: baseline;
+  display: flex;
+  align-items: center;
   padding-top: 6px;
   padding-bottom: 7px;
   padding-right: 1rem;
@@ -129,10 +127,16 @@ const Place = styled.p`
   font-weight: bold;
 `
 
+const Adress = styled.div`
+`
+
+const AdressDetails = styled.div`
+`
+
 const AdressDetail = styled.p`
   display: inline-block;
   font-size: 0.7rem;
-  margin-left: 4px;
+  margin-right: 4px;
 `
 
 const SearchButtonWrapper = styled.div`
@@ -205,6 +209,7 @@ function Autocomplete() {
       const osmId = geocodingResult.osm_id ? geocodingResult.osm_id : urlParams[3]
       const osmType = geocodingResult.osm_type ? geocodingResult.osm_type[0].toUpperCase() : urlParams[4]
       const placeName = name ? name.replaceAll(" ", "+") : urlParams[5]
+      const layer = map.getLayers().getArray()[0].getProperties().name
       if (urlParams.length > 3) {
         setOsm_id(osmId)
         setOsm_type(osmType)
@@ -242,11 +247,18 @@ function Autocomplete() {
     setGotFirstData(false)
     setInput(e.target.value)
     setSearchQuery(e.target.value.replaceAll(",", "+").replaceAll(" ", "+").replaceAll("++", "+"))
+    if (e.target.value.length === 0) {
+      setShowSuggestions(false)
+    }
   }
 
   useEffect(() => {
     !gotFirstData ? getFirstSuggestionResultsDelayed(lat, lon, searchQuery, suggestionLimit) : null
   }, [extent])
+
+  useEffect(() => {
+    console.log(showSuggestions)
+  }, [showSuggestions])
 
   const filterData = (data) => {
     let set = []
@@ -434,8 +446,8 @@ function Autocomplete() {
       return
     } else {
       return suggestions.length ? (
-        <SuggestionsContainer>
-          <ListContainer Name="suggestions">
+        <SuggestionsContainer >
+          <ListContainer showSuggestions={showSuggestions} name="suggestions">
             {suggestions.map((suggestion, index) => {
               const searchTerm = `${
                 suggestion.properties.name
@@ -457,12 +469,16 @@ function Autocomplete() {
               return (
                 <ListItem key={index} onClick={() => selectResult(searchTerm, osmId, osmType, name)}>
                   <ButtonWrapper>{getSymbol(suggestion.properties.osm_value)}</ButtonWrapper>
+                  <Adress>
                   {suggestion.properties.name ? <Place>{`${suggestion.properties.name}`}</Place> : null}
+                  <AdressDetails>
                   {suggestion.properties.street ? <AdressDetail>{`${suggestion.properties.street} `}</AdressDetail> : null}
                   {suggestion.properties.housenumber ? <AdressDetail>{`${suggestion.properties.housenumber}`}</AdressDetail> : null}
                   {suggestion.properties.city ? <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail> : null}
                   {suggestion.properties.country ? <AdressDetail>{`${suggestion.properties.country}`}</AdressDetail> : null}
                   {suggestion.properties.AdressDetail ? <AdressDetail>{suggestion.properties.AdressDetail}</AdressDetail> : null}
+                  </AdressDetails>
+                  </Adress>
                 </ListItem>
               )
             })}
@@ -476,7 +492,7 @@ function Autocomplete() {
     <>
       {visible ? <Sidebar visible={visible} /> : null}
       <>
-        <Container>
+        <Container showSuggestions={showSuggestions} >
           <SearchButtonWrapper onClick={() => handleVisability()}>
             <BurgerIcon />
           </SearchButtonWrapper>

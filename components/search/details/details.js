@@ -45,7 +45,7 @@ const DetailsWrapper = styled.div`
     background: var(--gray);
   }
   ${media.lessThan("432px")`  
-  display: block;
+  display: flex;
   flex-direction: column;
     position: absolute;
     border-radius: 0;
@@ -266,7 +266,6 @@ function Details({ result, name }) {
   }
 
   const startDragging = ({ clientY }) => {
-    console.log(elemRef.current.style)
     setIsControlled(true)
     transformTypes.forEach((transform) => {
       elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`

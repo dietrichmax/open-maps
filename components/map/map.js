@@ -21,6 +21,7 @@ const MapWrapper = ({ children, zoom, center }) => {
   const [lon, setLon] = useState()
   const [lat, setLat] = useState()
   const [aZoom, setAZoom] = useState()
+  const [aLayer, setALayer] = useState()
 
   const getHash = () => {
     if (window.location.hash.length === 0) return

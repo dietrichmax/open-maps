@@ -24,10 +24,10 @@ export default async function handler(req, res) {
     }
   }*/
 
-  const wikiLang = geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
-  const wikipediaTitle = geocodingData[0].extratags.wikipedia
+  const wikiLang = geocodingData[0] && geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
+  const wikipediaTitle = geocodingData[0] && geocodingData[0].extratags.wikipedia
     ? geocodingData[0].extratags.wikipedia.replace(/^.+:/, "")
-    : geocodingData[0].extratags["brand:wikipedia"]
+    : geocodingData[0] && geocodingData[0].extratags["brand:wikipedia"]
     ? geocodingData[0].extratags["brand:wikipedia"]
     : null
   const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
