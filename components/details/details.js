@@ -8,7 +8,7 @@ import Image from "next/image"
 import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
-import Rating from "@/components/search/details/rating/rating"
+import Rating from "@components/details/rating/rating"
 //mport SlidingUpPanel from 'rn-sliding-up-panel';
 const md5 = require("md5")
 

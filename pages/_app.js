@@ -7,6 +7,7 @@ import { init } from "@socialgouv/matomo-next"
 import App from "next/app"
 import SEO from "@components/seo/seo"
 
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 class MyApp extends App {
   componentDidMount() {

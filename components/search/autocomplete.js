@@ -13,10 +13,11 @@ import VectorLayer from "ol/layer/Vector"
 import GeoJSON from "ol/format/GeoJSON"
 import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
 import { ImCross } from "react-icons/im"
-import Details from "@/components/search/details/details"
+import Details from "@components/details/details"
 import { Sidebar } from "@/components/sidebar"
 import MapContext from "@/components/map/mapContext"
 import { fetchPOST } from "@/components/utils/fetcher"
+import maplibregl from 'maplibre-gl';
 
 const Container = styled.div`
   position: absolute;
@@ -198,8 +199,9 @@ function Autocomplete() {
   }, [osm_id, osm_type, placeName])
 
   const updateHash = () => {
-    const zoom = map.getView().getZoom().toFixed(2)
-    const lonLat = transform(map.getView().getCenter(), "EPSG:3857", "EPSG:4326")
+    const zoom = map.getZoom().toFixed(2)
+    const center = map.getCenter()
+    const lonLat = [center.lng, center.lat]
 
     const urlTemp = window.location.hash
     const urlParams = urlTemp.replace("#", "").split(",")
@@ -209,7 +211,7 @@ function Autocomplete() {
       const osmId = geocodingResult.osm_id ? geocodingResult.osm_id : urlParams[3]
       const osmType = geocodingResult.osm_type ? geocodingResult.osm_type[0].toUpperCase() : urlParams[4]
       const placeName = name ? name.replaceAll(" ", "+") : urlParams[5]
-      const layer = map.getLayers().getArray()[0].getProperties().name
+      //const layer = map.getLayers().getArray()[0].getProperties().name
       if (urlParams.length > 3) {
         setOsm_id(osmId)
         setOsm_type(osmType)
@@ -231,11 +233,11 @@ function Autocomplete() {
 
   const getOptions = () => {
     if (map) {
-      const center = transform(map.getView().getCenter(), "EPSG:3857", "EPSG:4326")
-      setExtent(transformExtent(map.getView().calculateExtent(map.getSize()), "EPSG:3857", "EPSG:4326"))
-      setLon(parseInt(center[0]))
-      setLat(parseInt(center[1]))
-      setZoom(parseInt(map.getView().getZoom() + 2))
+      const center = map.getCenter()
+      setExtent(map.getBounds())
+      setLon(parseInt(center.lng))
+      setLat(parseInt(center.lat))
+      setZoom(parseInt(map.getZoom()))
     }
   }
 
@@ -256,9 +258,6 @@ function Autocomplete() {
     !gotFirstData ? getFirstSuggestionResultsDelayed(lat, lon, searchQuery, suggestionLimit) : null
   }, [extent])
 
-  useEffect(() => {
-    console.log(showSuggestions)
-  }, [showSuggestions])
 
   const filterData = (data) => {
     let set = []
@@ -278,11 +277,6 @@ function Autocomplete() {
         }
         return true
       })
-      /*const lookup = set.reduce((a, e) => {
-        a[e.name] = ++a[e.name] || 0;
-        return a;
-      }, {});
-      set.filter(e => lookup[e.properties])*/
       return set.slice(0, 7)
     }
   }
@@ -300,7 +294,6 @@ function Autocomplete() {
     getGeocodingResults(osmId, osmType)
     setShowSuggestions(false)
     setShowResult(true)
-    //push(["trackEvent", "search", searchTerm])
   }
 
   const deleteSearch = () => {
@@ -359,21 +352,19 @@ function Autocomplete() {
   useEffect(() => {
     setShowSuggestions(false)
     if (geocodingResult && geocodingResult.boundingbox) {
-      removeGeojson()
-      const transformedBbox = transformExtent(
-        [geocodingResult.boundingbox[2], geocodingResult.boundingbox[0], geocodingResult.boundingbox[3], geocodingResult.boundingbox[1]],
-        "EPSG:4326",
-        "EPSG:3857"
-      )
-      map.getView().fit(transformedBbox, {
-        duration: 1000,
-        padding: [100, 100, 100, 100],
-      })
-      addGeojson(geocodingResult)
+      /*/removeGeojson()
+      new maplibregl.Marker({color: "#FF0000"})
+      .setLngLat([139.7525,35.6846])
+      .addTo(map)*/
+
+      console.log(geocodingResult)
+      const bbox = [geocodingResult.boundingbox[2], geocodingResult.boundingbox[0], geocodingResult.boundingbox[3], geocodingResult.boundingbox[1]];
+      map.fitBounds(bbox, {duration: 3000});
+      /*addGeojson(geocodingResult)*/
     }
     setShowSuggestions(false)
     if (map) {
-      updateHash()
+      //updateHash()
     }
   }, [geocodingResult])
 

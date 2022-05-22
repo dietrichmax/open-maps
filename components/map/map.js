@@ -5,18 +5,19 @@ import Map from "ol/Map"
 import { transform } from "ol/proj"
 import styled from "styled-components"
 import media from "styled-media-query"
+import maplibregl from 'maplibre-gl';
 
 const MapContainer = styled.div`
+  position: relative;
   height: 100vh;
   width: 100%;
-  position: relative;
   ${media.lessThan("432px")`  
   overflow: hidden;
   `}
 `
 
 const MapWrapper = ({ children, zoom, center }) => {
-  const mapRef = useRef()
+  const mapContainerRef = useRef();
   const [map, setMap] = useState(null)
   const [lon, setLon] = useState()
   const [lat, setLat] = useState()
@@ -26,75 +27,54 @@ const MapWrapper = ({ children, zoom, center }) => {
   const getHash = () => {
     if (window.location.hash.length === 0) return
     const parameters = window.location.hash.replace("#", "").split(",")
-    //console.log(parameters)
-    //const first = a.slice(0, n).join(',')
-    //console.log(first)
-    //var second =  a.slice(n).join(',');
-    //console.log(second)
     setLat(parameters[0])
     setLon(parameters[1])
     setAZoom(parameters[2])
-    // use regex
   }
 
   useEffect(() => {
     if (map) {
-      map.getView().setCenter(transform([lon, lat], "EPSG:4326", "EPSG:3857"))
-      map.getView().setZoom(aZoom)
+      console.log([lon, lat])
+    map.setCenter([lon, lat])
+    map.setZoom(aZoom);
     }
   }, [lat, lon, aZoom])
 
   // on component mount
   useEffect(() => {
     getHash()
-    let options = {
-      view: new View({ zoom, center, maxZoom: 20 }),
-      layers: [],
-      controls: [],
-      overlays: [],
-    }
-
-    let mapObject = new Map(options)
-    mapObject.setTarget(mapRef.current)
+    const mapObject  = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+      center: center,
+      zoom: zoom,
+    });
+    mapObject.addControl(new maplibregl.NavigationControl(), 'top-right');
     setMap(mapObject)
-
-    return () => mapObject.setTarget(undefined)
+    return () => {
+      mapObject.remove();
+    }
   }, [])
 
   // zoom change handler
   useEffect(() => {
     if (!map) return
-    map.getView().setZoom(zoom)
+    map.setZoom(zoom);
   }, [zoom])
 
   // center change handler
   useEffect(() => {
     if (!map) return
-    map.getView().setCenter(center)
+    map.setCenter(center)
   }, [center])
 
   useEffect(() => {
     if (!map) return
-    map.on("click", function (evt) {
-      const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-        return feature
-      })
-      if (feature) {
-        console.log("click")
-      }
-    })
-
-    // change mouse cursor when over marker
-    map.on("pointermove", function (e) {
-      const pixel = map.getEventPixel(e.originalEvent)
-      const hit = map.hasFeatureAtPixel(pixel)
-      map.getTarget().style.cursor = hit ? "pointer" : ""
-    })
   }, [map])
 
   return (
     <MapContext.Provider value={{ map }}>
-      <MapContainer ref={mapRef} className="ol-map">
+      <MapContainer ref={mapContainerRef} className="ol-map">
         {children}
       </MapContainer>
     </MapContext.Provider>
