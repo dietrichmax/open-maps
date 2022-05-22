@@ -9,7 +9,7 @@ import media from "styled-media-query"
 import { capitalizeFirstLetter } from "@/components/utils/capitalizeFirstLetter"
 import { Button } from "@/styles/templates/button"
 import Rating from "@/components/search/details/rating/rating"
-
+//mport SlidingUpPanel from 'rn-sliding-up-panel';
 const md5 = require("md5")
 
 const DetailsContainer = styled.div``
@@ -49,7 +49,7 @@ const DetailsWrapper = styled.div`
   flex-direction: column;
     position: absolute;
     border-radius: 0;
-    top: 64px;
+    top: 55px;
     left: 0; 
     overflow: unset;
     width: 100%;
@@ -241,9 +241,14 @@ function Details({ result, name }) {
   const [image, setImage] = useState()
   const [isMobile, setIsMobile] = useState(false)
   const [isControlled, setIsControlled] = useState(true)
-  const [innerHeight, setInnerHeight] = useState()
-
-  const elemRef = useRef(null)
+  const [deviceHeight, setDeviceHeight] = useState()
+  const statusBarHeight = 55
+  const draggableRange = {
+    top: deviceHeight - statusBarHeight,
+    bottom: deviceHeight - statusBarHeight - 100,
+  }
+  const transformTypes = ["transform", "-ms-transform", "-webkit-transform", "moz-transform", "-o-transform"]
+  const elemRef = useRef()
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
@@ -251,7 +256,6 @@ function Details({ result, name }) {
     const { target, clientY } = event
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
-    console.log(clientY)
 
     dragProps.current = {
       dragStartTop: top - offsetTop,
@@ -262,32 +266,30 @@ function Details({ result, name }) {
   }
 
   const startDragging = ({ clientY }) => {
+    console.log(elemRef.current.style)
     setIsControlled(true)
-    elemRef.current.style.transform = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
-    elemRef.current.style["-ms-transform"] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
-    elemRef.current.style["-webkit-transform"] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
-    //console.log(elemRef.current.style["-ms-transform"])
-    //console.log(elemRef.current.style["-webkit-transform"])
-    //console.log(elemRef.current.style.transform)
+    transformTypes.forEach((transform) => {
+      elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
+    })
   }
 
   const stopDragging = ({ clientY }) => {
     setIsControlled(false)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
-      elemRef.current.style.transform = `translate3d(0px, ${window.innerHeight * 0.8}px, 0px)`
-      elemRef.current.style["-ms-transform"] = `translate3d(0px, ${window.innerHeight * 0.8}px, 0px)`
-      elemRef.current.style["-webkit-transform"] = `translate3d(0px, ${window.innerHeight * 0.8}px, 0px)`
+      transformTypes.forEach((transform) => {
+        elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
+      })
     } else {
-      elemRef.current.style.transform = `translate3d(0px, 0px, 0px)`
-      elemRef.current.style["-ms-transform"] = `translate3d(0px, 0px, 0px)`
-      elemRef.current.style["-webkit-transform"] = `translate3d(0px, 0px, 0px)`
+      transformTypes.forEach((transform) => {
+        elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
+      })
     }
     window.removeEventListener("mousemove", startDragging, false)
     window.removeEventListener("mouseup", stopDragging, false)
   }
 
   const resize = () => {
-    setInnerHeight(window.innerHeight)
+    setDeviceHeight(window.innerHeight)
     if (window.innerWidth <= 432) {
       setIsMobile(true)
     } else {
@@ -296,7 +298,7 @@ function Details({ result, name }) {
   }
 
   useEffect(() => {
-    setInnerHeight(window.innerHeight)
+    setDeviceHeight(window.innerHeight)
     if (window.innerWidth <= 432) {
       setIsMobile(true)
     }
@@ -306,6 +308,7 @@ function Details({ result, name }) {
   useEffect(() => {}, [isMobile])
 
   useEffect(() => {
+    setImage("")
     getImage(result)
   }, [result])
 
@@ -319,32 +322,13 @@ function Details({ result, name }) {
         },
       })
       const wikidata = await res.json()
-      if (wikidata) {
-        const imageName = wikidata.claims.P18 ? wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_") : setImage("/assets/placeholder_image.jpg")
+      if (wikidata && wikidata.claims.P18) {
+        const imageName = wikidata.claims.P18[0].mainsnak.datavalue.value.replaceAll(" ", "_")
         const hash = md5(imageName)
         setImage(`https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`)
-      } else {
-        setImage("/assets/placeholder_image.jpg")
       }
-    }
-  }
-
-  const renderImage = () => {
-    if (image) {
-      return (
-        <Image
-          src={image}
-          layout="fill"
-          target="_blank"
-          rel="nofollow noopener noreferrer"
-          href={image}
-          objectFit="cover"
-          objectPosition="top"
-          alt={`Image of ${result.display_name}`}
-          title={`Image of ${result.display_name}`}
-          priority={true}
-        />
-      )
+    } else {
+      setImage("/assets/placeholder_image.jpg")
     }
   }
 
@@ -385,13 +369,28 @@ function Details({ result, name }) {
   } else {
     return (
       /*<Attribution y={window.innerHeight}/>*/
-      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={innerHeight - 170}>
+      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={deviceHeight - 170}>
         {isMobile ? (
           <PanelDrawer>
             <PanelHandler />
           </PanelDrawer>
         ) : null}
-        <ImageWrapper>{renderImage()}</ImageWrapper>
+        <ImageWrapper>
+          {image ? (
+            <Image
+              src={image}
+              layout="fill"
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+              href={image}
+              objectFit="cover"
+              objectPosition="top"
+              alt={`Image of ${result.display_name}`}
+              title={`Image of ${result.display_name}`}
+              priority={true}
+            />
+          ) : null}
+        </ImageWrapper>
         <Header>
           {name ? <Title>{name}</Title> : null}
           {result.type ? <Type>{capitalizeFirstLetter(result.type)}</Type> : null}

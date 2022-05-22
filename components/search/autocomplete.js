@@ -31,8 +31,12 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   width: 400px;
-  height: 64px;
+  height: 55px;
   box-shadow: var(--box-shadow);
+  :focus {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
   ${media.lessThan("432px")`
     top: 0px;
     left: 0px;
@@ -84,10 +88,12 @@ const SuggestionsContainer = styled.div`
   position: absolute;
   width: 100%;
   left: 0;
-  top: 64px;
-
+  top: 55px;
   ${media.lessThan("432px")`
-  top: 64px;
+  top: 55px;
+  height: 100vh;
+  background-color: var(--body-bg);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   `}
 `
 
@@ -132,7 +138,7 @@ const AdressDetail = styled.p`
 const SearchButtonWrapper = styled.div`
   display: flex;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 22px;
   align-items: center;
   padding: 0;
   border: none;
@@ -265,7 +271,7 @@ function Autocomplete() {
         return a;
       }, {});
       set.filter(e => lookup[e.properties])*/
-      return set.slice(0, 5)
+      return set.slice(0, 7)
     }
   }
 
