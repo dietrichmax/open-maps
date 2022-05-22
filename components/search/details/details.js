@@ -45,7 +45,7 @@ const DetailsWrapper = styled.div`
     background: var(--gray);
   }
   ${media.lessThan("432px")`  
-  display: flex;
+  display: block;
   flex-direction: column;
     position: absolute;
     border-radius: 0;
@@ -369,7 +369,7 @@ function Details({ result, name }) {
   } else {
     return (
       /*<Attribution y={window.innerHeight}/>*/
-      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={deviceHeight - 170}>
+      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled}>
         {isMobile ? (
           <PanelDrawer>
             <PanelHandler />
