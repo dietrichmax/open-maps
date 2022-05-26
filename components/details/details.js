@@ -261,7 +261,8 @@ const PanelHandler = styled.div`
 
 function Details({ result, name }) {
   const [image, setImage] = useState()
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobileSize, setIsMobileSize] = useState(false)
+  const [isMobileDevice, setIsMobileDevice] = useState(false)
   const [isControlled, setIsControlled] = useState(true)
   const [deviceHeight, setDeviceHeight] = useState()
   const statusBarHeight = 55
@@ -276,8 +277,7 @@ function Details({ result, name }) {
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
-    if (!isMobile) return
-    const { target, clientY } = event
+    const { target, clientY } = isMobileDevice ? event.changedTouches[0] : event
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
 
@@ -336,16 +336,17 @@ function Details({ result, name }) {
   const resize = () => {
     setDeviceHeight(window.innerHeight)
     if (window.innerWidth <= 432) {
-      setIsMobile(true)
+      setIsMobileSize(true)
     } else {
-      setIsMobile(false)
+      setIsMobileSize(false)
     }
   }
 
   useEffect(() => {
     setDeviceHeight(window.innerHeight)
+    setIsMobileDevice(navigator.userAgentData.mobile)
     if (window.innerWidth <= 432) {
-      setIsMobile(true)
+      setIsMobileSize(true)
     }
     window.addEventListener("resize", resize)
   }, [])
@@ -409,7 +410,7 @@ function Details({ result, name }) {
     return (
       <DetailsContainer>
         <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
-          {isMobile ? (
+          {isMobileSize ? (
             <PanelDrawer>
               <PanelHandler />
             </PanelDrawer>
