@@ -277,7 +277,8 @@ function Details({ result, name }) {
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
-    const { target, clientY } = isMobileDevice ? event.touches[0].pageY : event
+    const clientY = isMobileDevice ? event.touches[0].pageY : event.clientY
+    const { target,  } = isMobileDevice ? event.touches[0].pageY : event
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
 
