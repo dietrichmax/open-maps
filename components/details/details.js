@@ -277,7 +277,7 @@ function Details({ result, name }) {
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
-    const { target, clientY } = isMobileDevice ? event.changedTouches[0] : event
+    const { target, clientY } = isMobileDevice ? event.touches[0] : event
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
 
@@ -409,7 +409,7 @@ function Details({ result, name }) {
   } else {
     return (
       <DetailsContainer>
-        <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
+        <DetailsWrapper ontouchstart={initialiseDrag} onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
           {isMobileSize ? (
             <PanelDrawer>
               <PanelHandler />
