@@ -277,7 +277,7 @@ function Details({ result, name }) {
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
-    const clientY = isMobileDevice ? event.touches[0].clientY : event.clientY
+    const clientY = isMobileDevice ? event.clientY : event.touches[0].clientY
     const target = event.target
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
@@ -294,7 +294,8 @@ function Details({ result, name }) {
     })
   }
 
-  const startDragging = ({ clientY }) => {
+  const startDragging = () => {
+    const clientY = isMobileDevice ? event.clientY : event.touches[0].clientY
     setIsControlled(true)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY < 0) {
       transformTypes.forEach((transform) => {
@@ -311,7 +312,8 @@ function Details({ result, name }) {
     }
   }
 
-  const stopDragging = ({ clientY }) => {
+  const stopDragging = () => {
+    const clientY = isMobileDevice ? event.clientY : event.touches[0].clientY
     setIsControlled(false)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
       transformTypes.forEach((transform) => {
