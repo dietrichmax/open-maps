@@ -61,7 +61,10 @@ const DetailsWrapper = styled.div`
     width: 100%;
     max-height: calc(100vh - 65px);
     transform:  ${(props) => (props.height ? `translate3d(0px, ${props.height}px, 0px)` : "translate3d(0px, 150px, 0px)")};
-    transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};    
+    transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};   
+    ::-webkit-scrollbar {
+      width: 6px;
+      } 
   `}
 `
 
@@ -296,6 +299,8 @@ function Details({ result, name }) {
 
   const startDragging = (event) => {
     const y = isMobileDevice ? event.touches[0].clientY : event.clientY
+    elemRef.current.style["overflow-y"] = "unset"
+    elemRef.current.style["overflow-x"] = "unset"
     setIsControlled(true)
     if (dragProps.current.dragStartTop + y - dragProps.current.dragStartY < 0) {
       transformTypes.forEach((transform) => {
