@@ -272,13 +272,13 @@ function Details({ result, name }) {
   }
   const transformTypes = ["transform", "-ms-transform", "-webkit-transform", "moz-transform", "-o-transform"]
   const releaseEvents = ["mouseup", "touchend"]
-  const hotspotEvents = ["mousemove", "touchmove", "touchstart"]
+  const hotspotEvents = ["mousemove", "touchmove"]
   const elemRef = useRef()
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
-    const clientY = isMobileDevice ? event.touches[0].pageY : event.clientY
-    const { target,  } = isMobileDevice ? event.touches[0].pageY : event
+    const clientY = isMobileDevice ? event.touches[0].clientY : event.clientY
+    const target = event.target
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
 
