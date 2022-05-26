@@ -19,19 +19,19 @@ const DetailsContainer = styled.div`
 
 const DetailsWrapper = styled.div`
 
-::-webkit-scrollbar {
-width: 11px;
-}
-scrollbar-width: thin;
-scrollbar-color: var(--content-bg);
-}
-::-webkit-scrollbar-track {
-background: var(--body-bg);
-}
-::-webkit-scrollbar-thumb {
-background-color: var(--gray);
-border-radius: var(--border-radius);
-}
+  ::-webkit-scrollbar {
+  width: 11px;
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--content-bg);
+  }
+  ::-webkit-scrollbar-track {
+  background: var(--body-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+  background-color: var(--gray);
+  border-radius: var(--border-radius);
+  }
 
   display: block;
   position: relative;
@@ -50,17 +50,16 @@ border-radius: var(--border-radius);
   overflow: auto;
   border-radius: var(--border-radius);
   animation: appear 600ms forwards;
-  transform: translate3d(0px, 0px, 0px)
+  transform: translate3d(0px, 0px, 0px);
   ${media.lessThan("432px")`  
     display: flex;
     margin-bottom: 0;
     flex-direction: column;
-    position: absolute;
     border-radius: 0;
-    top: auto;
+    top: 0;
     left: 0;     
     width: 100%;
-    max-height: calc(100vh - 64px);
+    max-height: calc(100vh - 65px);
     transform:  ${(props) => (props.height ? `translate3d(0px, ${props.height}px, 0px)` : "translate3d(0px, 150px, 0px)")};
     transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};    
     overflow: unset;
