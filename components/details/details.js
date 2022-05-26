@@ -37,7 +37,7 @@ const DetailsWrapper = styled.div`
   position: relative;
   top: var(--space);
   left: 16px;
-  z-index: 2;
+  z-index: 3;
   max-height: calc(100vh - (65px + 3 * 16px));
   background-color:var(--body-bg);
   width: var(--sidebar-width);
@@ -62,8 +62,6 @@ const DetailsWrapper = styled.div`
     max-height: calc(100vh - 65px);
     transform:  ${(props) => (props.height ? `translate3d(0px, ${props.height}px, 0px)` : "translate3d(0px, 150px, 0px)")};
     transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};    
-    overflow: unset;
-    bottom: 0;
   `}
 `
 

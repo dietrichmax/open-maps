@@ -47,7 +47,7 @@ const MapWrapper = ({ children, zoom, center }) => {
       style: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
       center: center,
       zoom: zoom,
-      //attributionControl: false
+      attributionControl: false
     })
     /*mapObject.addControl(new maplibregl.GeolocateControl({
       positionOptions: {
@@ -57,10 +57,11 @@ const MapWrapper = ({ children, zoom, center }) => {
       trackUserLocation: true,
       // Draw an arrow next to the location dot to indicate which direction the device is heading.
       showUserHeading: true
-      }), "bottom-right")
-    /*mapObject.addControl(new maplibregl.AttributionControl({
+      }), "bottom-right")*/
+    mapObject.addControl(new maplibregl.AttributionControl({
+      compact: true,
       customAttribution: '<a href="https://mxd.codes" title="mxd.codes" >mxd.codes</a>'
-      }));*/
+      }));
     setMap(mapObject)
     return () => {
       mapObject.remove()

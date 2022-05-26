@@ -23,7 +23,7 @@ const Container = styled.div`
   position: relative;
   top: var(--space-sm);
   left: var(--space-sm);
-  z-index: 3;
+  z-index: 4;
   border-radius: var(--border-radius);
   border-bottom-left-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
   border-bottom-right-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
