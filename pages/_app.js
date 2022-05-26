@@ -7,7 +7,7 @@ import { init } from "@socialgouv/matomo-next"
 import App from "next/app"
 import SEO from "@components/seo/seo"
 
-import 'maplibre-gl/dist/maplibre-gl.css';
+import "maplibre-gl/dist/maplibre-gl.css"
 
 class MyApp extends App {
   componentDidMount() {
@@ -49,7 +49,7 @@ class MyApp extends App {
           <meta property="og:site_name" content={config.siteTitle} />
           <meta property="og:url" content={config.siteUrl} />
           <meta property="og:image" content="/assets/map-marker-icon.png" />
-        </Head> 
+        </Head>
         <SEO />
         <Component {...pageProps} />
       </>

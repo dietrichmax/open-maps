@@ -17,21 +17,21 @@ import Details from "@components/details/details"
 import { Sidebar } from "@/components/sidebar"
 import MapContext from "@/components/map/mapContext"
 import { fetchPOST } from "@/components/utils/fetcher"
-import maplibregl from 'maplibre-gl';
+import maplibregl from "maplibre-gl"
 
 const Container = styled.div`
-  position: absolute;
+  position: relative;
   top: var(--space-sm);
   left: var(--space-sm);
   z-index: 3;
   border-radius: var(--border-radius);
-  border-bottom-left-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
-  border-bottom-right-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
+  border-bottom-left-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
+  border-bottom-right-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
   background-color: var(--body-bg);
   display: flex;
   align-items: center;
   width: 400px;
-  height: 55px;
+  height: 65px;
   box-shadow: var(--box-shadow);
   ${media.lessThan("432px")`
     top: 0px;
@@ -67,7 +67,7 @@ const AutoCompleteInputContainer = styled.div`
   display: flex;
   align-items: center;
   background-color: var(--border-color);
-  margin-right: var(--space-sm);
+  margin-right: 7.5px;
   border-radius: var(--border-radius);
   :focus {
     background-color: #fff;
@@ -77,6 +77,7 @@ const AutoCompleteInputContainer = styled.div`
 const AutoCompleteInput = styled(Input)`
   width: 100%;
   max-width: 350px;
+  height: 50px;
   background-color: var(--border-color);
 `
 
@@ -99,8 +100,8 @@ const ListContainer = styled.ol`
   background-color: var(--body-bg);
   box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   border-radius: var(--border-radius);
-  border-top-left-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
-  border-top-right-radius: ${(props) => props.showSuggestions ? 0 : "var(--border-radius)"};
+  border-top-left-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
+  border-top-right-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
   overflow: hidden;
   ${media.lessThan("400px")`
   border-radius: 0;
@@ -128,11 +129,9 @@ const Place = styled.p`
   font-weight: bold;
 `
 
-const Adress = styled.div`
-`
+const Adress = styled.div``
 
-const AdressDetails = styled.div`
-`
+const AdressDetails = styled.div``
 
 const AdressDetail = styled.p`
   display: inline-block;
@@ -202,6 +201,7 @@ function Autocomplete() {
     const zoom = map.getZoom().toFixed(2)
     const center = map.getCenter()
     const lonLat = [center.lng, center.lat]
+    //const layer = map.getLayers().getArray()[0].getProperties().name
 
     const urlTemp = window.location.hash
     const urlParams = urlTemp.replace("#", "").split(",")
@@ -211,17 +211,26 @@ function Autocomplete() {
       const osmId = geocodingResult.osm_id ? geocodingResult.osm_id : urlParams[3]
       const osmType = geocodingResult.osm_type ? geocodingResult.osm_type[0].toUpperCase() : urlParams[4]
       const placeName = name ? name.replaceAll(" ", "+") : urlParams[5]
-      //const layer = map.getLayers().getArray()[0].getProperties().name
-      if (urlParams.length > 3) {
-        setOsm_id(osmId)
-        setOsm_type(osmType)
-        setPlaceName(placeName.replaceAll("+", " "))
-      }
       window.location.hash = `${lonLat[1].toFixed(4)},${lonLat[0].toFixed(4)},${zoom},${osmId},${osmType},${placeName}`
     }
   }
 
+  const getHash = () => {
+    const urlTemp = window.location.hash
+    const urlParams = urlTemp.replace("#", "").split(",")
+    const osmId = geocodingResult.osm_id ? geocodingResult.osm_id : urlParams[3]
+    const osmType = geocodingResult.osm_type ? geocodingResult.osm_type[0].toUpperCase() : urlParams[4]
+    const placeName = name ? name.replaceAll(" ", "+") : urlParams[5]
+    if (urlParams.length > 3) {
+      setOsm_id(osmId)
+      setOsm_type(osmType)
+      setPlaceName(placeName.replaceAll("+", " "))
+    }
+  }
+
   if (map) {
+    map.on("load", getHash)
+
     map.on("moveend", updateHash)
   }
 
@@ -257,7 +266,6 @@ function Autocomplete() {
   useEffect(() => {
     !gotFirstData ? getFirstSuggestionResultsDelayed(lat, lon, searchQuery, suggestionLimit) : null
   }, [extent])
-
 
   const filterData = (data) => {
     let set = []
@@ -321,76 +329,68 @@ function Autocomplete() {
     )
   }
 
-  const image = new CircleStyle({
-    radius: 5,
-    fill: null,
-    stroke: new Stroke({ color: "#3f72af", width: 10 }),
-  })
-
-  const styles = {
-    Point: new Style({
-      image: image,
-    }),
-    MultiPolygon: new Style({
-      stroke: new Stroke({
-        color: "#3f72af",
-        width: 3,
-      }),
-    }),
-    Polygon: new Style({
-      stroke: new Stroke({
-        color: "#3f72af",
-        width: 3,
-      }),
-    }),
-  }
-
-  const styleFunction = function (feature) {
-    return styles[feature.getGeometry().getType()]
-  }
-
   useEffect(() => {
+    removeGeojson()
     setShowSuggestions(false)
     if (geocodingResult && geocodingResult.boundingbox) {
-      /*/removeGeojson()
-      new maplibregl.Marker({color: "#FF0000"})
-      .setLngLat([139.7525,35.6846])
-      .addTo(map)*/
-
-      console.log(geocodingResult)
-      const bbox = [geocodingResult.boundingbox[2], geocodingResult.boundingbox[0], geocodingResult.boundingbox[3], geocodingResult.boundingbox[1]];
-      map.fitBounds(bbox, {duration: 3000});
-      /*addGeojson(geocodingResult)*/
+      const bbox = [geocodingResult.boundingbox[2], geocodingResult.boundingbox[0], geocodingResult.boundingbox[3], geocodingResult.boundingbox[1]]
+      map.fitBounds(bbox, {
+        linear: true,
+        padding: { top: 100, bottom: 100, left: 100, right: 100 },
+      })
     }
     setShowSuggestions(false)
     if (map) {
-      //updateHash()
+      addGeojson(geocodingResult)
     }
   }, [geocodingResult])
 
   const addGeojson = (geocodingResult) => {
-    //console.log(geocodingResult.geojson)
-    const vectorSource = new VectorSource({
-      features: new GeoJSON().readFeatures(geocodingResult.geojson, { featureProjection: "EPSG:3857" }),
-    })
-
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
-      zIndex: 3,
-      style: styleFunction,
-      properties: {
-        name: "Geojson Layer",
-      },
-    })
-    map.addLayer(vectorLayer)
+    if (geocodingResult === undefined || null) return
+    if (!map.getSource("geojson_source")) {
+      map.addSource("geojson_source", {
+        type: "geojson",
+        data: geocodingResult.geojson,
+      })
+    }
+    if (!map.getLayer("geojson_layer")) {
+      map.addLayer({
+        id: "geojson_layer",
+        type: "fill",
+        source: "geojson_source",
+        layout: {},
+        paint: {
+          "line-color": "#3f72af",
+          "line-width": 3,
+        },
+      })
+    }
+    if (!map.getLayer("geojson_outline")) {
+      map.addLayer({
+        id: "geojson_outline",
+        type: "line",
+        source: "geojson_source",
+        layout: {},
+        paint: {
+          "line-color": "#3f72af",
+          "line-width": 3,
+        },
+      })
+    }
   }
 
   const removeGeojson = () => {
-    map.getLayers().forEach((layer) => {
-      if (layer.get("name") === "Geojson Layer") {
-        layer.getSource().clear()
-      }
-    })
+    // remove source
+    if (map && map.getLayer("geojson_layer")) {
+      map.removeLayer("geojson_layer")
+      console.log("layer")
+    }
+    if (map && map.getLayer("geojson_outline")) {
+      map.removeLayer("geojson_outline")
+    }
+    if (map && map.getSource("geojson_source")) {
+      map.removeSource("geojson_source")
+    }
   }
 
   const getFirstSuggestionResultsDelayed = useCallback(
@@ -437,7 +437,7 @@ function Autocomplete() {
       return
     } else {
       return suggestions.length ? (
-        <SuggestionsContainer >
+        <SuggestionsContainer>
           <ListContainer showSuggestions={showSuggestions} name="suggestions">
             {suggestions.map((suggestion, index) => {
               const searchTerm = `${
@@ -461,14 +461,14 @@ function Autocomplete() {
                 <ListItem key={index} onClick={() => selectResult(searchTerm, osmId, osmType, name)}>
                   <ButtonWrapper>{getSymbol(suggestion.properties.osm_value)}</ButtonWrapper>
                   <Adress>
-                  {suggestion.properties.name ? <Place>{`${suggestion.properties.name}`}</Place> : null}
-                  <AdressDetails>
-                  {suggestion.properties.street ? <AdressDetail>{`${suggestion.properties.street} `}</AdressDetail> : null}
-                  {suggestion.properties.housenumber ? <AdressDetail>{`${suggestion.properties.housenumber}`}</AdressDetail> : null}
-                  {suggestion.properties.city ? <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail> : null}
-                  {suggestion.properties.country ? <AdressDetail>{`${suggestion.properties.country}`}</AdressDetail> : null}
-                  {suggestion.properties.AdressDetail ? <AdressDetail>{suggestion.properties.AdressDetail}</AdressDetail> : null}
-                  </AdressDetails>
+                    {suggestion.properties.name ? <Place>{`${suggestion.properties.name}`}</Place> : null}
+                    <AdressDetails>
+                      {suggestion.properties.street ? <AdressDetail>{`${suggestion.properties.street} `}</AdressDetail> : null}
+                      {suggestion.properties.housenumber ? <AdressDetail>{`${suggestion.properties.housenumber}`}</AdressDetail> : null}
+                      {suggestion.properties.city ? <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail> : null}
+                      {suggestion.properties.country ? <AdressDetail>{`${suggestion.properties.country}`}</AdressDetail> : null}
+                      {suggestion.properties.AdressDetail ? <AdressDetail>{suggestion.properties.AdressDetail}</AdressDetail> : null}
+                    </AdressDetails>
                   </Adress>
                 </ListItem>
               )
@@ -483,7 +483,7 @@ function Autocomplete() {
     <>
       {visible ? <Sidebar visible={visible} /> : null}
       <>
-        <Container showSuggestions={showSuggestions} >
+        <Container showSuggestions={showSuggestions}>
           <SearchButtonWrapper onClick={() => handleVisability()}>
             <BurgerIcon />
           </SearchButtonWrapper>

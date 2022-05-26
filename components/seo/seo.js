@@ -2,7 +2,6 @@ import Head from "next/head"
 import { config } from "@config"
 
 const SEO = () => {
-
   return (
     <Head>
       {/* META TAGS */}
@@ -16,11 +15,7 @@ const SEO = () => {
       {/* OpenGraph tags */}
       <meta property="og:url" content={config.siteUrl} />
       <meta name="og:title" property="og:title" content={config.siteTitle} />
-      <meta
-        name="og:description"
-        property="og:description"
-        content={config.description}
-      />
+      <meta name="og:description" property="og:description" content={config.description} />
       <meta property="og:site_name" content={config.siteTitle} />
       <meta property="og:image" content={`${config.image}`} />
 

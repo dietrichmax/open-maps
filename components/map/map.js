@@ -5,7 +5,7 @@ import Map from "ol/Map"
 import { transform } from "ol/proj"
 import styled from "styled-components"
 import media from "styled-media-query"
-import maplibregl from 'maplibre-gl';
+import maplibregl from "maplibre-gl"
 
 const MapContainer = styled.div`
   position: relative;
@@ -17,7 +17,7 @@ const MapContainer = styled.div`
 `
 
 const MapWrapper = ({ children, zoom, center }) => {
-  const mapContainerRef = useRef();
+  const mapContainerRef = useRef()
   const [map, setMap] = useState(null)
   const [lon, setLon] = useState()
   const [lat, setLat] = useState()
@@ -35,31 +35,31 @@ const MapWrapper = ({ children, zoom, center }) => {
   useEffect(() => {
     if (map) {
       console.log([lon, lat])
-    map.setCenter([lon, lat])
-    map.setZoom(aZoom);
+      map.setCenter([lon, lat])
+      map.setZoom(aZoom)
     }
   }, [lat, lon, aZoom])
 
   // on component mount
   useEffect(() => {
     getHash()
-    const mapObject  = new maplibregl.Map({
+    const mapObject = new maplibregl.Map({
       container: mapContainerRef.current,
       style: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
       center: center,
       zoom: zoom,
-    });
-    mapObject.addControl(new maplibregl.NavigationControl(), 'top-right');
+    })
+    mapObject.addControl(new maplibregl.NavigationControl(), "top-right")
     setMap(mapObject)
     return () => {
-      mapObject.remove();
+      mapObject.remove()
     }
   }, [])
 
   // zoom change handler
   useEffect(() => {
     if (!map) return
-    map.setZoom(zoom);
+    map.setZoom(zoom)
   }, [zoom])
 
   // center change handler

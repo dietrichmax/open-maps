@@ -14,7 +14,7 @@ function Index() {
 
   //properties={stadiaGoogleHybridProps}
   return (
-    <Map center={center} zoom={zoom} style={{position:'absolute',width:'100%',height:'100%'}}>
+    <Map center={center} zoom={zoom} style={{ position: "absolute", width: "100%", height: "100%" }}>
       <Autocomplete />
       {/*<Layers>
             <OSMLayer />

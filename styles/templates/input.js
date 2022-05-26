@@ -8,7 +8,6 @@ const Input = styled.input`
   border-radius: var(--border-radius);
   width: 100%;
   color: var(--text-color);
-  height: 35px;
   border: none;
   :active {
     border: none;

@@ -16,8 +16,8 @@ const DetailsContainer = styled.div``
 
 const DetailsWrapper = styled.div`
   display: inline-block;
-  position: absolute;
-  top: 96px;
+  position: relative;
+  top: var(--space);
   left: 16px;
   bottom: 16px;
   z-index: 2;
@@ -29,6 +29,9 @@ const DetailsWrapper = styled.div`
   border-radius: var(--border-radius);
   padding-bottom: 1rem;
   overflow-x: hidden;
+  overflow: unset;
+  border-radius: var(--border-radius);
+  animation: appear 600ms forwards;
   ::-webkit-scrollbar {
     width: 10px;
   }
@@ -45,32 +48,31 @@ const DetailsWrapper = styled.div`
     background: var(--gray);
   }
   ${media.lessThan("432px")`  
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
     position: absolute;
     border-radius: 0;
-    top: 55px;
-    left: 0; 
-    overflow: unset;
+    top: auto;
+    left: 0;     
     width: 100%;
     height: 100%;
-    overflow: unset;
-    transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};
+    transform:  ${(props) => (props.height ? `translate3d(0px, ${props.height}px, 0px)` : "translate3d(0px, 150px, 0px)")};
+    transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};    
+    bottom: 0;
   `}
 `
 
 const ImageWrapper = styled.div`
   position: relative;
   display: block;
+  border-radius: var(--border-radius);
   width: var(--sidebar-width);
   height: 250px;
   width: 400px;
   ${media.lessThan("432px")`
-  height: 200px;
-  width: 100%;
-  order: 1;
-
-`}
+    order: 1;
+    min-height: 200px;
+  `}
 `
 
 const Header = styled.div`
@@ -92,6 +94,9 @@ const SubTitle = styled.h2`
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0;
+  line-height: 1.5rem;
 `
 
 const Type = styled.p`
@@ -133,9 +138,9 @@ const ActionsWrapper = styled(Button)`
     background: var(--body-bg);
   }
   ${media.lessThan("432px")`
-margin-left: 0;
-margin-bottom: 0;
-margin-right: var(--space-sm);
+    margin-left: 0;
+    margin-bottom: 0;
+    margin-right: var(--space-sm);
 `}
 `
 
@@ -152,25 +157,31 @@ const DirectionsButton = styled(Button)`
     opacity: 0.8;
   }
   ${media.lessThan("432px")`
-  margin-bottom: 1rem;
-  min-width: 100%;
+    margin-bottom: 1rem;
+    min-width: 100%;
 `}
 `
 
 const WikipediaData = styled.div`
   padding: 0 2rem 0 2rem;
+  background-color: #fff;
   order: 3;
 `
 
-const WikipediaDataContainer = styled.div``
+const WikipediaDataContainer = styled.div`
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.25rem;
+`
 
 const WikipediaCredit = styled.div`
-  margin-left: 2rem;
-  margin-right: 2rem;
-  margin-top: 1rem;
+  padding: 1rem 2rem 0 2rem;
+  background-color: #fff;
   order: 4;
 `
 const WikipediaLink = styled.a`
+  font-size: 0.875rem;
   border-bottom: 1px solid var(--secondary-color);
   :hover {
     border-bottom: none;
@@ -183,6 +194,8 @@ const InformationContainer = styled.div`
   align-items: center;
   border-top: 1px solid var(--border-color);
   order: 5;
+  background-color: #fff;
+  height: 100%;
 `
 
 const InformationIconWrapper = styled(Button)`
@@ -245,9 +258,11 @@ function Details({ result, name }) {
   const statusBarHeight = 55
   const draggableRange = {
     top: deviceHeight - statusBarHeight,
-    bottom: deviceHeight - statusBarHeight - 100,
+    bottom: deviceHeight - statusBarHeight - 110,
   }
   const transformTypes = ["transform", "-ms-transform", "-webkit-transform", "moz-transform", "-o-transform"]
+  const releaseEvents = ["mouseup", "touchend"]
+  const hotspotEvents = ["mousemove", "touchmove"]
   const elemRef = useRef()
   const dragProps = useRef()
 
@@ -261,15 +276,29 @@ function Details({ result, name }) {
       dragStartTop: top - offsetTop,
       dragStartY: clientY,
     }
-    window.addEventListener("mousemove", startDragging, false)
-    window.addEventListener("mouseup", stopDragging, false)
+    hotspotEvents.forEach(function (event) {
+      window.addEventListener(event, startDragging, false)
+    })
+    releaseEvents.forEach(function (event) {
+      window.addEventListener(event, stopDragging, false)
+    })
   }
 
   const startDragging = ({ clientY }) => {
     setIsControlled(true)
-    transformTypes.forEach((transform) => {
-      elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
-    })
+    if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY < 0) {
+      transformTypes.forEach((transform) => {
+        elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
+      })
+    } else if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > draggableRange.bottom) {
+      transformTypes.forEach((transform) => {
+        elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
+      })
+    } else {
+      transformTypes.forEach((transform) => {
+        elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
+      })
+    }
   }
 
   const stopDragging = ({ clientY }) => {
@@ -278,13 +307,21 @@ function Details({ result, name }) {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
       })
+      elemRef.current.style["overflow-y"] = "unset"
+      elemRef.current.style["overflow-x"] = "unset"
     } else {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
       })
+      elemRef.current.style["overflow-y"] = "auto"
+      elemRef.current.style["overflow-x"] = "inherit"
     }
-    window.removeEventListener("mousemove", startDragging, false)
-    window.removeEventListener("mouseup", stopDragging, false)
+    hotspotEvents.forEach(function (event) {
+      window.removeEventListener(event, startDragging, false)
+    })
+    releaseEvents.forEach(function (event) {
+      window.removeEventListener(event, stopDragging, false)
+    })
   }
 
   const resize = () => {
@@ -303,8 +340,6 @@ function Details({ result, name }) {
     }
     window.addEventListener("resize", resize)
   }, [])
-
-  useEffect(() => {}, [isMobile])
 
   useEffect(() => {
     setImage("")
@@ -335,14 +370,10 @@ function Details({ result, name }) {
     if (!result.summary || result.summary === 2) {
       return null
     }
-    let text = `${result.summary.substr(0, result.summary.indexOf(". "))}.`
-    if (text.length < 3) {
-      text = result.summary
-    }
     return (
       <WikipediaData>
         <SubTitle>Short Summary</SubTitle>
-        <WikipediaDataContainer>{text}</WikipediaDataContainer>
+        <WikipediaDataContainer>{result.summary}</WikipediaDataContainer>
       </WikipediaData>
     )
   }
@@ -363,12 +394,13 @@ function Details({ result, name }) {
     )
   }
 
+  console.log(isMobile)
   if (result.length === 0) {
     return null
   } else {
     return (
       /*<Attribution y={window.innerHeight}/>*/
-      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled}>
+      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
         {isMobile ? (
           <PanelDrawer>
             <PanelHandler />
@@ -426,70 +458,72 @@ function Details({ result, name }) {
             </WikipediaLink>{" "}
           </WikipediaCredit>
         ) : null}
-        <InformationContainer>
-          <SubTitle>Information</SubTitle>
-          {result.address ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaMapMarkerAlt title="Address details" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Address</InformationDetailsTitle>
-                <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-          {result.information.opening_hours ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaClock title="Opening hours" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Opening hours</InformationDetailsTitle>
-                <InformationDetailsValue>{result.information.opening_hours}</InformationDetailsValue>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-          {result.information.website ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaHome title="Website Link" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Website</InformationDetailsTitle>
-                <InformationWebsiteLink href={result.information.website} title={result.information.website} alt={`Link to website of ${result.display_name}`}>
-                  {result.information.website}
-                </InformationWebsiteLink>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-          {result.information.email ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaEnvelope />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
-                <InformationWebsiteLink title={result.information.email} alt={`Email address of ${result.name}`} href={`mailto:${result.information.email}`}>
-                  {result.information.email}
-                </InformationWebsiteLink>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-          {result.information.phone ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaPhone title="Phone number" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Phone</InformationDetailsTitle>
-                <InformationWebsiteLink title={result.information.phone} alt={`Phone number of ${result.name}`}>
-                  {result.information.phone}
-                </InformationWebsiteLink>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-        </InformationContainer>
+        {result.information || result.address ? (
+          <InformationContainer>
+            <SubTitle>Information</SubTitle>
+            {result.address ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaMapMarkerAlt title="Address details" />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>Address</InformationDetailsTitle>
+                  <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+            {result.information.opening_hours ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaClock title="Opening hours" />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>Opening hours</InformationDetailsTitle>
+                  <InformationDetailsValue>{result.information.opening_hours}</InformationDetailsValue>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+            {result.information.website ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaHome title="Website Link" />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>Website</InformationDetailsTitle>
+                  <InformationWebsiteLink href={result.information.website} title={result.information.website} alt={`Link to website of ${result.display_name}`}>
+                    {result.information.website}
+                  </InformationWebsiteLink>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+            {result.information.email ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaEnvelope />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
+                  <InformationWebsiteLink title={result.information.email} alt={`Email address of ${result.name}`} href={`mailto:${result.information.email}`}>
+                    {result.information.email}
+                  </InformationWebsiteLink>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+            {result.information.phone ? (
+              <InformationItem>
+                <InformationIconWrapper>
+                  <FaPhone title="Phone number" />
+                </InformationIconWrapper>
+                <InformationDetails>
+                  <InformationDetailsTitle>Phone</InformationDetailsTitle>
+                  <InformationWebsiteLink title={result.information.phone} alt={`Phone number of ${result.name}`}>
+                    {result.information.phone}
+                  </InformationWebsiteLink>
+                </InformationDetails>
+              </InformationItem>
+            ) : null}
+          </InformationContainer>
+        ) : null}
         {Object.keys(result.details).length > 0 ? (
           <InformationContainer>
             <SubTitle>Details</SubTitle>

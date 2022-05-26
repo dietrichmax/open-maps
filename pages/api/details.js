@@ -24,17 +24,19 @@ export default async function handler(req, res) {
     }
   }*/
 
-  const wikiLang = geocodingData[0] && geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
-  const wikipediaTitle = geocodingData[0] && geocodingData[0].extratags.wikipedia
-    ? geocodingData[0].extratags.wikipedia.replace(/^.+:/, "")
-    : geocodingData[0] && geocodingData[0].extratags["brand:wikipedia"]
-    ? geocodingData[0].extratags["brand:wikipedia"]
-    : null
+  const wikiLang =
+    geocodingData[0] && geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
+  const wikipediaTitle =
+    geocodingData[0] && geocodingData[0].extratags.wikipedia
+      ? geocodingData[0].extratags.wikipedia.replace(/^.+:/, "")
+      : geocodingData[0] && geocodingData[0].extratags["brand:wikipedia"]
+      ? geocodingData[0].extratags["brand:wikipedia"]
+      : null
   const wikipediaLink = wikipediaTitle ? `${wikiLang}:${wikipediaTitle}` : null
 
   if (wikipediaTitle) {
     const wikipediaData = await fetchGET(
-      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`
+      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=3&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`
     )
     if (wikipediaData) {
       summary = wikipediaData.query.pages[0].extract
