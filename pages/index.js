@@ -1,25 +1,26 @@
 import React, { useState, useEffect, useContext } from "react"
 import Map from "@/components/map"
 import Autocomplete from "@/components/search/autocomplete"
-import { fromLonLat } from "ol/proj"
-import { Layers } from "components/layers"
-import { OSMLayer } from "components/layers"
-import MapContext from "@/components/map/mapContext"
-import { XYZ } from "ol/source"
-import { TileLayer } from "components/layers"
-import { fetchGET } from "@components/utils/fetcher"
 
 function Index() {
-  const [center, setCenter] = useState([0,0])
+  const [center, setCenter] = useState()
   const [zoom, setZoom] = useState(0)
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(position) {
-        setCenter([position.coords.longitude, position.coords.latitude]);
-        setZoom(12)
-      });
-    } 
+
+
+
+  useEffect(() => {  
+    const urlTemp = window.location.hash
+    const urlParams = urlTemp.replace("#", "").split(",")
+    if (urlParams.length < 3) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          setCenter([position.coords.longitude, position.coords.latitude]);
+          setZoom(10)
+        });
+      } 
+    }
+    
   }, [])
 
 

@@ -243,9 +243,9 @@ function Autocomplete() {
     if (map) {
       const center = map.getCenter()
       setExtent(map.getBounds())
-      setLon(parseInt(center.lng))
-      setLat(parseInt(center.lat))
-      setZoom(parseInt(map.getZoom()))
+      setLon(center.lng)
+      setLat(center.lat)
+      setZoom(map.getZoom())
     }
   }
 

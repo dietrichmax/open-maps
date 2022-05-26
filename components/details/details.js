@@ -19,7 +19,6 @@ const DetailsWrapper = styled.div`
   position: relative;
   top: var(--space);
   left: 16px;
-  bottom: 16px;
   z-index: 2;
   max-height: calc(100vh - 64px);
   background-color: #fff;
@@ -27,9 +26,10 @@ const DetailsWrapper = styled.div`
   border: 0;
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
-  padding-bottom: 1rem;
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-sm);
   overflow-x: hidden;
-  overflow: unset;
+  overflow: auto;
   border-radius: var(--border-radius);
   animation: appear 600ms forwards;
   ::-webkit-scrollbar {
@@ -49,6 +49,7 @@ const DetailsWrapper = styled.div`
   }
   ${media.lessThan("432px")`  
     display: flex;
+    margin-bottom: 0;
     flex-direction: column;
     position: absolute;
     border-radius: 0;
