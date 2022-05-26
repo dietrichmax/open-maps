@@ -46,8 +46,8 @@ const DetailsWrapper = styled.div`
   border-radius: var(--border-radius);
   padding-bottom: var(--space-sm);
   margin-bottom: var(--space-sm);
-  overflow-x: hidden;
-  overflow: auto;
+  overflow-x: unset;
+  overflow-y: aunset;
   border-radius: var(--border-radius);
   animation: appear 600ms forwards;
   transform: translate3d(0px, 0px, 0px);
@@ -299,8 +299,6 @@ function Details({ result, name }) {
 
   const startDragging = (event) => {
     const y = isMobileDevice ? event.touches[0].clientY : event.clientY
-    elemRef.current.style["overflow-y"] = "unset"
-    elemRef.current.style["overflow-x"] = "unset"
     setIsControlled(true)
     if (dragProps.current.dragStartTop + y - dragProps.current.dragStartY < 0) {
       transformTypes.forEach((transform) => {
