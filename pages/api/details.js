@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 
   if (wikipediaTitle) {
     const wikipediaData = await fetchGET(
-      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=3&explaintext=1&continue=&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`
+      `https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext=1&exsentences=3&format=json&formatversion=2&format=json&titles=${wikipediaTitle}&origin=*`
     )
     if (wikipediaData) {
       summary = wikipediaData.query.pages[0].extract
