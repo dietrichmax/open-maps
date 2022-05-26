@@ -270,16 +270,9 @@ function Autocomplete() {
     let set = []
     if (data.features) {
       set = data.features.filter((hit) => {
-        if (
-          hit.properties.osm_value === "AdressDetail" ||
-          hit.properties.osm_value === "continent" ||
-          hit.properties.osm_value === "state" ||
-          hit.properties.osm_value === "municipality"
-        ) {
+        if (hit.properties.osm_value === "continent" || hit.properties.osm_value === "state" || hit.properties.osm_value === "municipality") {
           return false
         } else if (hit.properties.type === "county" || hit.properties.type === "country") {
-          return false
-        } else if (hit.properties.osm_key === "boundary") {
           return false
         }
         return true
@@ -465,6 +458,7 @@ function Autocomplete() {
                       {suggestion.properties.street ? <AdressDetail>{`${suggestion.properties.street} `}</AdressDetail> : null}
                       {suggestion.properties.housenumber ? <AdressDetail>{`${suggestion.properties.housenumber}`}</AdressDetail> : null}
                       {suggestion.properties.city ? <AdressDetail>{`${suggestion.properties.city}`}</AdressDetail> : null}
+                      {suggestion.properties.county ? <AdressDetail>{`${suggestion.properties.county}`}</AdressDetail> : null}
                       {suggestion.properties.country ? <AdressDetail>{`${suggestion.properties.country}`}</AdressDetail> : null}
                       {suggestion.properties.AdressDetail ? <AdressDetail>{suggestion.properties.AdressDetail}</AdressDetail> : null}
                     </AdressDetails>

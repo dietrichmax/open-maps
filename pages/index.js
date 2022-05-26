@@ -3,26 +3,21 @@ import Map from "@/components/map"
 import Autocomplete from "@/components/search/autocomplete"
 
 function Index() {
-  const [center, setCenter] = useState()
+  const [center, setCenter] = useState([14, 46])
   const [zoom, setZoom] = useState(0)
 
-
-
-
-  useEffect(() => {  
+  useEffect(() => {
     const urlTemp = window.location.hash
     const urlParams = urlTemp.replace("#", "").split(",")
     if (urlParams.length < 3) {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          setCenter([position.coords.longitude, position.coords.latitude]);
-          setZoom(10)
-        });
-      } 
+        navigator.geolocation.getCurrentPosition(function (position) {
+          setCenter([position.coords.longitude, position.coords.latitude])
+          setZoom(9)
+        })
+      }
     }
-    
   }, [])
-
 
   return (
     <Map center={center} zoom={zoom} style={{ position: "absolute", width: "100%", height: "100%" }}>

@@ -34,8 +34,8 @@ const MapWrapper = ({ children, zoom, center }) => {
 
   useEffect(() => {
     if (map) {
-      map.setCenter([lon, lat])
       map.setZoom(aZoom)
+      map.setCenter([lon, lat])
     }
   }, [lat, lon, aZoom])
 

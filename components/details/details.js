@@ -15,12 +15,12 @@ const md5 = require("md5")
 const DetailsContainer = styled.div``
 
 const DetailsWrapper = styled.div`
-  display: inline-block;
+  display: block;
   position: relative;
   top: var(--space);
   left: 16px;
   z-index: 2;
-  max-height: calc(100vh - 64px);
+  max-height: calc(100vh - (65px + 3 * 16px));
   background-color: #fff;
   width: var(--sidebar-width);
   border: 0;
@@ -32,6 +32,7 @@ const DetailsWrapper = styled.div`
   overflow: auto;
   border-radius: var(--border-radius);
   animation: appear 600ms forwards;
+  transform: translate3d(0px, 0px, 0px)
   ::-webkit-scrollbar {
     width: 10px;
   }
@@ -56,9 +57,10 @@ const DetailsWrapper = styled.div`
     top: auto;
     left: 0;     
     width: 100%;
-    height: 100%;
+    max-height: calc(100vh - 64px);
     transform:  ${(props) => (props.height ? `translate3d(0px, ${props.height}px, 0px)` : "translate3d(0px, 150px, 0px)")};
     transition: ${(props) => (!props.isControlled ? `0.5s` : `none`)};    
+    overflow: unset;
     bottom: 0;
   `}
 `
@@ -67,10 +69,16 @@ const ImageWrapper = styled.div`
   position: relative;
   display: block;
   border-radius: var(--border-radius);
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
   width: var(--sidebar-width);
   height: 250px;
   width: 400px;
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
   ${media.lessThan("432px")`
+    border-radius: 0;
     order: 1;
     min-height: 200px;
   `}
@@ -262,8 +270,8 @@ function Details({ result, name }) {
     bottom: deviceHeight - statusBarHeight - 110,
   }
   const transformTypes = ["transform", "-ms-transform", "-webkit-transform", "moz-transform", "-o-transform"]
-  const releaseEvents =  ["mouseup", "touchend"]
-  const hotspotEvents =  ["mousemove", "touchmove", "touchstart"]
+  const releaseEvents = ["mouseup", "touchend"]
+  const hotspotEvents = ["mousemove", "touchmove", "touchstart"]
   const elemRef = useRef()
   const dragProps = useRef()
 
@@ -277,30 +285,29 @@ function Details({ result, name }) {
       dragStartTop: top - offsetTop,
       dragStartY: clientY,
     }
-    hotspotEvents.forEach(function(event) {
+    hotspotEvents.forEach(function (event) {
       window.addEventListener(event, startDragging, false)
     })
-    releaseEvents.forEach(function(event) {
+    releaseEvents.forEach(function (event) {
       window.addEventListener(event, stopDragging, false)
     })
   }
 
   const startDragging = ({ clientY }) => {
     setIsControlled(true)
-      if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY < 0 ) {
-        transformTypes.forEach((transform) => {
+    if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY < 0) {
+      transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
       })
-      } else if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > draggableRange.bottom) {
-        transformTypes.forEach((transform) => {
+    } else if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > draggableRange.bottom) {
+      transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
       })
-      } else {
-        transformTypes.forEach((transform) => {
-      elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
-    })
+    } else {
+      transformTypes.forEach((transform) => {
+        elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
+      })
     }
-    
   }
 
   const stopDragging = ({ clientY }) => {
@@ -309,19 +316,19 @@ function Details({ result, name }) {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
       })
-      elemRef.current.style["overflow-y"] = "unset";
-      elemRef.current.style["overflow-x"] = "unset";
+      elemRef.current.style["overflow-y"] = "unset"
+      elemRef.current.style["overflow-x"] = "unset"
     } else {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
       })
-      elemRef.current.style["overflow-y"] = "auto";
-      elemRef.current.style["overflow-x"] = "inherit";
+      elemRef.current.style["overflow-y"] = "auto"
+      elemRef.current.style["overflow-x"] = "inherit"
     }
-    hotspotEvents.forEach(function(event) {
+    hotspotEvents.forEach(function (event) {
       window.removeEventListener(event, startDragging, false)
     })
-    releaseEvents.forEach(function(event) {
+    releaseEvents.forEach(function (event) {
       window.removeEventListener(event, stopDragging, false)
     })
   }
@@ -400,193 +407,194 @@ function Details({ result, name }) {
     return null
   } else {
     return (
-      /*<Attribution y={window.innerHeight}/>*/
-      <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
-        {isMobile ? (
-          <PanelDrawer>
-            <PanelHandler />
-          </PanelDrawer>
-        ) : null}
-        <ImageWrapper>
-          {image ? (
-            <Image
-              src={image}
-              layout="fill"
+      <DetailsContainer>
+        <DetailsWrapper onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
+          {isMobile ? (
+            <PanelDrawer>
+              <PanelHandler />
+            </PanelDrawer>
+          ) : null}
+          <ImageWrapper>
+            {image ? (
+              <Image
+                src={image}
+                layout="fill"
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                href={image}
+                objectFit="cover"
+                objectPosition="top"
+                alt={`Image of ${result.display_name}`}
+                title={`Image of ${result.display_name}`}
+                priority={true}
+              />
+            ) : null}
+          </ImageWrapper>
+          <Header>
+            {name ? <Title>{name}</Title> : null}
+            {result.type ? <Type>{capitalizeFirstLetter(result.type)}</Type> : null}
+          </Header>
+          <Rating result={result} />
+          <Actions>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&origin=&destination=${encodeURI(result.display_name)}&travelmode=driving`} //&dir_action=navigate
               target="_blank"
-              rel="nofollow noopener noreferrer"
-              href={image}
-              objectFit="cover"
-              objectPosition="top"
-              alt={`Image of ${result.display_name}`}
-              title={`Image of ${result.display_name}`}
-              priority={true}
-            />
-          ) : null}
-        </ImageWrapper>
-        <Header>
-          {name ? <Title>{name}</Title> : null}
-          {result.type ? <Type>{capitalizeFirstLetter(result.type)}</Type> : null}
-        </Header>
-        <Rating result={result} />
-        <Actions>
-          <a
-            href={`https://www.google.com/maps/dir/?api=1&origin=&destination=${encodeURI(result.display_name)}&travelmode=driving`} //&dir_action=navigate
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <DirectionsButton title="Get directions to this place">
-              <FaRoute style={{ marginRight: ".5rem" }} />
-              Directions
-            </DirectionsButton>
-          </a>
-          <ActionsResponsiveContainer>
-            <ActionsWrapper title="Save this place">
-              <FaBookmark />
-            </ActionsWrapper>
-            <ActionsWrapper title="Share this place">
-              <BsShareFill />
-            </ActionsWrapper>
-          </ActionsResponsiveContainer>
-        </Actions>
-        {renderWikidata(result)}
-        {result.wikipediaLink ? (
-          <WikipediaCredit>
-            <WikipediaLink
-              title={`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
-              href={`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
+              rel="noopener noreferrer"
             >
-              {`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
-            </WikipediaLink>{" "}
-          </WikipediaCredit>
-        ) : null}
-        {result.information || result.address ? (
-        <InformationContainer>
-          <SubTitle>Information</SubTitle>
-          {result.address ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaMapMarkerAlt title="Address details" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Address</InformationDetailsTitle>
-                <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
-              </InformationDetails>
-            </InformationItem>
+              <DirectionsButton title="Get directions to this place">
+                <FaRoute style={{ marginRight: ".5rem" }} />
+                Directions
+              </DirectionsButton>
+            </a>
+            <ActionsResponsiveContainer>
+              <ActionsWrapper title="Save this place">
+                <FaBookmark />
+              </ActionsWrapper>
+              <ActionsWrapper title="Share this place">
+                <BsShareFill />
+              </ActionsWrapper>
+            </ActionsResponsiveContainer>
+          </Actions>
+          {renderWikidata(result)}
+          {result.wikipediaLink ? (
+            <WikipediaCredit>
+              <WikipediaLink
+                title={`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
+                href={`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
+              >
+                {`https://${result.wikipediaLang}.wikipedia.org/wiki/${result.wikipediaLink}`}
+              </WikipediaLink>{" "}
+            </WikipediaCredit>
           ) : null}
-          {result.information.opening_hours ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaClock title="Opening hours" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Opening hours</InformationDetailsTitle>
-                <InformationDetailsValue>{result.information.opening_hours}</InformationDetailsValue>
-              </InformationDetails>
-            </InformationItem>
+          {result.information || result.address ? (
+            <InformationContainer>
+              <SubTitle>Information</SubTitle>
+              {result.address ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaMapMarkerAlt title="Address details" />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Address</InformationDetailsTitle>
+                    <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.information.opening_hours ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaClock title="Opening hours" />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Opening hours</InformationDetailsTitle>
+                    <InformationDetailsValue>{result.information.opening_hours}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.information.website ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaHome title="Website Link" />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Website</InformationDetailsTitle>
+                    <InformationWebsiteLink href={result.information.website} title={result.information.website} alt={`Link to website of ${result.display_name}`}>
+                      {result.information.website}
+                    </InformationWebsiteLink>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.information.email ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaEnvelope />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
+                    <InformationWebsiteLink title={result.information.email} alt={`Email address of ${result.name}`} href={`mailto:${result.information.email}`}>
+                      {result.information.email}
+                    </InformationWebsiteLink>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.information.phone ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaPhone title="Phone number" />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Phone</InformationDetailsTitle>
+                    <InformationWebsiteLink title={result.information.phone} alt={`Phone number of ${result.name}`}>
+                      {result.information.phone}
+                    </InformationWebsiteLink>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+            </InformationContainer>
           ) : null}
-          {result.information.website ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaHome title="Website Link" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Website</InformationDetailsTitle>
-                <InformationWebsiteLink href={result.information.website} title={result.information.website} alt={`Link to website of ${result.display_name}`}>
-                  {result.information.website}
-                </InformationWebsiteLink>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-          {result.information.email ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaEnvelope />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
-                <InformationWebsiteLink title={result.information.email} alt={`Email address of ${result.name}`} href={`mailto:${result.information.email}`}>
-                  {result.information.email}
-                </InformationWebsiteLink>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-          {result.information.phone ? (
-            <InformationItem>
-              <InformationIconWrapper>
-                <FaPhone title="Phone number" />
-              </InformationIconWrapper>
-              <InformationDetails>
-                <InformationDetailsTitle>Phone</InformationDetailsTitle>
-                <InformationWebsiteLink title={result.information.phone} alt={`Phone number of ${result.name}`}>
-                  {result.information.phone}
-                </InformationWebsiteLink>
-              </InformationDetails>
-            </InformationItem>
-          ) : null}
-        </InformationContainer>
-        ) : null }
-        {Object.keys(result.details).length > 0 ? (
-          <InformationContainer>
-            <SubTitle>Details</SubTitle>
-            {result.details.wheelchair ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaAccessibleIcon />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Wheelchair accessible</InformationDetailsTitle>
+          {Object.keys(result.details).length > 0 ? (
+            <InformationContainer>
+              <SubTitle>Details</SubTitle>
+              {result.details.wheelchair ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaAccessibleIcon />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Wheelchair accessible</InformationDetailsTitle>
 
-                  <InformationDetailsValue>{result.details.wheelchair}</InformationDetailsValue>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.details.takeaway ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaBicycle />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Takeaway</InformationDetailsTitle>
-                  <InformationDetailsValue>{result.details.takeaway}</InformationDetailsValue>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.details.cuisine ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaHamburger />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Cuisine</InformationDetailsTitle>
-                  <InformationDetailsValue>{result.details.cuisine.replaceAll("_", " ")}</InformationDetailsValue>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.details.outdoor_seating ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaUmbrellaBeach />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Outdoor seating</InformationDetailsTitle>
-                  <InformationDetailsValue>{result.details.outdoor_seating}</InformationDetailsValue>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.details.internet_access ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaWifi />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Internet access</InformationDetailsTitle>
-                  <InformationDetailsValue>{result.details.internet_access}</InformationDetailsValue>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-          </InformationContainer>
-        ) : null}
-      </DetailsWrapper>
+                    <InformationDetailsValue>{result.details.wheelchair}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.details.takeaway ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaBicycle />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Takeaway</InformationDetailsTitle>
+                    <InformationDetailsValue>{result.details.takeaway}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.details.cuisine ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaHamburger />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Cuisine</InformationDetailsTitle>
+                    <InformationDetailsValue>{result.details.cuisine.replaceAll("_", " ")}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.details.outdoor_seating ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaUmbrellaBeach />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Outdoor seating</InformationDetailsTitle>
+                    <InformationDetailsValue>{result.details.outdoor_seating}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+              {result.details.internet_access ? (
+                <InformationItem>
+                  <InformationIconWrapper>
+                    <FaWifi />
+                  </InformationIconWrapper>
+                  <InformationDetails>
+                    <InformationDetailsTitle>Internet access</InformationDetailsTitle>
+                    <InformationDetailsValue>{result.details.internet_access}</InformationDetailsValue>
+                  </InformationDetails>
+                </InformationItem>
+              ) : null}
+            </InformationContainer>
+          ) : null}
+        </DetailsWrapper>
+      </DetailsContainer>
     )
   }
 }
