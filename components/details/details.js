@@ -409,7 +409,7 @@ function Details({ result, name }) {
   } else {
     return (
       <DetailsContainer>
-        <DetailsWrapper ontouchstart={initialiseDrag} onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
+        <DetailsWrapper onTouchStart={initialiseDrag} onMouseDown={initialiseDrag} ref={elemRef} isControlled={isControlled} height={draggableRange.bottom}>
           {isMobileSize ? (
             <PanelDrawer>
               <PanelHandler />
