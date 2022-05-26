@@ -6,6 +6,7 @@ function Index() {
   const [center, setCenter] = useState([14, 46])
   const [zoom, setZoom] = useState(0)
 
+
   useEffect(() => {
     const urlTemp = window.location.hash
     const urlParams = urlTemp.replace("#", "").split(",")
@@ -17,6 +18,16 @@ function Index() {
         })
       }
     }
+    if ( 'AmbientLightSensor' in window ) {
+      const sensor = new AmbientLightSensor();
+      sensor.addEventListener('reading', event => {
+        alert('Current light level:', sensor.illuminance);
+      });
+      sensor.addEventListener('error', event => {
+        alert(event.error.name, event.error.message);
+      });
+      sensor.start();
+    } 
   }, [])
 
   return (
