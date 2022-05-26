@@ -27,7 +27,7 @@ const Container = styled.div`
   border-radius: var(--border-radius);
   border-bottom-left-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
   border-bottom-right-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
-  background-color: var(--body-bg);
+  background-color: var(--content-bg);
   display: flex;
   align-items: center;
   width: 400px;
@@ -54,6 +54,7 @@ const SearchAction = styled.div`
   font-size: 18px;
   padding: 1rem;
   padding-right: 1.25rem;
+  background-color: var(--content-bg);
 `
 
 const AutoCompleteContainer = styled.div`
@@ -66,11 +67,11 @@ const AutoCompleteContainer = styled.div`
 const AutoCompleteInputContainer = styled.div`
   display: flex;
   align-items: center;
-  background-color: var(--border-color);
+  background-color: var(--content-bg);
   margin-right: 7.5px;
   border-radius: var(--border-radius);
   :focus {
-    background-color: #fff;
+    background-color: var(--body-bg);
   }
 `
 
@@ -78,7 +79,7 @@ const AutoCompleteInput = styled(Input)`
   width: 100%;
   max-width: 350px;
   height: 50px;
-  background-color: var(--border-color);
+  background-color: var(--content-bg);
 `
 
 const SuggestionsContainer = styled.div`
@@ -146,7 +147,7 @@ const SearchButtonWrapper = styled.div`
   align-items: center;
   padding: 0;
   border: none;
-  background: var(--body-bg);
+  background: var(--content-bg);
   padding: 1rem;
   border-bottom-left-radius: var(--border-radius);
   border-top-left-radius: var(--border-radius);
@@ -160,6 +161,7 @@ const ButtonWrapper = styled.div`
 
 const DeleteSearchButtonWrapper = styled.div`
   display: flex;
+  background-color: var(--content-bg);
 `
 
 const CloseButton = styled(ImCross)`

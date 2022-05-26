@@ -12,16 +12,34 @@ import Rating from "@components/details/rating/rating"
 //mport SlidingUpPanel from 'rn-sliding-up-panel';
 const md5 = require("md5")
 
-const DetailsContainer = styled.div``
+const DetailsContainer = styled.div`
+
+
+`
 
 const DetailsWrapper = styled.div`
+
+::-webkit-scrollbar {
+width: 11px;
+}
+scrollbar-width: thin;
+scrollbar-color: var(--content-bg);
+}
+::-webkit-scrollbar-track {
+background: var(--body-bg);
+}
+::-webkit-scrollbar-thumb {
+background-color: var(--gray);
+border-radius: var(--border-radius);
+}
+
   display: block;
   position: relative;
   top: var(--space);
   left: 16px;
-  z-index: 3;
+  z-index: 2;
   max-height: calc(100vh - (65px + 3 * 16px));
-  background-color: #fff;
+  background-color:var(--body-bg);
   width: var(--sidebar-width);
   border: 0;
   box-shadow: var(--box-shadow);
@@ -33,21 +51,6 @@ const DetailsWrapper = styled.div`
   border-radius: var(--border-radius);
   animation: appear 600ms forwards;
   transform: translate3d(0px, 0px, 0px)
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--body-bg);
-  }
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: var(--gray);
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--gray);
-  }
   ${media.lessThan("432px")`  
     display: flex;
     margin-bottom: 0;
@@ -173,7 +176,7 @@ const DirectionsButton = styled(Button)`
 
 const WikipediaData = styled.div`
   padding: 0 2rem 0 2rem;
-  background-color: #fff;
+  background-color:var(--body-bg);
   order: 3;
 `
 
@@ -186,7 +189,7 @@ const WikipediaDataContainer = styled.div`
 
 const WikipediaCredit = styled.div`
   padding: 1rem 2rem 0 2rem;
-  background-color: #fff;
+  background-color:var(--body-bg);
   order: 4;
 `
 const WikipediaLink = styled.a`
@@ -203,7 +206,7 @@ const InformationContainer = styled.div`
   align-items: center;
   border-top: 1px solid var(--border-color);
   order: 5;
-  background-color: #fff;
+  background-color:var(--body-bg);
   height: 100%;
 `
 
@@ -315,7 +318,7 @@ function Details({ result, name }) {
   const stopDragging = (event) => {
     const y = isMobileDevice ? event.changedTouches[0].clientY : event.clientY
     setIsControlled(false)
-    if (dragProps.current.dragStartTop + y - dragProps.current.dragStartY > 400) {
+    if (dragProps.current.dragStartTop + y - dragProps.current.dragStartY > 350) {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
       })

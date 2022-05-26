@@ -1,12 +1,13 @@
 import { useEffect } from "react"
-import "@/styles/globals.css"
-import "@/public/fonts/Quicksand/style.css"
 import { config } from "config"
 import Head from "next/head"
 import { init } from "@socialgouv/matomo-next"
 import App from "next/app"
 import SEO from "@components/seo/seo"
+import Providers from "@/components/utils/providers"
+import GlobalStyle from "@/styles/global.js"
 
+import "@/public/fonts/Quicksand/style.css"
 import "maplibre-gl/dist/maplibre-gl.css"
 
 class MyApp extends App {
@@ -51,7 +52,10 @@ class MyApp extends App {
           <meta property="og:image" content="/assets/map-marker-icon.png" />
         </Head>
         <SEO />
-        <Component {...pageProps} />
+        <Providers>
+          <GlobalStyle />
+          <Component {...pageProps} />
+        </Providers>
       </>
     )
   }
