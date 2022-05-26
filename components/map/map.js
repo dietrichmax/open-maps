@@ -48,6 +48,7 @@ const MapWrapper = ({ children, zoom, center }) => {
       style: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
       center: center,
       zoom: zoom,
+      zoomControl: false
     })
     mapObject.addControl(new maplibregl.NavigationControl(), "top-right")
     setMap(mapObject)

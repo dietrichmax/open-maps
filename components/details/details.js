@@ -261,8 +261,8 @@ function Details({ result, name }) {
     bottom: deviceHeight - statusBarHeight - 110,
   }
   const transformTypes = ["transform", "-ms-transform", "-webkit-transform", "moz-transform", "-o-transform"]
-  const releaseEvents = ["mouseup", "touchend"]
-  const hotspotEvents = ["mousemove", "touchmove"]
+  const releaseEvents =  ["mouseup", "touchend"]
+  const hotspotEvents =  ["mousemove", "touchmove", "touchstart"]
   const elemRef = useRef()
   const dragProps = useRef()
 
@@ -276,29 +276,30 @@ function Details({ result, name }) {
       dragStartTop: top - offsetTop,
       dragStartY: clientY,
     }
-    hotspotEvents.forEach(function (event) {
+    hotspotEvents.forEach(function(event) {
       window.addEventListener(event, startDragging, false)
     })
-    releaseEvents.forEach(function (event) {
+    releaseEvents.forEach(function(event) {
       window.addEventListener(event, stopDragging, false)
     })
   }
 
   const startDragging = ({ clientY }) => {
     setIsControlled(true)
-    if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY < 0) {
-      transformTypes.forEach((transform) => {
+      if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY < 0 ) {
+        transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
       })
-    } else if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > draggableRange.bottom) {
-      transformTypes.forEach((transform) => {
+      } else if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > draggableRange.bottom) {
+        transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
       })
-    } else {
-      transformTypes.forEach((transform) => {
-        elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
-      })
+      } else {
+        transformTypes.forEach((transform) => {
+      elemRef.current.style[transform] = `translate3d(0px, ${dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY}px, 0px)`
+    })
     }
+    
   }
 
   const stopDragging = ({ clientY }) => {
@@ -307,19 +308,19 @@ function Details({ result, name }) {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, ${draggableRange.bottom}px, 0px)`
       })
-      elemRef.current.style["overflow-y"] = "unset"
-      elemRef.current.style["overflow-x"] = "unset"
+      elemRef.current.style["overflow-y"] = "unset";
+      elemRef.current.style["overflow-x"] = "unset";
     } else {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
       })
-      elemRef.current.style["overflow-y"] = "auto"
-      elemRef.current.style["overflow-x"] = "inherit"
+      elemRef.current.style["overflow-y"] = "auto";
+      elemRef.current.style["overflow-x"] = "inherit";
     }
-    hotspotEvents.forEach(function (event) {
+    hotspotEvents.forEach(function(event) {
       window.removeEventListener(event, startDragging, false)
     })
-    releaseEvents.forEach(function (event) {
+    releaseEvents.forEach(function(event) {
       window.removeEventListener(event, stopDragging, false)
     })
   }
@@ -394,7 +395,6 @@ function Details({ result, name }) {
     )
   }
 
-  console.log(isMobile)
   if (result.length === 0) {
     return null
   } else {
@@ -459,71 +459,71 @@ function Details({ result, name }) {
           </WikipediaCredit>
         ) : null}
         {result.information || result.address ? (
-          <InformationContainer>
-            <SubTitle>Information</SubTitle>
-            {result.address ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaMapMarkerAlt title="Address details" />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Address</InformationDetailsTitle>
-                  <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.information.opening_hours ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaClock title="Opening hours" />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Opening hours</InformationDetailsTitle>
-                  <InformationDetailsValue>{result.information.opening_hours}</InformationDetailsValue>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.information.website ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaHome title="Website Link" />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Website</InformationDetailsTitle>
-                  <InformationWebsiteLink href={result.information.website} title={result.information.website} alt={`Link to website of ${result.display_name}`}>
-                    {result.information.website}
-                  </InformationWebsiteLink>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.information.email ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaEnvelope />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
-                  <InformationWebsiteLink title={result.information.email} alt={`Email address of ${result.name}`} href={`mailto:${result.information.email}`}>
-                    {result.information.email}
-                  </InformationWebsiteLink>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-            {result.information.phone ? (
-              <InformationItem>
-                <InformationIconWrapper>
-                  <FaPhone title="Phone number" />
-                </InformationIconWrapper>
-                <InformationDetails>
-                  <InformationDetailsTitle>Phone</InformationDetailsTitle>
-                  <InformationWebsiteLink title={result.information.phone} alt={`Phone number of ${result.name}`}>
-                    {result.information.phone}
-                  </InformationWebsiteLink>
-                </InformationDetails>
-              </InformationItem>
-            ) : null}
-          </InformationContainer>
-        ) : null}
+        <InformationContainer>
+          <SubTitle>Information</SubTitle>
+          {result.address ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaMapMarkerAlt title="Address details" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Address</InformationDetailsTitle>
+                <InformationDetailsValue>{renderAdress(result)}</InformationDetailsValue>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
+          {result.information.opening_hours ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaClock title="Opening hours" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Opening hours</InformationDetailsTitle>
+                <InformationDetailsValue>{result.information.opening_hours}</InformationDetailsValue>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
+          {result.information.website ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaHome title="Website Link" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Website</InformationDetailsTitle>
+                <InformationWebsiteLink href={result.information.website} title={result.information.website} alt={`Link to website of ${result.display_name}`}>
+                  {result.information.website}
+                </InformationWebsiteLink>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
+          {result.information.email ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaEnvelope />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>E-Mail</InformationDetailsTitle>
+                <InformationWebsiteLink title={result.information.email} alt={`Email address of ${result.name}`} href={`mailto:${result.information.email}`}>
+                  {result.information.email}
+                </InformationWebsiteLink>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
+          {result.information.phone ? (
+            <InformationItem>
+              <InformationIconWrapper>
+                <FaPhone title="Phone number" />
+              </InformationIconWrapper>
+              <InformationDetails>
+                <InformationDetailsTitle>Phone</InformationDetailsTitle>
+                <InformationWebsiteLink title={result.information.phone} alt={`Phone number of ${result.name}`}>
+                  {result.information.phone}
+                </InformationWebsiteLink>
+              </InformationDetails>
+            </InformationItem>
+          ) : null}
+        </InformationContainer>
+        ) : null }
         {Object.keys(result.details).length > 0 ? (
           <InformationContainer>
             <SubTitle>Details</SubTitle>
