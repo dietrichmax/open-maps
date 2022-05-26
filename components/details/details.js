@@ -277,7 +277,14 @@ function Details({ result, name }) {
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
-    const clientY = isMobileDevice ? event.clientY : event.touches[0].clientY
+    let clientY
+    if(event.type == 'touchstart' || event.type == 'touchmove' || event.type == 'touchend' || event.type == 'touchcancel'){
+      var touch = event.touches[0] || event.changedTouches[0];
+      clientY = touch.pageY;
+  } else if (event.type == 'mousedown' || event.type == 'mouseup' || event.type == 'mousemove' || event.type == 'mouseover'|| event.type=='mouseout' || event.type=='mouseenter' || event.type=='mouseleave') {
+    clientY = event.clientY;
+  }
+
     const target = event.target
     const { offsetTop } = target
     const { top } = elemRef.current.getBoundingClientRect()
@@ -294,8 +301,8 @@ function Details({ result, name }) {
     })
   }
 
-  const startDragging = () => {
-    const clientY = isMobileDevice ? event.clientY : event.touches[0].clientY
+  const startDragging = ({clientY}) => {
+    console.log(clientY)
     setIsControlled(true)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY < 0) {
       transformTypes.forEach((transform) => {
@@ -312,8 +319,7 @@ function Details({ result, name }) {
     }
   }
 
-  const stopDragging = () => {
-    const clientY = isMobileDevice ? event.clientY : event.touches[0].clientY
+  const stopDragging = ({ clientY }) => {
     setIsControlled(false)
     if (dragProps.current.dragStartTop + clientY - dragProps.current.dragStartY > 400) {
       transformTypes.forEach((transform) => {
@@ -339,6 +345,7 @@ function Details({ result, name }) {
   const resize = () => {
     setDeviceHeight(window.innerHeight)
     if (window.innerWidth <= 432) {
+      setIsMobileDevice(true)
       setIsMobileSize(true)
     } else {
       setIsMobileSize(false)
