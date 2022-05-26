@@ -34,7 +34,6 @@ const MapWrapper = ({ children, zoom, center }) => {
 
   useEffect(() => {
     if (map) {
-      console.log([lon, lat])
       map.setCenter([lon, lat])
       map.setZoom(aZoom)
     }
@@ -48,9 +47,20 @@ const MapWrapper = ({ children, zoom, center }) => {
       style: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
       center: center,
       zoom: zoom,
-      zoomControl: false
+      //attributionControl: false
     })
-    mapObject.addControl(new maplibregl.NavigationControl(), "top-right")
+    /*mapObject.addControl(new maplibregl.GeolocateControl({
+      positionOptions: {
+      enableHighAccuracy: true
+      },
+      // When active the map will receive updates to the device's location as it changes.
+      trackUserLocation: true,
+      // Draw an arrow next to the location dot to indicate which direction the device is heading.
+      showUserHeading: true
+      }), "bottom-right")
+    /*mapObject.addControl(new maplibregl.AttributionControl({
+      customAttribution: '<a href="https://mxd.codes" title="mxd.codes" >mxd.codes</a>'
+      }));*/
     setMap(mapObject)
     return () => {
       mapObject.remove()

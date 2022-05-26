@@ -7,12 +7,22 @@ import { OSMLayer } from "components/layers"
 import MapContext from "@/components/map/mapContext"
 import { XYZ } from "ol/source"
 import { TileLayer } from "components/layers"
+import { fetchGET } from "@components/utils/fetcher"
 
 function Index() {
-  const [center, setCenter] = useState([14, 46])
-  const [zoom, setZoom] = useState(5)
+  const [center, setCenter] = useState([0,0])
+  const [zoom, setZoom] = useState(0)
 
-  //properties={stadiaGoogleHybridProps}
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        setCenter([position.coords.longitude, position.coords.latitude]);
+        setZoom(12)
+      });
+    } 
+  }, [])
+
+
   return (
     <Map center={center} zoom={zoom} style={{ position: "absolute", width: "100%", height: "100%" }}>
       <Autocomplete />

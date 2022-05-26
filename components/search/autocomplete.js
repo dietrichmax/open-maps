@@ -230,7 +230,6 @@ function Autocomplete() {
 
   if (map) {
     map.on("load", getHash)
-
     map.on("moveend", updateHash)
   }
 
