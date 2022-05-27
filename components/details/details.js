@@ -299,6 +299,8 @@ function Details({ result, name }) {
   const startDragging = (event) => {
     const y = isMobileDevice ? event.touches[0].clientY : event.clientY
     setIsControlled(true)
+    elemRef.current.style["overflow-y"] = "unset"
+    elemRef.current.style["overflow-x"] = "unset"
     if (dragProps.current.dragStartTop + y - dragProps.current.dragStartY < 0) {
       transformTypes.forEach((transform) => {
         elemRef.current.style[transform] = `translate3d(0px, 0px, 0px)`
