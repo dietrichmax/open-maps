@@ -44,7 +44,7 @@ const MapWrapper = ({ children, zoom, center }) => {
     getHash()
     const mapObject = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: `https://api.maptiler.com/maps/openstreetmap/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+      style: `/assets/osm_liberty.json`,
       center: center,
       zoom: zoom,
       attributionControl: false

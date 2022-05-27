@@ -13,8 +13,9 @@ import Rating from "@components/details/rating/rating"
 const md5 = require("md5")
 
 const DetailsContainer = styled.div`
-
-
+  ${media.lessThan("432px")`
+    height: calc(100vh - 65px);
+  `}
 `
 
 const DetailsWrapper = styled.div`
@@ -29,7 +30,7 @@ const DetailsWrapper = styled.div`
   background: var(--body-bg);
   }
   ::-webkit-scrollbar-thumb {
-  background-color: var(--gray);
+  background-color: var(--border-color);
   border-radius: var(--border-radius);
   }
 
@@ -38,16 +39,16 @@ const DetailsWrapper = styled.div`
   top: var(--space);
   left: 16px;
   z-index: 3;
+  height: 100%;
   max-height: calc(100vh - (65px + 3 * 16px));
-  background-color:var(--body-bg);
+  background-color:var(--content-bg);
   width: var(--sidebar-width);
   border: 0;
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
   padding-bottom: var(--space-sm);
   margin-bottom: var(--space-sm);
-  overflow-x: unset;
-  overflow-y: aunset;
+  overflow: auto;
   border-radius: var(--border-radius);
   animation: appear 600ms forwards;
   transform: translate3d(0px, 0px, 0px);
@@ -97,9 +98,9 @@ const Header = styled.div`
 const Title = styled.h1`
   font-size: 1.375rem;
   font-weight: 600;
-  letter-spacing: 0;
   line-height: 1.75rem;
   margin-bottom: 0.25rem;
+  letter-spacing: .5px;
 `
 
 const SubTitle = styled.h2`
@@ -141,7 +142,7 @@ const ActionsResponsiveContainer = styled.div`
 const ActionsWrapper = styled(Button)`
   border: 1px solid var(--border-color);
   display: flex;
-  border-radius: 50%;
+  border-radius: var(--border-radius);
   cursor: pointer;
   margin-left: var(--space-sm);
   padding: 0.75rem;
@@ -176,7 +177,6 @@ const DirectionsButton = styled(Button)`
 
 const WikipediaData = styled.div`
   padding: 0 2rem 0 2rem;
-  background-color:var(--body-bg);
   order: 3;
 `
 
@@ -189,7 +189,6 @@ const WikipediaDataContainer = styled.div`
 
 const WikipediaCredit = styled.div`
   padding: 1rem 2rem 0 2rem;
-  background-color:var(--body-bg);
   order: 4;
 `
 const WikipediaLink = styled.a`
@@ -206,7 +205,6 @@ const InformationContainer = styled.div`
   align-items: center;
   border-top: 1px solid var(--border-color);
   order: 5;
-  background-color:var(--body-bg);
   height: 100%;
 `
 
@@ -280,6 +278,7 @@ function Details({ result, name }) {
   const dragProps = useRef()
 
   const initialiseDrag = (event) => {
+    if (!isMobileSize) return
     const y = isMobileDevice ? event.touches[0].clientY : event.clientY
     const target = event.target
     const { offsetTop } = target
@@ -385,7 +384,7 @@ function Details({ result, name }) {
         setImage(`https://upload.wikimedia.org/wikipedia/commons/${hash[0]}/${hash[0]}${hash[1]}/${imageName}`)
       }
     } else {
-      setImage("/assets/placeholder_image.jpg")
+      setImage("/assets/default_geocode.jpg")
     }
   }
 

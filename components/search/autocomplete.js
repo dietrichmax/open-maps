@@ -3,21 +3,16 @@ import styled from "styled-components"
 import BurgerIcon from "@/components/sidebar/burgerIcon"
 import { DrawShapes } from "@/components/draw"
 import media from "styled-media-query"
-import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style"
 import { Input } from "@/styles/templates/input"
-import { transform } from "ol/proj"
 import debounce from "lodash/debounce"
-import { transformExtent } from "ol/proj"
-import VectorSource from "ol/source/Vector"
-import VectorLayer from "ol/layer/Vector"
-import GeoJSON from "ol/format/GeoJSON"
-import { FaMapMarkerAlt, FaTrain } from "react-icons/fa"
-import { ImCross } from "react-icons/im"
 import Details from "@components/details/details"
-import { Sidebar } from "@/components/sidebar"
 import MapContext from "@/components/map/mapContext"
 import { fetchPOST } from "@/components/utils/fetcher"
-import maplibregl from "maplibre-gl"
+import Logo from "@/components/logo/logo"
+import { FaPrint, FaPencilAlt, FaMapMarkerAlt, FaTrain, FaBookmark, FaClock, FaAccessibleIcon, FaHamburger, FaBicycle, FaUmbrellaBeach, FaWifi } from "react-icons/fa"
+import { FiShare2 } from "react-icons/fi"
+import { ImEmbed2, ImCross } from "react-icons/im"
+import { BiImport } from "react-icons/bi"
 
 const Container = styled.div`
   position: relative;
@@ -52,9 +47,8 @@ const SearchContainer = styled.div`
 const SearchAction = styled.div`
   display: flex;
   font-size: 18px;
-  padding: 1rem;
-  padding-right: 1.25rem;
-  background-color: var(--content-bg);
+  margin-right: 1.25rem;
+  background-color: var(--body-bg);
 `
 
 const AutoCompleteContainer = styled.div`
@@ -98,7 +92,7 @@ const SuggestionsContainer = styled.div`
 const ListContainer = styled.ol`
   list-style: none;
   padding-inline-start: 0;
-  background-color: var(--body-bg);
+  background-color: var(--content-bg);
   box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
   border-radius: var(--border-radius);
   border-top-left-radius: ${(props) => (props.showSuggestions ? 0 : "var(--border-radius)")};
@@ -147,7 +141,7 @@ const SearchButtonWrapper = styled.div`
   align-items: center;
   padding: 0;
   border: none;
-  background: var(--content-bg);
+  background-color: var(--content-bg);
   padding: 1rem;
   border-bottom-left-radius: var(--border-radius);
   border-top-left-radius: var(--border-radius);
@@ -164,12 +158,99 @@ const DeleteSearchButtonWrapper = styled.div`
   background-color: var(--content-bg);
 `
 
+
+const SidebarContainer = styled.div`
+  position: absolute;
+  z-index: 6;
+  background-color: var(--body-bg);
+  width: 300px;
+  height: 100vh;
+  font-size: 1rem;
+  ${media.lessThan("432px")`
+    width: 100%;
+  `}
+`
+
+const PageWrap = styled.div`
+  position: absolute;
+  z-index: 5;
+  height: 100%;
+  width: 100%;
+  opacity: 0.3;
+  background: black;
+`
+
 const CloseButton = styled(ImCross)`
   cursor: pointer;
+  font-size: .875rem;
+  color: var(--gray);
+`
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  padding: 1rem 0 1rem 0;
+  align-items: center;
+`
+const SectionHeader = styled.p`
+  margin-bottom: 0.5rem;
+  text-decoration: underline;
+`
+
+const SectionItem = styled.li`
+  padding: .5rem 0;
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  :hover {
+    text-decoration: underline;
+  }
+`
+
+const SectionButton = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+
+const SectionTitle = styled.div`
+  margin-left: var(--space-sm);
+  font-size: .875rem;
+  line-height: 24px;
+
+`
+
+const Section = styled.div`
+  border-top: 1px solid #d9d9d9;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  padding: 1rem 0;
+`
+
+const InfoSection = styled.div`
+  border-top: 1px solid #d9d9d9;
+  margin-top: auto;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  padding: 1rem 0;
+`
+
+const InfoLinks = styled.a`
+  color: var(--text-color);
+  border-bottom: 1px solid var(--secondary-color);
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin-right: 1rem;
+  :hover {
+    border-bottom: none;
+  }
 `
 
 function Autocomplete() {
-  const [visible, setVisible] = useState(false)
+  const [showSidebar, setShowSidebar] = useState(false)
   const [zoom, setZoom] = useState(8)
   const [lat, setLat] = useState(0)
   const [lon, setLon] = useState(0)
@@ -251,8 +332,8 @@ function Autocomplete() {
     }
   }
 
-  const handleVisability = () => {
-    visible ? setVisible(false) : setVisible(true)
+  const toggleSidebar = () => {
+    showSidebar ? setShowSidebar(false) : setShowSidebar(true)
   }
 
   const handleChange = (e) => {
@@ -306,7 +387,7 @@ function Autocomplete() {
   }
 
   const HandleSearch = () => {
-    if (!showResult)
+    if (!showResult && input.length === 0)
       return (
         /*<DeleteSearchButtonWrapper>
       <FaSearch 
@@ -393,7 +474,6 @@ function Autocomplete() {
     }, 200),
     []
   )
-
   async function getFirstSuggestionResults(lat, lon, input, limit) {
     if (!input || input.length < 1) return
     const data = await fetchPOST("/api/autocomplete", { lat, lon, input, limit, zoom })
@@ -476,10 +556,62 @@ function Autocomplete() {
 
   return (
     <>
-      {visible ? <Sidebar visible={visible} /> : null}
+      {showSidebar ? (
+              <>
+              <SidebarContainer>
+                <Header>
+                  <Logo />
+                  <CloseButton onClick={toggleSidebar} title="Close menu">
+                    Close
+                  </CloseButton>
+                </Header>
+                <Section>
+                  <SectionItem>
+                    <SectionButton><FaBookmark/></SectionButton>
+                    <SectionTitle>Your places</SectionTitle>
+                  </SectionItem>
+                </Section>
+                
+                <Section>
+                  <SectionItem>
+                    <SectionButton><BiImport/></SectionButton>
+                    <SectionTitle>Import data</SectionTitle>
+                  </SectionItem>
+                  <SectionItem>
+                    <SectionButton><FaPencilAlt/></SectionButton>
+                    <SectionTitle>Draw shapes</SectionTitle>
+                  </SectionItem>
+                </Section>
+                <Section>
+                  <SectionItem>
+                    <SectionButton><FiShare2/></SectionButton>
+                    <SectionTitle>Share Map</SectionTitle>
+                  </SectionItem>
+                  <SectionItem>
+                    <SectionButton><ImEmbed2/></SectionButton>
+                    <SectionTitle>Embed Map</SectionTitle>
+                    </SectionItem>
+                  <SectionItem>
+                    <SectionButton><FaPrint/></SectionButton>
+                    <SectionTitle>Print Map</SectionTitle>
+                    </SectionItem>
+                </Section>
+                <InfoSection>
+                  <InfoLinks title="Privacy Policy" href="https://mxd.codes/privacy-policy">
+                    Privacy
+                  </InfoLinks>
+                  <InfoLinks title="Site Notice" href="https://mxd.codes/site-notice">
+                    Site-Notice
+                  </InfoLinks>
+                </InfoSection>
+              </SidebarContainer>
+              <PageWrap onClick={toggleSidebar} />
+            </>
+      
+      ) : null}
       <>
         <Container showSuggestions={showSuggestions}>
-          <SearchButtonWrapper onClick={() => handleVisability()}>
+          <SearchButtonWrapper onClick={toggleSidebar}>
             <BurgerIcon />
           </SearchButtonWrapper>
           <SearchContainer>

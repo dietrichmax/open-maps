@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       image = "/assets/placeholder_image.jpg"
     }
   }*/
-
+  
   const wikiLang =
     geocodingData[0] && geocodingData[0].extratags.wikipedia ? geocodingData[0].extratags.wikipedia.substr(0, geocodingData[0].extratags.wikipedia.indexOf(":")) : "en"
   const wikipediaTitle =

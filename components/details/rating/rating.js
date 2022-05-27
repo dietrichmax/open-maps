@@ -26,9 +26,9 @@ const FeedbackWrapperContainer = styled.div`
 
 const FeedbackWrapper = styled.button`
   border: 1px solid var(--border-color);
-  background: var(--body-bg);
   display: flex;
-  border-radius: 50%;
+  border-radius: var(--border-radius);
+  background: var(--content-bg);
   cursor: pointer;
   margin-left: 1rem;
   padding: 0.75rem;
@@ -41,8 +41,7 @@ const FeedbackWrapper = styled.button`
 
 const FeedbackResult = styled.div`
   align-items: center;
-  font-size: 0.85rem;
-  color: ${(props) => (props.value > 85 ? "var(--success-color)" : "var(--failure-color)")};
+  font-size: 0.95rem;
 `
 
 const ActionsResponsiveContainer = styled.div`
@@ -107,7 +106,7 @@ function Rating({ result }) {
     return (
       <FeedbackContainer>
         <ActionsResponsiveContainer>
-          <FeedbackResult value={percent}>{percent}% liked this place</FeedbackResult>
+          <FeedbackResult >{percent}% liked this place</FeedbackResult>
           <FeedbackWrapperContainer>
             <FeedbackWrapper onClick={() => handleRating("upvote")} title="Upvote this place">
               <FaThumbsUp style={{ color: "var(--success-color)" }} />
