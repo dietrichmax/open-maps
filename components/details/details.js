@@ -82,6 +82,7 @@ const ImageWrapper = styled.div`
   overflow: hidden;
   max-width: 100%;
   max-height: 100%;
+  z-index: 3;
   ${media.lessThan("432px")`
     border-radius: 0;
     order: 1;
@@ -92,6 +93,7 @@ const ImageWrapper = styled.div`
 const Header = styled.div`
   margin: var(--space-sm) var(--space);
   display: block;
+  z-index: 3;
   ${media.lessThan("432px")`
   `}
 `
@@ -138,6 +140,7 @@ const Actions = styled.div`
 const ActionsResponsiveContainer = styled.div`
   display: flex;
   align-items: center;
+  z-index: 3;
 `
 
 const ActionsWrapper = styled(Button)`
@@ -179,6 +182,7 @@ const DirectionsButton = styled(Button)`
 const WikipediaData = styled.div`
   padding: 0 2rem 0 2rem;
   order: 3;
+  z-index: 3;
 `
 
 const WikipediaDataContainer = styled.div`
@@ -191,6 +195,7 @@ const WikipediaDataContainer = styled.div`
 const WikipediaCredit = styled.div`
   padding: 1rem 2rem 0 2rem;
   order: 4;
+  z-index: 3;
 `
 const WikipediaLink = styled.a`
   font-size: 0.875rem;
@@ -206,6 +211,7 @@ const InformationContainer = styled.div`
   align-items: center;
   border-top: 1px solid var(--border-color);
   order: 5;
+  z-index: 3;
   height: 100%;
 `
 
