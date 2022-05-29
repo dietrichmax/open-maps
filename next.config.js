@@ -23,7 +23,7 @@ module.exports = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ["upload.wikimedia.org", "source.unsplash.com"],
+    domains: ["upload.wikimedia.org", "www.openstreetmap.org", "source.unsplash.com"],
   },
   withPWA: {
     pwa: {

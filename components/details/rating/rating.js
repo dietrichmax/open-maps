@@ -9,7 +9,6 @@ const FeedbackContainer = styled.div`
   margin-top: 0.5rem;
   justify-content: space-between;
   border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
   padding: 1rem var(--space);
 
   ${media.lessThan("432px")`
@@ -106,7 +105,7 @@ function Rating({ result }) {
     return (
       <FeedbackContainer>
         <ActionsResponsiveContainer>
-          <FeedbackResult >{percent}% liked this place</FeedbackResult>
+          <FeedbackResult>{percent}% liked this place</FeedbackResult>
           <FeedbackWrapperContainer>
             <FeedbackWrapper onClick={() => handleRating("upvote")} title="Upvote this place">
               <FaThumbsUp style={{ color: "var(--success-color)" }} />

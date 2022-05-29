@@ -9,10 +9,15 @@ import Details from "@components/details/details"
 import MapContext from "@/components/map/mapContext"
 import { fetchPOST } from "@/components/utils/fetcher"
 import Logo from "@/components/logo/logo"
-import { FaPrint, FaPencilAlt, FaMapMarkerAlt, FaTrain, FaBookmark, FaClock, FaAccessibleIcon, FaHamburger, FaBicycle, FaUmbrellaBeach, FaWifi } from "react-icons/fa"
+import { FaPrint, FaPencilAlt, FaMapMarkerAlt, FaTrain, FaBookmark, FaTheaterMasks, FaStar, FaUniversity, FaParking, FaBus, FaIndustry, FaTshirt, FaTools } from "react-icons/fa"
 import { FiShare2 } from "react-icons/fi"
 import { ImEmbed2, ImCross } from "react-icons/im"
-import { BiImport } from "react-icons/bi"
+import { BiImport, BiDrink } from "react-icons/bi"
+import { MdRestaurant, MdComputer, MdCarRepair, MdLocalPharmacy, MdLocalGroceryStore, MdToys, MdMuseum, MdHotel } from "react-icons/md"
+import { AiFillBank } from "react-icons/ai"
+import { RiGovernmentFill } from "react-icons/ri"
+import { BsFillSignpostFill, BsHammer } from "react-icons/bs"
+import { GiArena } from "react-icons/gi"
 
 const Container = styled.div`
   position: relative;
@@ -26,7 +31,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   width: 400px;
-  height: 65px;
+  height: 56px;
   box-shadow: var(--box-shadow);
   ${media.lessThan("432px")`
     top: 0px;
@@ -122,16 +127,22 @@ const Place = styled.p`
   display: inline-block;
   font-size: 0.9rem;
   font-weight: bold;
+  overflow: hidden;
 `
 
-const Adress = styled.div``
+const Adress = styled.div`
+  overflow: hidden;
+`
 
-const AdressDetails = styled.div``
+const AdressDetails = styled.div`
+  overflow: hidden;
+`
 
 const AdressDetail = styled.p`
   display: inline-block;
   font-size: 0.7rem;
   margin-right: 4px;
+  overflow: hidden;
 `
 
 const SearchButtonWrapper = styled.div`
@@ -149,7 +160,7 @@ const SearchButtonWrapper = styled.div`
 
 const ButtonWrapper = styled.div`
   display: inline-block;
-  width: 68px;
+  min-width: 68px;
   text-align: center;
 `
 
@@ -157,7 +168,6 @@ const DeleteSearchButtonWrapper = styled.div`
   display: flex;
   background-color: var(--content-bg);
 `
-
 
 const SidebarContainer = styled.div`
   position: absolute;
@@ -182,7 +192,7 @@ const PageWrap = styled.div`
 
 const CloseButton = styled(ImCross)`
   cursor: pointer;
-  font-size: .875rem;
+  font-size: 0.875rem;
   color: var(--gray);
 `
 
@@ -200,7 +210,7 @@ const SectionHeader = styled.p`
 `
 
 const SectionItem = styled.li`
-  padding: .5rem 0;
+  padding: 0.5rem 0;
   list-style: none;
   cursor: pointer;
   display: flex;
@@ -215,12 +225,10 @@ const SectionButton = styled.div`
   align-items: center;
 `
 
-
 const SectionTitle = styled.div`
   margin-left: var(--space-sm);
-  font-size: .875rem;
+  font-size: 0.875rem;
   line-height: 24px;
-
 `
 
 const Section = styled.div`
@@ -270,11 +278,14 @@ function Autocomplete() {
 
   const { map } = useContext(MapContext)
 
+  const suggestionLimit = 30
+  const maxResults = 7
+
   useEffect(() => {
     if (osm_id && osm_type) {
       setInput(placeName)
       setName(placeName)
-      getGeocodingResults(osm_id, osm_type)
+      getGeocodingResults(osm_id, osm_type, placeName)
       setShowSuggestions(false)
       setShowResult(true)
     }
@@ -316,8 +327,6 @@ function Autocomplete() {
     map.on("moveend", updateHash)
   }
 
-  const suggestionLimit = 30
-
   useEffect(() => {
     getOptions()
   }, [searchQuery])
@@ -349,34 +358,36 @@ function Autocomplete() {
     !gotFirstData ? getFirstSuggestionResultsDelayed(lat, lon, searchQuery, suggestionLimit) : null
   }, [extent])
 
-  const filterData = (data) => {
-    let set = []
-    if (data.features) {
-      set = data.features.filter((hit) => {
-        if (hit.properties.osm_value === "continent" || hit.properties.osm_value === "state" || hit.properties.osm_value === "municipality") {
-          return false
-        } else if (hit.properties.type === "county" || hit.properties.type === "country") {
-          return false
-        }
-        return true
-      })
-      return set.slice(0, 7)
-    }
-  }
-
   const selectResult = (searchTerm, osmId, osmType, name) => {
     setInput(searchTerm)
     setName(name)
-    getGeocodingResults(osmId, osmType)
+    getGeocodingResults(osmId, osmType, searchTerm)
     setShowSuggestions(false)
     setShowResult(true)
   }
 
-  const selectInput = () => {
-    setName(name)
-    getGeocodingResults(osmId, osmType)
-    setShowSuggestions(false)
-    setShowResult(true)
+  async function getSearchResults(lat, lon, input, limit) {
+    if (!input || input.length < 1) return
+    const data = await fetchPOST("/api/autocomplete", { lat, lon, input, limit, zoom })
+    if (!data) {
+      console.log("error")
+    } else {
+      setGotFirstData(true)
+      setSuggestions(data)
+      setShowSuggestions(true)
+    }
+  }
+
+  async function search(event) {
+    if (event.key === "Enter") {
+      const searchResults = await getSearchResults(lat, lon, input, maxResults, zoom)
+      if (searchResults.length > 1) {
+        setGeocodingResult(searchResults)
+        setShowResult(false)
+      }
+      console.log(searchResults)
+      setShowSuggestions(false)
+    }
   }
 
   const deleteSearch = () => {
@@ -428,18 +439,6 @@ function Autocomplete() {
         data: geocodingResult.geojson,
       })
     }
-    if (!map.getLayer("geojson_layer")) {
-      map.addLayer({
-        id: "geojson_layer",
-        type: "fill",
-        source: "geojson_source",
-        layout: {},
-        paint: {
-          "line-color": "#3f72af",
-          "line-width": 3,
-        },
-      })
-    }
     if (!map.getLayer("geojson_outline")) {
       map.addLayer({
         id: "geojson_outline",
@@ -456,10 +455,6 @@ function Autocomplete() {
 
   const removeGeojson = () => {
     // remove source
-    if (map && map.getLayer("geojson_layer")) {
-      map.removeLayer("geojson_layer")
-      console.log("layer")
-    }
     if (map && map.getLayer("geojson_outline")) {
       map.removeLayer("geojson_outline")
     }
@@ -481,26 +476,74 @@ function Autocomplete() {
       console.log("error")
     } else {
       setGotFirstData(true)
-      const filteredData = filterData(data)
-      setSuggestions(filteredData)
+      setSuggestions(data)
       setShowSuggestions(true)
+      return data
     }
   }
 
-  async function getGeocodingResults(osmId, osmType) {
+  async function getGeocodingResults(osmId, osmType, searchTerm) {
     //push(["trackEvent", "search", true])
-    const data = await fetchPOST(`/api/details`, { osmId, osmType })
+
+    const query = searchTerm.replaceAll(",", "+").replaceAll(" ", "+").replaceAll("++", "+")
+    const data = await fetchPOST(`/api/details`, { osmId, osmType, query })
     if (!data) {
       console.log("error")
     } else {
       setGeocodingResult(data)
       setShowSuggestions(false)
+      return data
     }
   }
 
   const getSymbol = (value) => {
-    if (value === "train_station") {
+    console.log(value)
+    if (value === "train_station" || value === "station" || value === "railway_station") {
       return <FaTrain />
+    } else if (value === "stadium") {
+      return <GiArena />
+    } else if (value === "theatre" || value === "arts_center") {
+      return <FaTheaterMasks />
+    } else if (value === "attraction") {
+      return <FaStar />
+    } else if (value === "restaurant") {
+      return <MdRestaurant />
+    } else if (value === "bar") {
+      return <BiDrink />
+    } else if (value === "attraction") {
+      return <FaStar />
+    } else if (value === "university") {
+      return <FaUniversity />
+    } else if (value === "parking") {
+      return <FaParking />
+    } else if (value === "bus_stop") {
+      return <FaBus />
+    } else if (value === "industrial") {
+      return <FaIndustry />
+    } else if (value === "bank") {
+      return <AiFillBank />
+    } else if (value === "government") {
+      return <RiGovernmentFill />
+    } else if (value === "post_box") {
+      return <BsFillSignpostFill />
+    } else if (value === "it" || value === "electronics") {
+      return <MdComputer />
+    } else if (value === "clothes") {
+      return <FaTshirt />
+    } else if (value === "car_repair") {
+      return <MdCarRepair />
+    } else if (value === "doityourself") {
+      return <FaTools />
+    } else if (value === "supermarket" || value === "beverages") {
+      return <MdLocalGroceryStore />
+    } else if (value === "pharmacy") {
+      return <MdLocalPharmacy />
+    } else if (value === "toys") {
+      return <MdToys />
+    } else if (value === "museum") {
+      return <MdMuseum />
+    } else if (value === "hotel" || value === "guest_house" || value === "apartment") {
+      return <MdHotel />
     } else {
       return <FaMapMarkerAlt />
     }
@@ -557,57 +600,68 @@ function Autocomplete() {
   return (
     <>
       {showSidebar ? (
-              <>
-              <SidebarContainer>
-                <Header>
-                  <Logo />
-                  <CloseButton onClick={toggleSidebar} title="Close menu">
-                    Close
-                  </CloseButton>
-                </Header>
-                <Section>
-                  <SectionItem>
-                    <SectionButton><FaBookmark/></SectionButton>
-                    <SectionTitle>Your places</SectionTitle>
-                  </SectionItem>
-                </Section>
-                
-                <Section>
-                  <SectionItem>
-                    <SectionButton><BiImport/></SectionButton>
-                    <SectionTitle>Import data</SectionTitle>
-                  </SectionItem>
-                  <SectionItem>
-                    <SectionButton><FaPencilAlt/></SectionButton>
-                    <SectionTitle>Draw shapes</SectionTitle>
-                  </SectionItem>
-                </Section>
-                <Section>
-                  <SectionItem>
-                    <SectionButton><FiShare2/></SectionButton>
-                    <SectionTitle>Share Map</SectionTitle>
-                  </SectionItem>
-                  <SectionItem>
-                    <SectionButton><ImEmbed2/></SectionButton>
-                    <SectionTitle>Embed Map</SectionTitle>
-                    </SectionItem>
-                  <SectionItem>
-                    <SectionButton><FaPrint/></SectionButton>
-                    <SectionTitle>Print Map</SectionTitle>
-                    </SectionItem>
-                </Section>
-                <InfoSection>
-                  <InfoLinks title="Privacy Policy" href="https://mxd.codes/privacy-policy">
-                    Privacy
-                  </InfoLinks>
-                  <InfoLinks title="Site Notice" href="https://mxd.codes/site-notice">
-                    Site-Notice
-                  </InfoLinks>
-                </InfoSection>
-              </SidebarContainer>
-              <PageWrap onClick={toggleSidebar} />
-            </>
-      
+        <>
+          <SidebarContainer>
+            <Header>
+              <Logo />
+              <CloseButton onClick={toggleSidebar} title="Close menu">
+                Close
+              </CloseButton>
+            </Header>
+            <Section>
+              <SectionItem>
+                <SectionButton>
+                  <FaBookmark />
+                </SectionButton>
+                <SectionTitle>Your places</SectionTitle>
+              </SectionItem>
+            </Section>
+
+            <Section>
+              <SectionItem>
+                <SectionButton>
+                  <BiImport />
+                </SectionButton>
+                <SectionTitle>Import data</SectionTitle>
+              </SectionItem>
+              <SectionItem>
+                <SectionButton>
+                  <FaPencilAlt />
+                </SectionButton>
+                <SectionTitle>Draw shapes</SectionTitle>
+              </SectionItem>
+            </Section>
+            <Section>
+              <SectionItem>
+                <SectionButton>
+                  <FiShare2 />
+                </SectionButton>
+                <SectionTitle>Share Map</SectionTitle>
+              </SectionItem>
+              <SectionItem>
+                <SectionButton>
+                  <ImEmbed2 />
+                </SectionButton>
+                <SectionTitle>Embed Map</SectionTitle>
+              </SectionItem>
+              <SectionItem>
+                <SectionButton>
+                  <FaPrint />
+                </SectionButton>
+                <SectionTitle>Print Map</SectionTitle>
+              </SectionItem>
+            </Section>
+            <InfoSection>
+              <InfoLinks title="Privacy Policy" href="https://mxd.codes/privacy-policy">
+                Privacy
+              </InfoLinks>
+              <InfoLinks title="Site Notice" href="https://mxd.codes/site-notice">
+                Site-Notice
+              </InfoLinks>
+            </InfoSection>
+          </SidebarContainer>
+          <PageWrap onClick={toggleSidebar} />
+        </>
       ) : null}
       <>
         <Container showSuggestions={showSuggestions}>
@@ -617,7 +671,7 @@ function Autocomplete() {
           <SearchContainer>
             <AutoCompleteContainer>
               <AutoCompleteInputContainer>
-                <AutoCompleteInput type="text" onChange={handleChange} value={input} placeholder="Search in mxd.codes Maps" />
+                <AutoCompleteInput type="text" onChange={handleChange} onKeyDown={search} value={input} placeholder="Search in mxd.codes Maps" />
                 <SearchAction>
                   <HandleSearch />
                 </SearchAction>

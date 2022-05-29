@@ -47,7 +47,7 @@ const MapWrapper = ({ children, zoom, center }) => {
       style: `/assets/osm_liberty.json`,
       center: center,
       zoom: zoom,
-      attributionControl: false
+      attributionControl: false,
     })
     /*mapObject.addControl(new maplibregl.GeolocateControl({
       positionOptions: {
@@ -58,10 +58,12 @@ const MapWrapper = ({ children, zoom, center }) => {
       // Draw an arrow next to the location dot to indicate which direction the device is heading.
       showUserHeading: true
       }), "bottom-right")*/
-    mapObject.addControl(new maplibregl.AttributionControl({
-      compact: true,
-      customAttribution: '<a href="https://mxd.codes" title="mxd.codes" >mxd.codes</a>'
-      }));
+    mapObject.addControl(
+      new maplibregl.AttributionControl({
+        compact: true,
+        customAttribution: '<a href="https://mxd.codes" title="mxd.codes" >mxd.codes</a>',
+      })
+    )
     setMap(mapObject)
     return () => {
       mapObject.remove()
