@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   let image
 
   const geocodingData = await fetchGET(
-    `https://nominatim.openstreetmap.org/search?q=${query}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`
+    `https://nominatim.openstreetmap.org/lookup?osm_ids=${osmType}${osmId}&format=json&extratags=1&addressdetails=1&accept-language=en&polygon_geojson=1&limit=1`
   )
 
   /*const filterData = (data) => {

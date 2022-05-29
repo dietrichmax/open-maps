@@ -497,7 +497,6 @@ function Autocomplete() {
   }
 
   const getSymbol = (value) => {
-    console.log(value)
     if (value === "train_station" || value === "station" || value === "railway_station") {
       return <FaTrain />
     } else if (value === "stadium") {
